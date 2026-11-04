@@ -16,3 +16,12 @@
 - On wrong qs: H12's own top letter = model's pick in 57%, = correct in 12%; H12 margin pick-correct +4.32; late blocks margin -1.97 (they lean to correct); stream before L22 +1.51.
 - Hypothesis H1: a content-independent letter prior is written by specific late MLP neurons (L22/L23) at the answer position; removing that component (not a uniform shift) should improve accuracy, mostly on late-letter answers.
 - Pass 2 (planned): same 512 DEV qs, original, acts: hidden 21-24, MLP acts of layers 21, 22, 23, conv out_proj input of L23.
+
+## Pass 2 (score original, same 512 DEV, acts L21-24 + MLP 21-23) -> fwd_02
+- code/005: always-on, low-variance letter neurons do NOT carry the A/B preference (H1b refuted). L22 MLP total push to the correct letter is -1.35 (vs +3.1 from head 12).
+- code/006 (H2 confirmed): L22 has one "leader suppressor" per letter (C n1812, D n464, E n7357, F n6492, G n3344, H n397, I n2786, J n3310) that fires (-3 to -4.6 logits on its letter) when its letter LEADS the stream entering the L22 MLP. No such neuron for A and B (A even has a booster, n2212). Total suppression of the leader (L22+L23): A -1.2, B -2.2, C -4.2, D -4.1, E -5.4, F -4.6, G -5.3, H -5.6, I -5.4, J -5.3. That asymmetry is the early-letter bias.
+- code/007: suppression is ~accuracy-neutral overall: E-J leaders are right 39.1% vs final 38.1%; J 0.51 -> 0.40, H .32 -> .28, but C .28 -> .32, F .42 -> .47 (n ~ 35-90 per letter, noisy).
+- code/008: ceiling of a pure letter-bias removal (cross-fitted constant offsets on recorded outputs) = +1.9 points (spread 1.8). Modest.
+- code/009 (H3 refuted): no long-prompt collapse; within subjects, longer questions are easier (+7.8 points).
+- Plan: equalise suppression by scaling the direct letter readout of the 8 L22 late-letter suppressors by alpha (code/010: removes (1 - alpha) of the column's component in the 9-dim letter-readout subspace). Screen alpha = 0.5, then 0 (and adding L23), on 256 fresh DEV questions (work/screen256.json; parent cached); confirm on HOLDOUT.
+- Pass 3: alpha = 0.5 on L22 only (8 columns of model.layers.22.feed_forward.w2.weight), both, screen256.

@@ -4,7 +4,7 @@ from wsp.editor import *
 alpha=float(sys.argv[1]); nb=int(sys.argv[2]); a23=float(sys.argv[3]) if len(sys.argv)>3 else 1.0
 SUP22=[389,5859,6620,1812,464,7357,6492,3344,397,2786,3310]
 SUP23=[3631,7209,1192,1876,2758,3520,1107,358,6512,1041]
-BIAS=[(20,1000),(22,190),(17,2401),(17,616),(23,1047),(15,4408),(23,4597),(19,6612)][:nb]
+BIAS=[(20,1000),(22,190),(17,2401),(17,616),(23,1047),(15,4408),(23,4597),(19,6612),(22,1449),(23,1903),(12,6170),(22,2820)][:nb]
 for n in list(edited()): drop_edit(n)
 E=load_original('model.embed_tokens.weight')[LETTER_IDS]; wn=load_original('model.embedding_norm.weight')
 U=(wn*E).T; Uc=U-U.mean(1,keepdim=True)          # 2048x10

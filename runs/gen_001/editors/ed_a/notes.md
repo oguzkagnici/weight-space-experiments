@@ -18,3 +18,11 @@
 - code/007: near-constant bias neurons (cv<0.6) writing early-letter bias: L20 n1000 (0.57 proj), L22 n190, L17 n2401, L17 n616, L23 n1047, ... Removing letter-subspace of top 5: offline +2.5pp alone, +3.3 combined with sup x0.5.
 
 ## Pass 2 (planned): EDIT = L22 w2 columns [389,5859,6620,1812,464,7357,6492,3344,397,2786,3310] x0.5 (code/008 args 0.5 0). Both, DEV[512:768] (screening set S).
+
+## Pass 2 result: L22 suppressor bank x0.5, S=DEV[512:768]
+- paired acc +0.78 +- 0.78 (3 w->r, 1 r->w, 13 preds changed); logp_correct -0.052 +- 0.014. Letter bias essentially unchanged.
+- code/009: the edit just raised the originally-top letter by +0.41 (vs direct estimate ~1.5): strong downstream compensation (L23), and it acts like a sharpening knob, not a debias. ABANDONED.
+- Lesson: direct-effect estimates for L22 edits overestimate; L23 edits have no downstream layers.
+- S original: acc 32.8, bias [1.15 1.31 1.2 .28 .22 1.2 -.25 -.92 -2.59 -1.59] (same pattern as DEV[:512]).
+
+## Pass 3 (planned): EDIT = project the centered letter-unembedding subspace (9-dim, span of (wn*E_k - mean)) out of the w2 columns (in post_ffn_norm-scaled space) of 12 near-constant bias neurons: (20,1000),(22,190),(17,2401),(17,616),(23,1047),(15,4408),(23,4597),(19,6612),(22,1449),(23,1903),(12,6170),(22,2820). code/008 args "1.0 12". Both on S with acts h20-24, post_ffn 20-23, post_op 21-23.

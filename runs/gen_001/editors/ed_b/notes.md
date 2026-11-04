@@ -26,3 +26,6 @@
 - code/010 per-head DLA: L22 head 12 is THE retrieval head (correct help +3.03, alone 34% acc); head 15 +0.48; heads 11,13,14 (and 0,8) anti-correct (-0.16..-0.23). L20 head 7 +0.13, L14 heads 12,15 small.
 - code/011/012 lens screening: larger neuron sets or alpha>1 do not beat E1; removing L22 anti heads or boosting h12/h15 hurts logp (-0.2..-1.4). After E1 the full remaining constant offset removal adds nothing (half-split): E1 already captures the gain of an ideal per-letter debias.
 ## Pass 3: dose-response, E1 at alpha 0.5 (same 16 neurons, w2[:,j] -= 0.5 P w2[:,j]), both, DEV[512:768]
+- RESULT pass 3 (E1 alpha 0.5, DEV[512:768]): acc +1.17 +- 1.17 (6 w->r, 3 r->w), logp +0.118 +- 0.024.
+- code/013: on questions still wrong after E1 (lens), the wrong winner's margin comes from L22 head 12 (+4.97 mean, positive in 91%); MLP22 counteracts (-2.30). Head 12 alone is correct on only 6% of these vs 79% of the right ones: the remaining errors are retrieval of the wrong option (upstream belief), not late loss.
+## Pass 4: E1 alpha 1.5 (overshoot: letter push reversed by 0.5), both, DEV[512:768]
