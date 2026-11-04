@@ -26,3 +26,17 @@
 - S original: acc 32.8, bias [1.15 1.31 1.2 .28 .22 1.2 -.25 -.92 -2.59 -1.59] (same pattern as DEV[:512]).
 
 ## Pass 3 (planned): EDIT = project the centered letter-unembedding subspace (9-dim, span of (wn*E_k - mean)) out of the w2 columns (in post_ffn_norm-scaled space) of 12 near-constant bias neurons: (20,1000),(22,190),(17,2401),(17,616),(23,1047),(15,4408),(23,4597),(19,6612),(22,1449),(23,1903),(12,6170),(22,2820). code/008 args "1.0 12". Both on S with acts h20-24, post_ffn 20-23, post_op 21-23.
+
+## Pass 3 result: EDIT v1 (12 bias neurons, letter-subspace projected out), S
+- paired acc +2.34 +- 1.35 (9 w->r, 3 r->w, 34 changed); logp_correct +0.190 +- 0.041 (z 4.7). Pred letters A35 B37 C36 D25 E17 F25 G26 H21 I22 J12 (orig A39 B45 C45 D28 E20 F27 G18 H13 I12 J9).
+- Bias on S: orig [1.15 1.31 1.2 .28 .22 1.2 -.25 -.92 -2.59 -1.59] -> v1 [.64 .35 -.17 -1.08 -.08 1.09 .02 .09 -.34 -.52]. Direct-effect prediction from pass-1 acts was [.4 .3 -.6 -1.1 -.2 1.2 .5 .1 -.3 -.4] => essentially NO self-repair for this edit (unlike the L22 suppressor edit).
+- Saved as work/best_v1.
+- code/013: blanket "all low-cv neurons" variants not better than hand-picked 12. code/016 per-head: L22h12 is the answer-copy head (content +2.96 logits on correct letter) and has its own bias (G +1.6, B -1.4); L22h6, L20h7 small near-constant bias heads.
+- code/017 dose (direct estimate on pass-1 acts): strength .25/.5/.75/1/1.25 -> acc 35.7/36.5/37.1/36.9/36.5, logp -2.75/-2.69/-2.66/-2.66/-2.67 (peak ~0.75-1.0: smooth dose-response).
+
+## Pass 4 (planned): EDIT v2 = v1 + 15 more neurons [(22,4543),(21,218),(23,6518),(23,4531),(22,5653),(23,514),(23,3073),(23,2189),(21,4481),(22,2212),(22,3998),(23,1439),(23,7466),(21,3455),(21,4902)] + head L22h6 (o_proj cols 768:896), all letter-subspace projected (code/018). Both on S. (direct estimate: acc 37.5, logp -2.57 vs v1 36.9/-2.66 on DEV[:512])
+
+## Pass 4 result: EDIT v2 on S
+- paired acc +3.12 +- 1.55 (12 w->r, 4 r->w, 42 changed); logp_correct +0.247 +- 0.047. Pred letters A36 B29 C34 D33 E25 F24 G19 H19 I24 J13. Better than v1 on same S (+2.34 / +0.190). Saved work/best_v2.
+
+## Pass 5 (planned): EDIT v2 (unchanged), both on HOLDOUT[0:256]. Pass 6: v2 on HOLDOUT[256:512].

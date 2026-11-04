@@ -25,3 +25,5 @@
 - code/009 (H3 refuted): no long-prompt collapse; within subjects, longer questions are easier (+7.8 points).
 - Plan: equalise suppression by scaling the direct letter readout of the 8 L22 late-letter suppressors by alpha (code/010: removes (1 - alpha) of the column's component in the 9-dim letter-readout subspace). Screen alpha = 0.5, then 0 (and adding L23), on 256 fresh DEV questions (work/screen256.json; parent cached); confirm on HOLDOUT.
 - Pass 3: alpha = 0.5 on L22 only (8 columns of model.layers.22.feed_forward.w2.weight), both, screen256.
+- Pass 3 RESULT (alpha 0.5, L22 only, screen256): paired acc +1.56 (SE 0.95), +5/-1, 17 predictions changed; dlogp(correct) -0.141 (SE 0.024): accuracy up but the correct letter's log-prob down, so the suppressors also calibrate (they lower overconfidence). Edit saved in work/edit_a05.
+- Pass 4: alpha 0.0 (full removal of the 8 L22 suppressors' letter readout), both, screen256.

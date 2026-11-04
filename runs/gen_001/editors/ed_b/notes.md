@@ -29,3 +29,7 @@
 - RESULT pass 3 (E1 alpha 0.5, DEV[512:768]): acc +1.17 +- 1.17 (6 w->r, 3 r->w), logp +0.118 +- 0.024.
 - code/013: on questions still wrong after E1 (lens), the wrong winner's margin comes from L22 head 12 (+4.97 mean, positive in 91%); MLP22 counteracts (-2.30). Head 12 alone is correct on only 6% of these vs 79% of the right ones: the remaining errors are retrieval of the wrong option (upstream belief), not late loss.
 ## Pass 4: E1 alpha 1.5 (overshoot: letter push reversed by 0.5), both, DEV[512:768]
+- RESULT pass 4 (E1 alpha 1.5, DEV[512:768]): acc +2.73 +- 1.79 (14 w->r, 7 r->w, 56 preds changed), logp +0.255 +- 0.070.
+  Dose-response on the same 256 DEV q (logp): alpha 0.5 +0.118, 1.0 +0.207, 1.5 +0.255; acc +1.17, +2.73, +2.73. Lens had predicted the optimum at 1.0; the real network still gains logp at 1.5 (more churn).
+- code/014/015: head 12 itself has a non-ordinal letter preference (over-picks G and C, under-picks A/B), but equalizing its per-letter gain (lens) hurts badly: abandoned.
+## Pass 5: E1 alpha 1.0 (work/edit_E1), both, HOLD[0:256]
