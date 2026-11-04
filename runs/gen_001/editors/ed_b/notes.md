@@ -21,3 +21,8 @@
 - code/009_make_edit.py work/sel_bias_neurons.json 1.0: for the 16 neurons, w2[:, j] -= P w2[:, j], P = projector onto centered letter readout subspace (E_letters * final-norm w * post_ffn_norm w of that layer). Tensors: w2 of layers 15,17,19,20,22,23 (rel change 0.12-0.9%).
   L15 [4408], L17 [2401,616], L19 [6612], L20 [1000,3296,3964,4353], L22 [190,1449,2820,4543], L23 [1047,4597,1903,3269].
 ## Pass 2: E1, both, DEV[512:768]
+- RESULT pass 2 (E1 vs original, DEV[512:768], unseen by selection): acc 36.33 -> 39.06, paired +2.73 +- 1.51 (11 w->r, 4 r->w); logp(correct) +0.207 +- 0.047 (z 4.4). Lens predicted +0.19 logp: real network ~ linear DLA prediction.
+  Pred counts edited A..J 30 43 39 22 23 21 30 20 15 13 (orig 32 53 50 28 22 18 19 14 8 12).
+- code/010 per-head DLA: L22 head 12 is THE retrieval head (correct help +3.03, alone 34% acc); head 15 +0.48; heads 11,13,14 (and 0,8) anti-correct (-0.16..-0.23). L20 head 7 +0.13, L14 heads 12,15 small.
+- code/011/012 lens screening: larger neuron sets or alpha>1 do not beat E1; removing L22 anti heads or boosting h12/h15 hurts logp (-0.2..-1.4). After E1 the full remaining constant offset removal adds nothing (half-split): E1 already captures the gain of an ideal per-letter debias.
+## Pass 3: dose-response, E1 at alpha 0.5 (same 16 neurons, w2[:,j] -= 0.5 P w2[:,j]), both, DEV[512:768]

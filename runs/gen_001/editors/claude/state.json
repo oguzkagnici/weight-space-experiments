@@ -1,6 +1,14 @@
 {
- "passes_used": 0,
+ "passes_used": 1,
  "pending": [
-  "gen_001_claude_p01_64d929"
+  "gen_001_claude_p02_0bccd2"
+ ],
+ "passes": [
+  {
+   "k": 1,
+   "id": "gen_001_claude_p01_64d929",
+   "type": "score",
+   "seconds": 462.6
+  }
  ]
 }

@@ -126,6 +126,10 @@ class Server:
 
     def loop(self):
         while True:
+            flag = os.path.join(QUEUE, "RESTART")
+            if os.path.exists(flag):          # graceful restart between jobs (picks up code changes)
+                os.remove(flag); self.beat("restarting")
+                os.execv(sys.executable, [sys.executable, "-m", "wsp.server"])
             fn = self.next_job()
             if not fn:
                 self.beat("idle"); time.sleep(2); continue

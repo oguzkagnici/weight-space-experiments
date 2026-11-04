@@ -5,9 +5,9 @@ import json, sys, numpy as np, torch
 from wsp.editor import *
 
 k = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-base = f"work/fwd_{k:02d}/score_{k:02d}_acts/original"
+base = f"work/fwd_{k:02d}/score_{k}_acts/original"
 idx = json.load(open(f"{base}/index.json"))
-rows = [json.loads(l) for l in open(f"work/fwd_{k:02d}/score_{k:02d}_original.jsonl")]
+rows = [json.loads(l) for l in open(f"work/fwd_{k:02d}/score_{k}_original.jsonl")]
 Q = questions()
 n = len(rows)
 nopt = np.array([len(Q[r["id"]]["options"]) for r in rows])

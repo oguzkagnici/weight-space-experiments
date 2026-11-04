@@ -54,9 +54,12 @@ def build_gpqa():
 
 
 _Q = None
+_QSIG = None
 def questions():
-    global _Q
-    if _Q is None:
+    global _Q, _QSIG
+    sig = tuple(os.path.getmtime(f) if os.path.exists(f) else 0 for f in (QFILE, GPQA_FILE))
+    if _Q is None or sig != _QSIG:
+        _QSIG = sig
         _Q = {}
         for fn in (QFILE, GPQA_FILE):
             if os.path.exists(fn):
