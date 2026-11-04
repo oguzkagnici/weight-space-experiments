@@ -27,3 +27,5 @@
 - Pass 3: alpha = 0.5 on L22 only (8 columns of model.layers.22.feed_forward.w2.weight), both, screen256.
 - Pass 3 RESULT (alpha 0.5, L22 only, screen256): paired acc +1.56 (SE 0.95), +5/-1, 17 predictions changed; dlogp(correct) -0.141 (SE 0.024): accuracy up but the correct letter's log-prob down, so the suppressors also calibrate (they lower overconfidence). Edit saved in work/edit_a05.
 - Pass 4: alpha 0.0 (full removal of the 8 L22 suppressors' letter readout), both, screen256.
+- Pass 4 RESULT (alpha 0, L22 only): paired acc +1.56 (SE 1.23), +7/-3, 27 changed; dlogp -0.298 (SE 0.047). No gain beyond alpha 0.5 and noisier: alpha 0.5 is the better strength. Edit saved in work/edit_a0.
+- Pass 5: alpha 0.5 on L22 AND the 8 L23 late-letter suppressors (C n1192, D n1876, E n2758, F n3520, G n1107, H n358, I n6512, J n1041), both, screen256.

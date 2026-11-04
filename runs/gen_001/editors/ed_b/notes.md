@@ -33,3 +33,5 @@
   Dose-response on the same 256 DEV q (logp): alpha 0.5 +0.118, 1.0 +0.207, 1.5 +0.255; acc +1.17, +2.73, +2.73. Lens had predicted the optimum at 1.0; the real network still gains logp at 1.5 (more churn).
 - code/014/015: head 12 itself has a non-ordinal letter preference (over-picks G and C, under-picks A/B), but equalizing its per-letter gain (lens) hurts badly: abandoned.
 ## Pass 5: E1 alpha 1.0 (work/edit_E1), both, HOLD[0:256]
+- RESULT pass 5 (E1 a=1.0, HOLD[0:256]): acc 34.38 -> 34.77, +0.39 +- 1.52 (8 w->r, 7 r->w); logp +0.230 +- 0.043 (z 5.3). Pred counts orig A..J 46 55 36 33 18 27 16 7 7 11 -> 50 42 28 24 19 27 24 13 15 14 (gold 33 27 24 25 22 24 26 21 27 27).
+## Pass 6: E1 alpha 1.5 (work/edit_E1a15), both, HOLD[0:256]
