@@ -342,6 +342,40 @@ def cmd_report(a):
     out = os.path.join(gd, "REPORT.md"); open(out, "w").write("\n".join(L) + "\n"); print("wrote", out)
 
 
+def cmd_crossover(a):
+    """Merge candidates by summing their weight deltas relative to the generation's parent, then stage the result in an
+    editor's edited/ folder (that editor still measures and submits it). Columns edited by several parents get the
+    sum of their deltas; overlaps are reported."""
+    st = state(); g = a.gen or st["gen"]
+    gen = json.load(open(os.path.join(gen_dir(g), "gen.json")))
+    def parent_tensor(name):
+        p = gen["parent_weights"] and os.path.join(gen["parent_weights"], name + ".safetensors")
+        if p and os.path.exists(p): return load_file(p)["tensor"].float()
+        from safetensors import safe_open
+        from .config import WEIGHTS_FILE
+        with safe_open(WEIGHTS_FILE, "pt") as f: return f.get_tensor(name).float()
+    cands = {c["name"]: c for c in candidates(g)}
+    deltas = {}
+    for nm in a.cands.split(","):
+        d = os.path.join(cands[nm]["dir"], "edited")
+        for fn in os.listdir(d):
+            name = fn[:-12]; t = load_file(os.path.join(d, fn))["tensor"].float()
+            delta = t - parent_tensor(name)
+            if name in deltas:
+                ov = ((deltas[name] != 0) & (delta != 0)).any(0).sum().item() if delta.dim() == 2 else 0
+                print(f"overlap in {name}: {ov} columns edited by more than one parent")
+                deltas[name] = deltas[name] + delta
+            else:
+                deltas[name] = delta
+    out = os.path.join(a.into, "edited"); os.makedirs(out, exist_ok=True)
+    for fn in os.listdir(out): os.remove(os.path.join(out, fn))
+    base_now = {}
+    for name, delta in deltas.items():
+        pt = parent_tensor(name)
+        save_file({"tensor": (pt + delta).contiguous()}, os.path.join(out, name + ".safetensors"))
+    print(f"staged crossover of {a.cands} ({len(deltas)} tensors) in {out}")
+
+
 def cmd_status(a):
     st = state()
     print(json.dumps({k: st[k] for k in ("gen", "champion", "lineage")}, indent=1))
@@ -364,13 +398,14 @@ def main():
     sp.add_parser("status")
     p = sp.add_parser("brief"); p.add_argument("editor", nargs="?")
     p = sp.add_parser("report"); p.add_argument("--gen", type=int)
+    p = sp.add_parser("crossover"); p.add_argument("cands"); p.add_argument("--into", required=True); p.add_argument("--gen", type=int)
     a = ap.parse_args()
     os.makedirs(RUNS, exist_ok=True)
     with open(os.path.join(RUNS, "events.jsonl"), "a") as f:
         f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "cmd": a.cmd,
                             "args": {k: v for k, v in vars(a).items() if k != "cmd"}}) + "\n")
     {"init": cmd_init, "new-gen": cmd_new_gen, "candidates": cmd_candidates, "select": cmd_select,
-     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief, "report": cmd_report}[a.cmd](a)
+     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief, "report": cmd_report, "crossover": cmd_crossover}[a.cmd](a)
 
 
 if __name__ == "__main__":

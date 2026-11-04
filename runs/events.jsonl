@@ -3,3 +3,5 @@
 {"time": "2026-11-04T19:42:53Z", "cmd": "report", "args": {"gen": null}}
 {"time": "2026-11-04T19:49:56Z", "cmd": "heldout", "args": {"who": "base", "n": 1000, "set": "gpqa"}}
 {"time": "2026-11-04T19:58:19Z", "cmd": "heldout", "args": {"who": "base", "n": 1000, "set": "gpqa"}}
+{"time": "2026-11-04T21:53:19Z", "cmd": "candidates", "args": {}}
+{"time": "2026-11-04T21:53:22Z", "cmd": "select", "args": {"wait": true}}
