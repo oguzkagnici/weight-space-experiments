@@ -6,3 +6,18 @@
 
 ## Pass 1 (diagnostic)
 - Edit: none. model=original, questions = DEV[:512]. Activations: hidden states 0..24, mlp 14..23, post_operator_norm / post_ffn_norm outputs 12..23, o_proj inputs for attn layers 12..22.
+- Result (original, DEV[:512]): acc 36.7%, mean logp(correct) -2.78. Pred letter counts A..J 94 95 78 58 40 54 38 28 15 12 vs gold 59 49 51 68 47 50 42 69 39 38.
+  Acc by gold letter: A .58 B .53 C .47 D .34 E .34 F .42 G .29 H .22 I .21 J .24. Strong early-letter bias.
+  Final mean centered letter logit (10-opt q): A +.98 B +1.51 C +.70 D +.18 E -.10 F +.87 G -.11 H -.67 I -1.82 J -1.55.
+  Removing that constant offset (fit on half, test on other half; lens arithmetic) gives +1.5..+4.7 pts and +0.13..0.23 logp.
+- Near misses: of 324 wrong, correct is 2nd in 77, 3rd 63, 4th 48 (spread out; not dominated by near misses).
+- Logit lens (code/002): letter accuracy ~11% through layer 14, ~21-26% layers 15-21, 27.7% at h22, 35% h23, 36.9% h24. Mid layers lens-pick A almost always. Little "known in the middle then lost": at h22 26 q correct->final wrong vs 72 wrong->final right.
+- DLA (code/003, onto centered letter unembeddings with final-norm scale): attn22 (full attn) is the retrieval head: correct-letter help +2.81. MLP22 suppresses it: help -1.19; per-question corr(attn22 push, mlp22 push) across letters median -0.88.
+  MLP22 has one suppressor neuron per letter (C:1812 D:464 E:7357 F:6492 G:3344 H:397 I:2786 J:3310; none found for A,B), firing when that letter is retrieved. Removing them (lens counterfactual, code/005): acc +0.5..1.5 but logp -0.2..-0.8: not pursued.
+- Early-letter bias sources (code/007, per-neuron DLA along the offset direction, layers 14-23): spread out but a set of neurons with near-constant activation and a smooth ordinal letter profile (early up, late down): L20 n1000 (+0.59), L22 n190 (+0.32), L17 n2401 (+0.28), n616, L23 n1047, n4597, n1903, L15 n4408, L19 n6612 ...
+- code/008: selection rule mu>0.08 along offset, sd<mu, |correct help|<0.03 -> 16 neurons (work/sel_bias_neurons.json). Lens counterfactual removing their letter push: out-of-half logp +0.21..+0.26, acc +0.4..+2.7; all DEV512 acc 36.9->39.1, logp -2.78->-2.59.
+
+## Edit E1 (work/edit_E1)
+- code/009_make_edit.py work/sel_bias_neurons.json 1.0: for the 16 neurons, w2[:, j] -= P w2[:, j], P = projector onto centered letter readout subspace (E_letters * final-norm w * post_ffn_norm w of that layer). Tensors: w2 of layers 15,17,19,20,22,23 (rel change 0.12-0.9%).
+  L15 [4408], L17 [2401,616], L19 [6612], L20 [1000,3296,3964,4353], L22 [190,1449,2820,4543], L23 [1047,4597,1903,3269].
+## Pass 2: E1, both, DEV[512:768]
