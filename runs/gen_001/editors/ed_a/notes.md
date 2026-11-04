@@ -57,3 +57,10 @@
 - v2 on HOLDOUT[0:768] (3 passes pooled): acc +1.69 +- ~0.96 pp ; logp_correct +0.183 +- ~0.026.
 
 ## Pass 10 (planned): EDIT v1 (code/008 "1.0 12"), both on HOLDOUT[0:256] (same Qs as pass 5 for v2: +1.95).
+- Pass 10 result (v1, HOLDOUT[0:256], same Qs as pass 5): +1.17 +- 1.61 (10 w->r, 7 r->w), logp +0.138 +- 0.039 (v2 there: +1.95 / +0.188). v2 > v1 again.
+- code/023 pooled v2 HOLDOUT[0:768]: acc +1.69 +- 0.96, logp +0.183 +- 0.026.
+
+## Submitted (code/024)
+- ed_a_v2_letterbias27h (PRIMARY): v2 = 27 neurons + L22h6 letter-subspace projection. edited/ = v2.
+- ed_a_v1_letterbias12: v1 = 12 neurons (subset).
+Budget used: 10/10.
