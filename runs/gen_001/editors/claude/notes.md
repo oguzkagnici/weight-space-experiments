@@ -31,3 +31,6 @@
 - Pass 5: alpha 0.5 on L22 AND the 8 L23 late-letter suppressors (C n1192, D n1876, E n2758, F n3520, G n1107, H n358, I n6512, J n1041), both, screen256.
 - Pass 5 RESULT (alpha 0.5 L22 + L23): paired +1.17 (SE 1.41), +8/-5, 39 changed; dlogp -0.434. Adding L23 adds churn, not accuracy: keep L23 untouched.
 - Pass 6: alpha 0.5 L22 suppressors + early-letter boosters' letter readout x0.5 (L22 n2212 A; L23 n1685 A, n2595 A, n1439 B), both, screen256.
+- Pass 6 RESULT (alpha 0.5 L22 + boosters x0.5): paired +2.34 (SE 1.35), +9/-3, 27 changed; dlogp -0.122 (SE 0.027). BEST on screen256. Saved in work/edit_best_boost.
+- CURRENT BEST EDIT (cand "equalize_boost"): model.layers.22.feed_forward.w2.weight columns 1812, 464, 7357, 6492, 3344, 397, 2786, 3310 (letter readout x0.5) + 2212 (x0.5); model.layers.23.feed_forward.w2.weight columns 1685, 2595, 1439 (letter readout x0.5). Built by `py code/010_edit_suppressors.py 0.5 none 0.5`.
+- Passes 7-8: HOLDOUT confirmation of the best edit on holdout[0:256] and [256:512] (work/req_hold1.json, req_hold2.json). Passes 9-10: the L22-only alpha 0.5 edit (work/edit_a05) on the same questions.

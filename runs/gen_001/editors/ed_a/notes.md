@@ -43,3 +43,10 @@
 - Pass 5 result (v2, HOLDOUT[0:256]): acc 36.72 -> 38.67, paired +1.95 +- 1.61 (11 w->r, 6 r->w); logp_correct +0.188 +- 0.044. Pred I 11->24, H 12->18, B 36->26.
 - Pass 6 result (v2, HOLDOUT[256:512]): acc 34.38 -> 35.94, paired +1.56 +- 1.56 (10 w->r, 6 r->w); logp +0.168 +- 0.043.
 - HOLDOUT[0:512] combined v2: acc +1.76 +- ~1.12 ; logp +0.178 +- ~0.031.
+- code/019: on S+HOLDOUT (768 Qs) the residual bias of v2 is [.3 -.1 -.13 -.13 .01 .78 -.26 -.06 -.04 -.37] (orig [1.25 1.34 .99 .21 .14 1.28 -.2 -.88 -2.33 -1.8]). Perfect constant debias on top of v2 would give only +0.8pp more (CV): v2 captures ~75% of the bias-removal ceiling.
+- code/020: further bias neurons/heads add ~nothing in direct estimate. Bias route saturated.
+
+## Pass 7 (planned): EDIT v2 unchanged. Transfer check on all practice questions with <=6 options (195 Qs; 153 have <=4 options), both. GPQA has 4 options.
+- Pass 7 result (v2, all 195 practice Qs with <=6 options; 142 not used in DEV[:768]): acc 43.59 -> 45.13, paired +1.54 +- 0.88 (3 w->r, 0 r->w); logp -0.052 +- 0.030 (slightly worse). 4-option subset (151): acc 45.7 -> 47.7; A-D bias [.64 .34 .33 -1.31] -> [.58 -.05 .2 -.74] (D under-pick halved). Transfers in accuracy; logp mixed.
+
+## Pass 8 (planned): EDIT v3 = v2 + L22 suppressor bank equalized: w2 columns scaled 1812 x.81, 464 x.42, 7357 x.33, 6492 x.52, 3344 x.50, 397 x.66, 2786 x.48, 3310 x.53 (A389, B6620/5859 untouched) (code/022). Both on S, compare to v2 on S (+3.12 / logp +.247).

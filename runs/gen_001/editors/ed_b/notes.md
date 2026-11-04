@@ -39,3 +39,6 @@
 - code/016: mean centered letter log-prob (10-opt q). Orig HOLD1: A..J +1.15 +1.30 +.80 +.45 -.06 +.89 -.10 -.86 -2.08 -1.49. a=1.0: +.82 +.05 -.25 -.51 -.25 +.72 +.20 +.32 -.76 -.33. a=1.5: +.67 -.49 -.84 -.97 -.29 +.64 +.27 +.92 -.16 +.25.
   Acc by gold A-E / F-J: orig .42/.26, a=1.0 .37/.32, a=1.5 .37/.36. The monotone early-letter gradient is gone; A and F residual preferences remain (not targeted).
 ## Pass 7: E1 alpha 2.0 (dose-response end), both, DEV[512:768]
+- RESULT pass 7 (E1 a=2.0, DEV[512:768]): acc +1.17 +- 2.03 (15/12, 77 changed); logp +0.272 +- 0.092. Overshoot: C/D now -1.7..-1.9, H-J positive.
+  Dose curve DEV[512:768]: alpha 0.5/1.0/1.5/2.0 -> acc +1.17/+2.73/+2.73/+1.17, logp +.118/+.207/+.255/+.272 (se grows .024->.092). Best compromise alpha 1.5.
+## Pass 8: E1 alpha 1.5 (work/edit_E1a15), both, HOLD[256:512]
