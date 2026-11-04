@@ -13,7 +13,8 @@ Request JSON (one pass each, whatever the size; failed requests do not count):
   "texts": ["raw text", ...]  or  "questions": ["<practice id>", ...] (rendered evaluation strings),
   "suffixes": ["text appended to each rendered question", ...] (optional, with "questions"),
   "return": {"token_logprobs": true, "topk": k<=50, "hidden_states": [...], "mlp": [...], "inputs": [...],
-             "outputs": [...], "positions": "last" | "mean" | "all", "attn_layers": [attention layer idx]}}
+             "outputs": [...], "positions": "last" | "mean" | "all", "attn_layers": [attention layer idx],
+             "attn_last": [attention layer idx]}}   (attn_last: attention FROM the last token, for every text)
      at most 1,024 texts, 200,000 tokens in total, 4,096 per text; attention probabilities for the first 4 texts."""
 import json, os, random, shutil, sys, time, uuid
 

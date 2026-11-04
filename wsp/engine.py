@@ -150,6 +150,14 @@ class Engine:
         positions = ret.get("positions", "last")
         topk = int(ret.get("topk", 0) or 0)
         attn_layers = ret.get("attn_layers") or []
+        attn_last = ret.get("attn_last") or []      # attention rows FROM the last token, for every text
+        attn_last_rows = {l: [] for l in attn_last}
+        from .config import LAYER_TYPES
+        attn_idx = [i for i, t in enumerate(LAYER_TYPES) if t != "conv"]   # out.attentions holds only these layers
+        for l in list(attn_layers) + list(attn_last):
+            if l not in attn_idx:
+                raise ValueError(f"layer {l} is not an attention layer; attention layers are {attn_idx}")
+        pos_of = {l: attn_idx.index(l) for l in attn_idx}
         meta = {"texts": len(texts), "positions": positions, "n_tokens": [], "files": {}}
         tok_lp, topk_ids, topk_lp, acts = [], [], [], {}
         attn_out = {}
@@ -158,7 +166,7 @@ class Engine:
             meta["n_tokens"].append(int(ids.shape[1]))
             store = {}
             hooks = self._hooks(ret, store)
-            want_attn = bool(attn_layers) and ti < MAX_ATTN_TEXTS
+            want_attn = (bool(attn_layers) and ti < MAX_ATTN_TEXTS) or bool(attn_last)
             if want_attn:
                 self.model.set_attn_implementation("eager")
             try:
@@ -186,9 +194,12 @@ class Engine:
                     acts.setdefault(key, []).append(v.mean(0).half().numpy())
                 else:
                     acts.setdefault(key, []).append(v[-1].half().numpy())
-            if want_attn and out.attentions is not None:
+            if attn_last and out.attentions is not None:
+                for l in attn_last:
+                    attn_last_rows[l].append(out.attentions[pos_of[l]][0, :, -1, :].float().numpy().T.astype(np.float16))  # T x heads
+            if want_attn and out.attentions is not None and ti < MAX_ATTN_TEXTS:
                 for l in attn_layers:
-                    a = out.attentions[l]
+                    a = out.attentions[pos_of[l]]
                     if a is not None:
                         attn_out[f"attn_L{l}_text{ti}"] = a[0].float().numpy().astype(np.float16)
         def save(name, arr):
@@ -206,6 +217,13 @@ class Engine:
             save(fname, np.concatenate(v) if positions == "all" else np.stack(v))
         for key, v in attn_out.items():
             save(key, v)
+        for l, v in attn_last_rows.items():
+            save(f"attn_last_L{l}", np.concatenate(v))
+            meta["attn_last_note"] = ("attn_last_L<l>: attention probabilities from each text's LAST token to every "
+                                      "position, concatenated over texts (rows = positions, cols = heads); "
+                                      "text i occupies rows offsets_tok[i]:offsets_tok[i+1]")
+        if attn_last_rows:
+            save("offsets_tok", np.concatenate([[0], np.cumsum(meta["n_tokens"])]))
         if positions == "all":
             save("offsets", offsets)
         json.dump(meta, open(os.path.join(out_dir, "meta.json"), "w"), indent=1)

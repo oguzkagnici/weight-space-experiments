@@ -1,0 +1,9 @@
+{
+ "editor": "claude",
+ "gen": 2,
+ "gen_name": "gen_002",
+ "parent": "base",
+ "parent_weights": null,
+ "budget": 10,
+ "max_candidates": 2
+}

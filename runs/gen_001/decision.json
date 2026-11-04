@@ -1,0 +1,189 @@
+{
+ "gen": 1,
+ "parent": "base",
+ "champion_selection": {
+  "n": 600,
+  "acc": 35.0,
+  "se": 1.95,
+  "mean_logp_correct": -2.904,
+  "mean_margin": -1.142,
+  "mean_letter_mass": 0.9991,
+  "by_category": {
+   "biology": [
+    80.0,
+    30
+   ],
+   "business": [
+    30.3,
+    33
+   ],
+   "chemistry": [
+    35.6,
+    59
+   ],
+   "computer science": [
+    29.2,
+    24
+   ],
+   "economics": [
+    46.0,
+    50
+   ],
+   "engineering": [
+    40.9,
+    44
+   ],
+   "health": [
+    23.3,
+    30
+   ],
+   "history": [
+    43.5,
+    23
+   ],
+   "law": [
+    28.3,
+    53
+   ],
+   "math": [
+    28.6,
+    70
+   ],
+   "other": [
+    27.5,
+    40
+   ],
+   "philosophy": [
+    27.6,
+    29
+   ],
+   "physics": [
+    25.4,
+    71
+   ],
+   "psychology": [
+    40.9,
+    44
+   ]
+  },
+  "pred_letter_counts": {
+   "A": 115,
+   "B": 110,
+   "C": 86,
+   "D": 60,
+   "E": 36,
+   "F": 63,
+   "G": 50,
+   "H": 31,
+   "I": 29,
+   "J": 20
+  },
+  "answer_letter_counts": {
+   "A": 63,
+   "B": 61,
+   "C": 85,
+   "D": 75,
+   "E": 54,
+   "F": 53,
+   "G": 56,
+   "H": 54,
+   "I": 53,
+   "J": 46
+  }
+ },
+ "candidates": [
+  {
+   "name": "claude/equalize_boost",
+   "acc": 35.5,
+   "n": 600,
+   "acc_diff": 0.5,
+   "acc_diff_se": 0.9,
+   "wrong_to_right": 16,
+   "right_to_wrong": 13,
+   "pred_changed": 76,
+   "logp_correct_diff": -0.1373,
+   "logp_correct_diff_se": 0.0205,
+   "z": 0.56,
+   "weights_changed": 24398,
+   "description": "Edit: scale the DIRECT LETTER READOUT (the component of a w2 column that the tied letter rows read through post_ffn_norm and the final norm; a 9-dim subspace) by 0.5 for (a) the 8 letter-specific \"leader suppressor\" neurons of layer 22's MLP, model.layers.22.feed_forward.w2.weight columns C 1812, D 464, E 7357, F 6492, G 3344, H 397, I 2786, J 3310, and (b) 4 early-letter \"booster\" neurons: L22 column 2212 (A), L23 columns 1685 (A), 2595 (A), 1439 (B). The rest of each column is unchanged. 24,398 weights differ in bf16.\nMechanism: after head L22.H12 moves the chosen option to the answer position, the L22 MLP suppresses the currently leading letter through one neuron per letter (-3 to -4.6 logits when that letter leads). There is no such neuron for A or B, and A/B have boosters. Total suppression of a leader: A -1.2, B -2.2, C..J -4.1 to -5.6. That asymmetry makes the model over-pick early letters (practice: A..C predicted 249 vs 168 true out of 512). Halving the late-letter suppressors and the A/B boosters equalises it.\nEvidence (paired, practice): screen256 DEV +2.34 (SE 1.35), +9/-3; dose-response for the suppressors alone: alpha 0.5 +1.56 (SE 0.95), alpha 0 +1.56 (SE 1.23) with more churn; adding layer 23's suppressors hurt (+1.17, SE 1.41). HOLDOUT 512 (never used for choices): parent 32.62 -> 33.98, +1.37 (SE 1.01), +17/-10. Side effect: the correct letter's log-probability falls (-0.13), because the suppressors also damp overconfidence."
+  },
+  {
+   "name": "claude/equalize_l22",
+   "acc": 35.5,
+   "n": 600,
+   "acc_diff": 0.5,
+   "acc_diff_se": 0.73,
+   "wrong_to_right": 11,
+   "right_to_wrong": 8,
+   "pred_changed": 44,
+   "logp_correct_diff": -0.1729,
+   "logp_correct_diff_se": 0.0181,
+   "z": 0.68,
+   "weights_changed": 16254,
+   "description": "Edit: the same as equalize_boost but only part (a): the direct letter readout of the 8 layer-22 late-letter leader suppressors (model.layers.22.feed_forward.w2.weight columns 1812, 464, 7357, 6492, 3344, 397, 2786, 3310) is scaled by 0.5. 16,254 weights differ in bf16.\nEvidence: screen256 DEV +1.56 (SE 0.95), +5/-1; HOLDOUT 512: +0.98 (SE 0.85), +12/-7, dlogp(correct) -0.153."
+  },
+  {
+   "name": "ed_a/ed_a_v1_letterbias12",
+   "acc": 34.5,
+   "n": 600,
+   "acc_diff": -0.5,
+   "acc_diff_se": 0.96,
+   "wrong_to_right": 15,
+   "right_to_wrong": 18,
+   "pred_changed": 71,
+   "logp_correct_diff": 0.1054,
+   "logp_correct_diff_se": 0.0276,
+   "z": -0.52,
+   "weights_changed": 24269,
+   "description": "Removes the answer-letter position prior written by 12 near-constant MLP neurons. Change: for w2 columns (layer,neuron) (20,1000),(22,190),(17,2401),(17,616),(23,1047),(15,4408),(23,4597),(19,6612),(22,1449),(23,1903),(12,6170),(22,2820), project out (in post_ffn_norm-scaled space) the 9-dim subspace spanned by the centered letter readout directions wn*E[A..J] (column -> (I-QQ^T)(pw*col)/pw); strength 1 (full removal). Mechanism: these neurons are ~constant at the answer position (cv<0.6) and write a fixed preference A,B,C,F >> H,I,J (orig bias in centered logits [1.15 1.66 .57 .16 .03 1.27 -.05 -1.14 -2.09 -1.58]); removal flattens it (S: I -2.59 -> -0.34) with no measurable self-repair (direct-logit prediction matched). Smooth dose-response in direct estimate (peak 0.75-1.0). Measured paired gain: DEV S (DEV[512:768], 256 Qs, not used for selection) acc +2.34 +- 1.35, logp_correct +0.190 +- 0.041; HOLDOUT[0:256] acc +1.17 +- 1.61, logp +0.138 +- 0.039. Subset of ed_a_v2, which measured better."
+  },
+  {
+   "name": "ed_a/ed_a_v2_letterbias27h",
+   "acc": 34.5,
+   "n": 600,
+   "acc_diff": -0.5,
+   "acc_diff_se": 1.12,
+   "wrong_to_right": 21,
+   "right_to_wrong": 24,
+   "pred_changed": 92,
+   "logp_correct_diff": 0.183,
+   "logp_correct_diff_se": 0.0302,
+   "z": -0.45,
+   "weights_changed": 306498,
+   "description": "Removes the answer-letter position prior written by near-constant components at the answer position. Change: centered letter-readout subspace (9-dim span of wn*E[A..J] minus mean) projected out (in post-norm-scaled space, strength 1) of: 27 MLP w2 columns (layer,neuron) (20,1000),(22,190),(17,2401),(17,616),(23,1047),(15,4408),(23,4597),(19,6612),(22,1449),(23,1903),(12,6170),(22,2820),(22,4543),(21,218),(23,6518),(23,4531),(22,5653),(23,514),(23,3073),(23,2189),(21,4481),(22,2212),(22,3998),(23,1439),(23,7466),(21,3455),(21,4902), and head L22h6 (o_proj input cols 768:896). Mechanism: parent over-picks A/B/C/F and starves H/I/J (pred A85 B99 .. I20 J14 vs true A69 B48 .. I41 J49 on 512 DEV); direct logit attribution shows the fixed bias is written by these low-variance, low-content neurons (not by the answer-copy head L22h12). Residual centered bias goes from [1.25 1.34 .99 .21 .14 1.28 -.2 -.88 -2.33 -1.8] to [.3 -.1 -.13 -.13 .01 .78 -.26 -.06 -.04 -.37]; captures ~75% of the offline constant-debias ceiling. Measured paired gain (edited - parent): HOLDOUT (768 practice Qs never used for choosing) acc +1.69 +- 0.96 pp, logp_correct +0.183 +- 0.026; screening set DEV[512:768] acc +3.12 +- 1.55, logp +0.247 +- 0.047; 4-option practice Qs (151) acc 45.7 -> 47.7, A-D bias D -1.31 -> -0.74 (all <=6-option Qs: +1.54 +- 0.88, logp -0.05 +- 0.03)."
+  },
+  {
+   "name": "ed_b/ed_b_bias16_a10",
+   "acc": 33.67,
+   "n": 600,
+   "acc_diff": -1.33,
+   "acc_diff_se": 0.94,
+   "wrong_to_right": 12,
+   "right_to_wrong": 20,
+   "pred_changed": 77,
+   "logp_correct_diff": 0.1182,
+   "logp_correct_diff_se": 0.0298,
+   "z": -1.41,
+   "weights_changed": 32156,
+   "description": "alpha = 1.0. Mechanism: the parent over-picks early letters (DEV-512 preds A..J 94 95 78 58 40 54 38 28 15 12 vs gold 59 49 51 68 47 50 42 69 39 38; acc by gold letter A .58 -> I .21). Per-neuron direct logit attribution onto the option-letter unembeddings (through final norm) shows a set of late MLP neurons with near-constant activation whose letter push is an ordinal 'early up / late down' profile (largest: L20 n1000, L22 n190, L17 n2401). Selected by: mean push along the measured offset > 0.08 logit, sd < mean, |help on correct letter| < 0.03 (DEV[:512]). Edit: for each of the 16 neurons, w2[:, j] -= alpha * P w2[:, j], P = projector onto the centered letter-readout subspace (letter unembeddings x final-norm gain x that layer's post_ffn_norm gain); alpha 1 removes exactly the neuron's letter push, other output directions untouched. Tensors: model.layers.{15,17,19,20,22,23}.feed_forward.w2.weight; neurons L15[4408], L17[2401,616], L19[6612], L20[1000,3296,3964,4353], L22[190,1449,2820,4543], L23[1047,4597,1903,3269]. Measured paired gain: DEV[512:768] acc +2.73 +- 1.51, logp +0.207 +- 0.047; HOLDOUT[0:256] acc +0.39 +- 1.52, logp +0.230 +- 0.043; HOLDOUT[256:512] acc -1.56 +- 1.10, logp +0.120 +- 0.045 (holdout 512 pooled: acc -0.59 +- ~0.94, logp +0.175 +- ~0.031). Exact removal (no overshoot) variant, the more conservative choice for 4-option transfer (not measured on 4-option q)."
+  },
+  {
+   "name": "ed_b/ed_b_bias16_a15",
+   "acc": 33.5,
+   "n": 600,
+   "acc_diff": -1.5,
+   "acc_diff_se": 1.21,
+   "wrong_to_right": 22,
+   "right_to_wrong": 31,
+   "pred_changed": 121,
+   "logp_correct_diff": 0.1219,
+   "logp_correct_diff_se": 0.0446,
+   "z": -1.24,
+   "weights_changed": 32337,
+   "description": "alpha = 1.5. Mechanism: the parent over-picks early letters (DEV-512 preds A..J 94 95 78 58 40 54 38 28 15 12 vs gold 59 49 51 68 47 50 42 69 39 38; acc by gold letter A .58 -> I .21). Per-neuron direct logit attribution onto the option-letter unembeddings (through final norm) shows a set of late MLP neurons with near-constant activation whose letter push is an ordinal 'early up / late down' profile (largest: L20 n1000, L22 n190, L17 n2401). Selected by: mean push along the measured offset > 0.08 logit, sd < mean, |help on correct letter| < 0.03 (DEV[:512]). Edit: for each of the 16 neurons, w2[:, j] -= alpha * P w2[:, j], P = projector onto the centered letter-readout subspace (letter unembeddings x final-norm gain x that layer's post_ffn_norm gain); alpha 1 removes exactly the neuron's letter push, other output directions untouched. Tensors: model.layers.{15,17,19,20,22,23}.feed_forward.w2.weight; neurons L15[4408], L17[2401,616], L19[6612], L20[1000,3296,3964,4353], L22[190,1449,2820,4543], L23[1047,4597,1903,3269]. Measured paired gain (edited - parent): DEV[512:768] (unseen by selection) acc +2.73 +- 1.79, logp(correct) +0.255 +- 0.070; HOLDOUT[0:256] acc +2.34 +- 1.91, logp +0.291 +- 0.064; HOLDOUT[256:512] acc -0.39 +- 1.52, logp +0.129 +- 0.067 (holdout 512 pooled: acc +0.98 +- ~1.2, logp +0.21). Dose-response on DEV[512:768] (alpha 0.5/1/1.5/2): acc +1.17/+2.73/+2.73/+1.17, logp +.118/+.207/+.255/+.272. Caveat: on 169 practice q with <=5 options (4-option format, where the parent shows no early-letter bias) acc +0.59 +- 1.03 but logp -0.126 +- 0.043 (alpha 1.5 overshoots)."
+  }
+ ],
+ "winner": null,
+ "rule": "z >= 2.0",
+ "time": 1793831789.7572083
+}
