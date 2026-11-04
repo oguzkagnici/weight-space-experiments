@@ -142,7 +142,12 @@ def wait(jid, timeout=WAIT):
 def status():
     hb = json.load(open(os.path.join(QUEUE, "heartbeat.json"))) if os.path.exists(os.path.join(QUEUE, "heartbeat.json")) else {}
     age = time.time() - hb.get("time", 0)
-    print(f"server: {hb.get('status')} (heartbeat {age:.0f}s ago){'  <-- SERVER DOWN?' if age > 120 else ''}")
+    try:
+        os.kill(int(hb.get("pid", 0)), 0); alive = bool(hb.get("pid"))
+    except (OSError, ValueError):
+        alive = False
+    print(f"server: {'alive' if alive else 'NOT RUNNING (tell the experimenters)'}; last status: {hb.get('status')} "
+          f"({age:.0f}s ago; the status only updates between passes)")
     for d in ("pending", "running"):
         print(d, sorted(os.listdir(os.path.join(QUEUE, d))))
     if os.environ.get("WSP_EDITOR_DIR"):

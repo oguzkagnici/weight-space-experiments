@@ -208,6 +208,13 @@ def cmd_decide(a):
         "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed", "description")} for t in table]})
     save_state(st)
     json.dump(rec, open(os.path.join(gd, "decision.json"), "w"), indent=1)
+    os.makedirs(os.path.join(ROOT, "results"), exist_ok=True)
+    with open(os.path.join(ROOT, "results", "ledger.jsonl"), "a") as f:
+        f.write(json.dumps({"gen": g, "parent": rec["parent"], "winner": rec["winner"], "rule": rec["rule"],
+                            "parent_selection_acc": champ["acc"], "selection_n": champ["n"], "new_champion": st["champion"],
+                            "candidates": [{k: t.get(k) for k in ("name", "acc", "acc_diff", "acc_diff_se", "z",
+                                            "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed")}
+                                           for t in table], "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
 
 
 def heldout_ids(n):
@@ -287,6 +294,54 @@ def cmd_brief(a):
         print(f"wrote {edir}/TASK.md ({len(txt)} chars)")
 
 
+def cmd_report(a):
+    st = state(); g = a.gen or st["gen"]; gd = gen_dir(g)
+    gen = json.load(open(os.path.join(gd, "gen.json")))
+    dec = json.load(open(os.path.join(gd, "decision.json"))) if os.path.exists(os.path.join(gd, "decision.json")) else None
+    L = [f"# Generation {g} report", "",
+         f"- Created: {time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime(gen['created']))}",
+         f"- Parent: `{gen['parent']}`",
+         f"- Editors: {', '.join(gen['editors'])}; budget {gen['budget']} passes each; up to {gen['max_candidates']} candidates each",
+         f"- Hidden selection subset: {len(gen['selection_questions'])} questions (seed `selection-gen-{g}`)", ""]
+    if gen.get("focus"):
+        L += ["## Suggested starting points", ""] + [f"- **{e}**: {t}" for e, t in gen["focus"].items()] + [""]
+    L += ["## Forward passes", "", "| editor | pass | type | model | n | headline | seconds |", "|---|---|---|---|---|---|---|"]
+    for ed in gen["editors"]:
+        pp = os.path.join(gd, "editors", ed, "passes.jsonl")
+        for line in open(pp) if os.path.exists(pp) else []:
+            r = json.loads(line); res = r.get("result") or {}
+            if r["type"] == "score":
+                pr = res.get("paired_edited_minus_original")
+                m = res.get("edited") or res.get("original") or {}
+                head = (f"paired {pr['acc_diff']:+.2f} (SE {pr['acc_diff_se']}), +{pr['wrong_to_right']}/-{pr['right_to_wrong']}, "
+                        f"dlogp {pr['logp_correct_diff']:+.4f}" if pr else f"acc {m.get('acc')}")
+                nq = m.get("n")
+            else:
+                head = f"read {res.get('texts')} texts"; nq = res.get("texts")
+            acts = " +acts" if (r.get("request") or {}).get("activations") else ""
+            L.append(f"| {ed} | {r['k']} | {r['type']}{acts} | {r.get('model')} | {nq} | {head} | {r.get('seconds')} |")
+    L += ["", "## Candidates", ""]
+    for c in candidates(g):
+        tot = sum(v["changed_bf16"] for v in c["manifest"]["tensors"].values())
+        L += [f"### {c['name']}", "", f"- Tensors: {', '.join(c['manifest']['tensors'])}", f"- Weights changed (bf16): {tot}",
+              "", c["description"].strip(), ""]
+    if dec:
+        ch = dec["champion_selection"]
+        L += ["## Selection (hidden questions) and decision", "",
+              f"Parent accuracy on the {ch['n']} selection questions: **{ch['acc']}%**. Rule: {dec['rule']}.", "",
+              "| candidate | acc | paired diff | SE | z | wrong->right | right->wrong | d logp(correct) | weights |",
+              "|---|---|---|---|---|---|---|---|---|"]
+        for t in sorted([t for t in dec["candidates"] if "acc_diff" in t], key=lambda t: -t["acc_diff"]):
+            L.append(f"| {t['name']} | {t['acc']} | {t['acc_diff']:+.2f} | {t['acc_diff_se']} | {t['z']:+.2f} | "
+                     f"{t['wrong_to_right']} | {t['right_to_wrong']} | {t['logp_correct_diff']:+.4f} | {t['weights_changed']} |")
+        L += ["", f"**Decision:** {'winner `' + dec['winner'] + '` becomes the new champion' if dec['winner'] else 'no candidate passed; the parent survives'}.", ""]
+    L += ["## Editors' reports", ""]
+    for ed in gen["editors"]:
+        rp = os.path.join(gd, "editors", ed, "report.md")
+        L += [f"### {ed}", "", open(rp).read().strip() if os.path.exists(rp) else "_(no report yet)_", ""]
+    out = os.path.join(gd, "REPORT.md"); open(out, "w").write("\n".join(L) + "\n"); print("wrote", out)
+
+
 def cmd_status(a):
     st = state()
     print(json.dumps({k: st[k] for k in ("gen", "champion", "lineage")}, indent=1))
@@ -308,13 +363,14 @@ def main():
     p.add_argument("--set", choices=["mmlupro", "gpqa"], default="mmlupro")
     sp.add_parser("status")
     p = sp.add_parser("brief"); p.add_argument("editor", nargs="?")
+    p = sp.add_parser("report"); p.add_argument("--gen", type=int)
     a = ap.parse_args()
     os.makedirs(RUNS, exist_ok=True)
     with open(os.path.join(RUNS, "events.jsonl"), "a") as f:
         f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "cmd": a.cmd,
                             "args": {k: v for k, v in vars(a).items() if k != "cmd"}}) + "\n")
     {"init": cmd_init, "new-gen": cmd_new_gen, "candidates": cmd_candidates, "select": cmd_select,
-     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief}[a.cmd](a)
+     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief, "report": cmd_report}[a.cmd](a)
 
 
 if __name__ == "__main__":
