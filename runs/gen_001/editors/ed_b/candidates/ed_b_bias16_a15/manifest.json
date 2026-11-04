@@ -1,0 +1,44 @@
+{
+ "label": "ed_b_bias16_a15",
+ "editor": "ed_b",
+ "gen": 1,
+ "time": 1793828953.5244672,
+ "tensors": {
+  "model.layers.15.feed_forward.w2.weight": {
+   "changed_bf16": 2021,
+   "numel": 15728640,
+   "rel_change": 0.0022346889600157738,
+   "sha_bf16": "6416033941dcd9f6"
+  },
+  "model.layers.17.feed_forward.w2.weight": {
+   "changed_bf16": 4017,
+   "numel": 15728640,
+   "rel_change": 0.002974542323499918,
+   "sha_bf16": "f4a0c2ae3eb3a969"
+  },
+  "model.layers.19.feed_forward.w2.weight": {
+   "changed_bf16": 2005,
+   "numel": 15728640,
+   "rel_change": 0.0018385520670562983,
+   "sha_bf16": "50e350572c9f2933"
+  },
+  "model.layers.20.feed_forward.w2.weight": {
+   "changed_bf16": 8069,
+   "numel": 15728640,
+   "rel_change": 0.007806240580976009,
+   "sha_bf16": "1816aae68f5cd494"
+  },
+  "model.layers.22.feed_forward.w2.weight": {
+   "changed_bf16": 8080,
+   "numel": 15728640,
+   "rel_change": 0.007031084969639778,
+   "sha_bf16": "4123e1bc7e37fb4a"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 8145,
+   "numel": 15728640,
+   "rel_change": 0.013583023101091385,
+   "sha_bf16": "460f580b78a13814"
+  }
+ }
+}

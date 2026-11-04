@@ -47,3 +47,9 @@
 - RESULT pass 9 (E1 a=1.0, HOLD[256:512]): acc -1.56 +- 1.10 (2 w->r, 6 r->w, 27 changed); logp +0.120 +- 0.045.
 - HOLDOUT totals (HOLD[0:512]): a=1.0 acc -0.59 +- ~0.94, logp +0.175 +- ~0.031; a=1.5 acc +0.98 +- ~1.22, logp +0.21 +- ~0.046.
 ## Pass 10: E1 alpha 1.5, both, all practice q with <=5 options (169 q; GPQA-like 4-option format check)
+- RESULT pass 10 (E1 a=1.5, 169 practice q with <=5 options, mostly 4-option): acc 44.38 -> 44.97, +0.59 +- 1.03 (2/1, 9 changed); logp -0.126 +- 0.043.
+  The original has no early-letter bias in the 4-option format (pred A..D 50 43 44 26 vs gold 48 40 37 38); the overshooting edit costs logp there. GPQA transfer risk for a=1.5; a=1.0 not measured there.
+
+## Final
+- Candidate ed_b_bias16_a15 = E1 alpha 1.5 (work/edit_E1a15). Unseen 10-opt sets: DEV[512:768] +2.73+-1.79, HOLD[0:256] +2.34+-1.91, HOLD[256:512] -0.39+-1.52 (holdout 512: +0.98 +- ~1.22; logp +0.21).
+- Candidate ed_b_bias16_a10 = E1 alpha 1.0 (work/edit_E1). DEV[512:768] +2.73+-1.51, HOLD[0:256] +0.39+-1.52, HOLD[256:512] -1.56+-1.10 (holdout 512: -0.59 +- ~0.94; logp +0.175).
