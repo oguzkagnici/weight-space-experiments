@@ -1,0 +1,20 @@
+{
+ "label": "routers_x1p5",
+ "editor": "claude",
+ "gen": 2,
+ "time": 1793836498.549491,
+ "tensors": {
+  "model.layers.14.self_attn.o_proj.weight": {
+   "changed_bf16": 524288,
+   "numel": 4194304,
+   "rel_change": 0.1659865528345108,
+   "sha_bf16": "3bfc2842f558967c"
+  },
+  "model.layers.20.self_attn.o_proj.weight": {
+   "changed_bf16": 262144,
+   "numel": 4194304,
+   "rel_change": 0.12034466862678528,
+   "sha_bf16": "1f9a8fc8efb36d35"
+  }
+ }
+}

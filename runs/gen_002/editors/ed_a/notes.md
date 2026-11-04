@@ -31,3 +31,9 @@
 ## Pass 5 (read, original, same 120 questions as pass 2): L20 q_norm/k_norm all positions + attn_last 20 -> does sliding-window L20 have the same primacy mechanism?
 - Pass-5 findings (code/014-015): L20 uses RoPE (half-rotation, theta 1e4, full head dim; fit resid 0.000; NoPE 0.11). Slot-mean keys again have a reliable PC1 (split-half r .95-.96) living mostly in low-frequency RoPE pairs (kv1: 67% in pairs 48-63), so rotated slot scores ~= pre-rope ones. L20 slot preference is "A first": e.g. L20h1 A +1.02, B +.13, rest ~-0.1..-0.3; h12/h13/h15 A +1, B +.3-.5. q fraction along v1 .2-.37.
 ## Pass 6 (both, S1): E1 (L22 alpha=1, all heads) + E2 (L20 q_proj, same construction with L20 slot-key PC1, alpha=1, all 16 heads; code/016)
+- Pass 6 result (S1): E1+E2: paired +1.95 (SE 1.87), 14 w->r / 9 r->w; logp +0.186 (SE 0.060). Centred bias [-.51 .27 -.17 -.3 .19 .98 .55 .12 -.86 -.27].
+  - vs E1 alone on same questions: dlogp +0.021 (SE 0.006), dacc 0.00 (SE 0.78). Small but consistent extra gain from L20.
+  - saved as work/edit_E1E2
+## Decision (DEV only): candidate 1 = E1+E2 (L22+L20 q-side ordinal removal, alpha 1); candidate 2 = E1 (L22 only, alpha 1).
+## Passes 7-8: E1+E2 on HOLDOUT[0:256], HOLDOUT[256:512]. Passes 9-10: E1 on the same.
+- Pass 7 (E1+E2, HOLD[0:256]): acc +0.00 (SE 2.14), 15/15, pred_changed 74, logp +0.197 (SE 0.080).

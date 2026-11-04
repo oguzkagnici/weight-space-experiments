@@ -1,0 +1,2 @@
+Edit: the same three heads (L14.H15, L14.H12, L20.H7; o_proj input columns of each head) scaled by 2. 786,432 weights.
+Evidence: DEV screen2 +1.95 (SE 1.51), +10/-5. HOLDOUT[0:512] (once): +0.20 (SE 1.09), +16/-15, dlogp -0.303. Submitted as the stronger dose; HOLDOUT shows it is about null.

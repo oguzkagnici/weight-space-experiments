@@ -10,3 +10,7 @@
 - Pass 5: routers x2, screen2 (dose-response), then choose candidates on DEV.
 - Pass 5 RESULT (routers x2, screen2): +1.95 (SE 1.51), +10/-5, 29 changed, dlogp -0.198. Dose-response on DEV: x1.5 +1.17, x2 +1.95, x3 +1.95 (screen256; dlogp -0.55).
 - CHOSEN ON DEV (before any HOLDOUT): candidate 1 = routers x2 (work/edit_r2), candidate 2 = routers x1.5 (work/edit_r15). Passes 6-7: x2 on HOLDOUT[0:512]; passes 8-9: x1.5 on the same 512.
+- Passes 6-9 RESULT (HOLDOUT 512, measured once): routers x2 +0.20 (SE 1.09), +16/-15, dlogp -0.303; routers x1.5 +0.59 (SE 0.70), +8/-5, dlogp -0.151. H5 essentially null.
+- Pass 10: routers x1.5 on HOLDOUT[512:768] (more data for the same chosen candidate; no choice made on it).
+- Pass 10 RESULT (x1.5, HOLDOUT[512:768]): +1.17 (SE 0.87), +4/-1. Pooled HOLDOUT 768: about +0.78 (SE ~0.55).
+- SUBMITTED routers_x1p5 and routers_x2. Report in report.md.

@@ -41,3 +41,14 @@
 - code/028 lens screen of equalizing this bank (down C-J x.5 / up A-C / all to -2 logits): acc .326-.346 vs base .348; no variant gains. Output stage is near-optimal for accuracy on this set.
 
 ## Pass 5 (both, S1) -- edit X0: model.layers.12.self_attn.o_proj.weight columns 1664:1792 (head 13) x0.0 (ablation, dose-response of the content path)
+- Result pass 5 (X0, L12.H13 ablated) on S1: acc +1.17 (SE 1.70), 11 w->r / 8 r->w, 69 preds changed, dlogp(correct) +0.564 (SE .082).
+  Gold rank diff -0.020 +- 0.076; entropy .99 -> 1.24; dlogp orig-wrong +0.90, orig-correct -0.16. Preds shift A 39->24, G 26->42.
+  => Dose-response x0 / x1 / x2: entropy 1.24 / .99 / .90, gold rank unchanged throughout. L12.H13 sets the CONFIDENCE of the option belief, not its ranking.
+  The content path is causal for confidence but redundant for which option wins.
+- Decision (DEV only): no rank-improving edit found. Candidates = X1 (DEV +1.56) and X0 (DEV +1.17). Measure on HOLDOUT: X1 on HOLD[0:768] (3 passes), X0 on HOLD[0:512] (2 passes).
+
+## Pass 6 (both, HOLD[0:256]) -- edit X1: L12 o_proj cols 1664:1792 x2.0
+- Result pass 6 (X1 on HOLD[0:256]): parent 37.1%, acc -0.78 (SE 1.24), 4 w->r / 6 r->w, dlogp -0.305 (SE .041). As predicted: a confidence knob, no accuracy gain.
+- Revised plan: X0 and X1 each on HOLD[0:512] (2 passes each); 1 read pass to test whether the model has knowledge the MC format does not use (option-likelihood "cloze" scoring on model-wrong questions).
+
+## Pass 7 (both, HOLD[0:256]) -- edit X0: L12 o_proj cols 1664:1792 x0.0

@@ -1,11 +1,6 @@
 {
- "passes_used": 5,
- "pending": [
-  "gen_002_claude_p06_95d67b",
-  "gen_002_claude_p07_1d04eb",
-  "gen_002_claude_p08_4cc4a4",
-  "gen_002_claude_p09_4cac4f"
- ],
+ "passes_used": 10,
+ "pending": [],
  "passes": [
   {
    "k": 1,
@@ -36,6 +31,36 @@
    "id": "gen_002_claude_p05_940a01",
    "type": "score",
    "seconds": 179.2
+  },
+  {
+   "k": 6,
+   "id": "gen_002_claude_p06_95d67b",
+   "type": "score",
+   "seconds": 163.3
+  },
+  {
+   "k": 7,
+   "id": "gen_002_claude_p07_1d04eb",
+   "type": "score",
+   "seconds": 158.4
+  },
+  {
+   "k": 8,
+   "id": "gen_002_claude_p08_4cc4a4",
+   "type": "score",
+   "seconds": 164.6
+  },
+  {
+   "k": 9,
+   "id": "gen_002_claude_p09_4cac4f",
+   "type": "score",
+   "seconds": 152.4
+  },
+  {
+   "k": 10,
+   "id": "gen_002_claude_p10_4cf107",
+   "type": "score",
+   "seconds": 191.7
   }
  ]
 }
