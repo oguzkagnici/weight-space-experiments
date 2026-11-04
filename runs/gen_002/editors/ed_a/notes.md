@@ -13,3 +13,16 @@
   - code/006: per-token log-attention regression (per-question demeaned): slot coefficients vs A for h12: B -.83 C -1.16 D -1.33 E -1.77 F -1.99 G -2.14 H -2.23 I -2.31 J -2.07; token distance only -0.15 per 100 tokens. => slot identity, not RoPE recency.
   - code/005: q at answer position barely reads the letter-unembedding subspace (7% of norm, weights read it 0.6x random) -> query letter-prior feedback via unembedding dirs is NOT the mechanism.
 ## Pass 2 (read, original, 120 10-option DEV[:512] questions, positions all): L22 q_norm/k_norm/q_proj/k_proj outputs + attn_last 22
+- Pass-2 findings (code/008-011): L22 attention scores = q.k/sqrt(128) on recorded q_norm/k_norm outputs with NO rotary needed (resid var 0.3%; NoPE-like).
+  - Slot-mean keys (per kv group) have a dominant ordinal PC1 v1 (split-half r .97): slot scores A -4.3 ... J +2.0. Rank 1 explains the whole slot preference (h12 range 2.06 of 2.22 nats).
+  - q at answer position has a large ~constant component along v1 (q.v1 ~ -2.6..-3.9, ~32% of |q|; sd of slot effect over questions only .17) => prefers low k.v1 = early tokens.
+  - k.v1 is a general position-like signal: question text -4.65, slots A..J -5.66 -3.77 -2.84 -1.89 -1.15 -1.19 -.6 -.3 .19 .31, template tail -3.65. Within options k.v1 ~ .53*slot + .36*abspos/100.
+  - L22h12 mass: question text .41, options .43 total, tail .15.
+## Pass 3 (both, DEV[512:768] = S1): edit E1 alpha=1.0
+- Edit: model.layers.22.self_attn.q_proj.weight, all 16 heads: W_h -= alpha * t t^T W_h, t = normalize(q_norm.weight * v1_g) (v1_g = PC1 of slot-mean keys, kv group g=h//4). code/012.
+- Pass 3 result (S1 = DEV[512:768], n=256): acc 38.28 -> 40.23, paired +1.95 (SE 1.79), 13 w->r / 8 r->w; logp(correct) +0.165 (SE 0.056).
+  - pred A..J 44 40 44 30 25 22 22 15 9 5 -> 22 27 32 32 28 28 38 19 19 11 (gold 36 22 22 28 29 24 25 27 17 26).
+  - centred letter logp (10-opt) orig [1.19 1.43 .68 .09 .34 1.08 .1 -.94 -2.27 -1.7] -> [-.38 .24 -.17 -.2 .28 .95 .5 -.07 -.85 -.31].
+  - code/013: cross-fitted constant-letter debias of BOTH models: orig .371 vs edit .394 (10-opt, n=213) -> gain is not only a letter offset.
+  - saved as work/edit_E1_a1.0
+## Pass 4 (both, S1): E1 alpha=0.5 (dose-response), same tensor/heads.
