@@ -1,1 +1,12 @@
-{"passes_used": 0, "pending": []}
+{
+ "passes_used": 1,
+ "pending": [],
+ "passes": [
+  {
+   "k": 1,
+   "id": "gen_002_ed_b_p01_345d6b",
+   "type": "read",
+   "seconds": 141.7
+  }
+ ]
+}
