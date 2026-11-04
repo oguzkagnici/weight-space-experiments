@@ -1,0 +1,93 @@
+{
+ "model": "LiquidAI/LFM3-1.7B (unedited)",
+ "set": "MMLU-Pro held-out fixed subset n=1000 (seed heldout-fixed)",
+ "protocol": "direct answer, letter argmax after \"The answer is (\", bf16, CPU",
+ "n": 1000,
+ "acc": 33.4,
+ "se": 1.49,
+ "mean_logp_correct": -2.9172,
+ "mean_margin": -1.146,
+ "mean_letter_mass": 0.9988,
+ "by_category": {
+  "biology": [
+   62.7,
+   59
+  ],
+  "business": [
+   24.6,
+   65
+  ],
+  "chemistry": [
+   31.3,
+   99
+  ],
+  "computer science": [
+   25.0,
+   28
+  ],
+  "economics": [
+   49.3,
+   71
+  ],
+  "engineering": [
+   49.4,
+   87
+  ],
+  "health": [
+   29.0,
+   69
+  ],
+  "history": [
+   32.4,
+   34
+  ],
+  "law": [
+   17.1,
+   76
+  ],
+  "math": [
+   28.0,
+   107
+  ],
+  "other": [
+   20.5,
+   78
+  ],
+  "philosophy": [
+   24.3,
+   37
+  ],
+  "physics": [
+   25.0,
+   112
+  ],
+  "psychology": [
+   48.7,
+   78
+  ]
+ },
+ "pred_letter_counts": {
+  "A": 147,
+  "B": 180,
+  "C": 166,
+  "D": 99,
+  "E": 97,
+  "F": 95,
+  "G": 82,
+  "H": 60,
+  "I": 41,
+  "J": 33
+ },
+ "answer_letter_counts": {
+  "A": 121,
+  "B": 107,
+  "C": 114,
+  "D": 104,
+  "E": 119,
+  "F": 88,
+  "G": 97,
+  "H": 81,
+  "I": 90,
+  "J": 79
+ }
+}

@@ -1,0 +1,321 @@
+"""Genetic-loop driver.
+
+  ga init
+  ga new-gen --editors claude,ed_a,ed_b --budget 6 --max-cands 2 [--sel-n 800]
+  ga candidates                     list the current generation's submitted candidates
+  ga select [--wait]                evaluate champion + every candidate on this generation's hidden selection subset
+  ga decide [--z 2.0] [--force CAND|--keep]   choose the winner (paired gain vs champion, needs z >= threshold)
+  ga heldout [WHO] [--n 1000]       evaluate a champion ('champion', 'base' or a champion id) on the fixed held-out subset
+  ga status
+
+Layout: runs/ga_state.json, runs/gen_NNN/{gen.json, editors/<name>/..., selection/}, runs/champions/<id>/weights/"""
+import argparse, json, math, os, random, shutil, sys, time
+import numpy as np
+from safetensors.torch import load_file, save_file
+import torch
+
+from .config import RUNS, QUEUE, ROOT
+from .server import locked_update, summarize, paired
+from . import data
+
+STATE = os.path.join(RUNS, "ga_state.json")
+PY = "/home/user/venv/bin/python"
+
+
+def state():
+    return json.load(open(STATE))
+
+
+def save_state(st):
+    json.dump(st, open(STATE + ".tmp", "w"), indent=1); os.replace(STATE + ".tmp", STATE)
+
+
+def gen_dir(g):
+    return os.path.join(RUNS, f"gen_{g:03d}")
+
+
+def enqueue_eval(jid, weights, qids, out, priority=0):
+    job = {"id": jid, "type": "eval", "priority": priority, "created": time.time(), "weights": weights,
+           "questions": qids, "out": out}
+    p = os.path.join(QUEUE, "pending", jid + ".json")
+    json.dump(job, open(p + ".tmp", "w")); os.replace(p + ".tmp", p)
+
+
+def wait_jobs(jids, poll=10, timeout=None):
+    t0 = time.time(); res = {}
+    while True:
+        for j in jids:
+            if j in res: continue
+            for d in ("done", "failed"):
+                p = os.path.join(QUEUE, d, j + ".json")
+                if os.path.exists(p):
+                    res[j] = json.load(open(p))
+        if len(res) == len(jids) or (timeout and time.time() - t0 > timeout):
+            return res
+        time.sleep(poll)
+
+
+def load_rows(path):
+    return [json.loads(l) for l in open(path)]
+
+
+# ---------------------------------------------------------------- commands
+def cmd_init(a):
+    os.makedirs(os.path.join(RUNS, "champions"), exist_ok=True)
+    if os.path.exists(STATE) and not a.force:
+        print("already initialised"); return
+    save_state({"gen": 0, "champion": "base", "champion_weights": None, "lineage": [], "history": []})
+    print("initialised: champion = base LFM3-1.7B")
+
+
+def write_wrappers(edir):
+    for name, mod in (("py", ""), ("fwd", "-m wsp.fwd")):
+        p = os.path.join(edir, name)
+        open(p, "w").write(f'#!/bin/bash\ncd "{edir}" && WSP_EDITOR_DIR="{edir}" PYTHONPATH="{ROOT}" '
+                           f'exec {PY} {mod} "$@"\n')
+        os.chmod(p, 0o755)
+
+
+def cmd_new_gen(a):
+    st = state()
+    g = st["gen"] + 1
+    gd = gen_dir(g)
+    if os.path.exists(gd):
+        sys.exit(f"{gd} exists")
+    sel_pool = data.splits()["selection"]
+    sel = sorted(random.Random(f"selection-gen-{g}").sample(sel_pool, a.sel_n))
+    os.makedirs(os.path.join(gd, "editors")); os.makedirs(os.path.join(gd, "selection"))
+    gen = {"gen": g, "name": f"gen_{g:03d}", "parent": st["champion"], "parent_weights": st["champion_weights"],
+           "editors": a.editors.split(","), "budget": a.budget, "max_candidates": a.max_cands,
+           "selection_questions": sel, "created": time.time(), "focus": json.loads(a.focus) if a.focus else {}}
+    json.dump(gen, open(os.path.join(gd, "gen.json"), "w"), indent=1)
+    for ed in gen["editors"]:
+        edir = os.path.join(gd, "editors", ed)
+        for sub in ("edited", "work", "code", "candidates"):
+            os.makedirs(os.path.join(edir, sub))
+        json.dump({"editor": ed, "gen": g, "gen_name": gen["name"], "parent": st["champion"],
+                   "parent_weights": st["champion_weights"], "budget": a.budget, "max_candidates": a.max_cands},
+                  open(os.path.join(edir, "meta.json"), "w"), indent=1)
+        json.dump({"passes_used": 0, "pending": []}, open(os.path.join(edir, "state.json"), "w"))
+        open(os.path.join(edir, "notes.md"), "w").write(f"# Notes of editor {ed}, generation {g}\n\n")
+        write_wrappers(edir)
+    st["gen"] = g; save_state(st)
+    print(f"generation {g} created at {gd}; parent = {st['champion']}; editors = {gen['editors']}; "
+          f"budget {a.budget} passes each; selection subset {a.sel_n} hidden questions")
+
+
+def candidates(g):
+    out = []
+    ed_root = os.path.join(gen_dir(g), "editors")
+    for ed in sorted(os.listdir(ed_root)):
+        cdir = os.path.join(ed_root, ed, "candidates")
+        for c in sorted(os.listdir(cdir)) if os.path.isdir(cdir) else []:
+            p = os.path.join(cdir, c)
+            if os.path.exists(os.path.join(p, "manifest.json")):
+                out.append({"name": f"{ed}/{c}", "dir": p, "manifest": json.load(open(os.path.join(p, "manifest.json"))),
+                            "description": open(os.path.join(p, "description.md")).read()})
+    return out
+
+
+def cmd_candidates(a):
+    g = state()["gen"]
+    for c in candidates(g):
+        tot = sum(v["changed_bf16"] for v in c["manifest"]["tensors"].values())
+        print(f"- {c['name']}: {len(c['manifest']['tensors'])} tensors, {tot} weights\n    {c['description'][:300]}")
+
+
+def cmd_select(a):
+    st = state(); g = st["gen"]; gd = gen_dir(g)
+    gen = json.load(open(os.path.join(gd, "gen.json")))
+    sel = gen["selection_questions"]
+    parent = [d for d in [gen["parent_weights"]] if d]
+    jobs = {}
+    jid = f"{gen['name']}_sel_champion"
+    out = os.path.join(gd, "selection", "champion.jsonl")
+    if not os.path.exists(out):
+        enqueue_eval(jid, parent, sel, out); jobs["champion"] = jid
+    for c in candidates(g):
+        safe = c["name"].replace("/", "__")
+        out = os.path.join(gd, "selection", f"{safe}.jsonl")
+        if os.path.exists(out): continue
+        jid = f"{gen['name']}_sel_{safe}"
+        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out)
+        jobs[c["name"]] = jid
+    print(f"enqueued {len(jobs)} selection evaluations on {len(sel)} hidden questions: {list(jobs)}")
+    if a.wait and jobs:
+        res = wait_jobs(list(jobs.values()))
+        for k, j in jobs.items():
+            r = res[j]; print(k, "ERROR " + r["error"] if "error" in r else f"acc {r['result']['acc']} ({r['seconds']}s)")
+
+
+def selection_table(g):
+    gd = gen_dir(g)
+    champ_p = os.path.join(gd, "selection", "champion.jsonl")
+    if not os.path.exists(champ_p):
+        return None, []
+    ch = load_rows(champ_p)
+    table = []
+    for c in candidates(g):
+        p = os.path.join(gd, "selection", c["name"].replace("/", "__") + ".jsonl")
+        if not os.path.exists(p):
+            table.append({"name": c["name"], "status": "not evaluated"}); continue
+        rows = load_rows(p)
+        pr = paired(ch, rows); s = summarize(rows)
+        z = pr["acc_diff"] / pr["acc_diff_se"] if pr["acc_diff_se"] else 0.0
+        table.append({"name": c["name"], "acc": s["acc"], **pr, "z": round(z, 2),
+                      "weights_changed": sum(v["changed_bf16"] for v in c["manifest"]["tensors"].values()),
+                      "description": c["description"]})
+    return summarize(ch), table
+
+
+def cmd_decide(a):
+    st = state(); g = st["gen"]; gd = gen_dir(g)
+    champ, table = selection_table(g)
+    if champ is None:
+        sys.exit("run `ga select --wait` first")
+    ev = [t for t in table if "acc_diff" in t]
+    ev.sort(key=lambda t: (t["acc_diff"], t["logp_correct_diff"]), reverse=True)
+    print(f"champion ({st['champion']}): acc {champ['acc']} on {champ['n']} hidden selection questions")
+    for t in ev:
+        print(f"  {t['name']:40s} acc {t['acc']:6.2f}  diff {t['acc_diff']:+6.2f} (SE {t['acc_diff_se']}, z {t['z']:+.2f})"
+              f"  +{t['wrong_to_right']}/-{t['right_to_wrong']}  dlogp {t['logp_correct_diff']:+.4f}  w={t['weights_changed']}")
+    winner = None
+    if a.force:
+        winner = next(t for t in ev if t["name"] == a.force)
+    elif not a.keep and ev and ev[0]["z"] >= a.z and ev[0]["acc_diff"] > 0:
+        winner = ev[0]
+    rec = {"gen": g, "parent": st["champion"], "champion_selection": champ, "candidates": table,
+           "winner": winner["name"] if winner else None, "rule": f"z >= {a.z}", "time": time.time()}
+    if winner:
+        cid = f"gen{g:03d}_{winner['name'].replace('/', '_')}"
+        cdir = os.path.join(RUNS, "champions", cid, "weights"); os.makedirs(cdir)
+        if st["champion_weights"]:
+            for fn in os.listdir(st["champion_weights"]):
+                shutil.copy2(os.path.join(st["champion_weights"], fn), cdir)
+        cand = next(c for c in candidates(g) if c["name"] == winner["name"])
+        for fn in os.listdir(os.path.join(cand["dir"], "edited")):
+            shutil.copy2(os.path.join(cand["dir"], "edited", fn), cdir)
+        json.dump({"id": cid, "gen": g, "from": winner["name"], "parent": st["champion"],
+                   "description": winner["description"], "selection": {k: winner[k] for k in
+                   ("acc", "acc_diff", "acc_diff_se", "z", "wrong_to_right", "right_to_wrong", "logp_correct_diff")}},
+                  open(os.path.join(RUNS, "champions", cid, "info.json"), "w"), indent=1)
+        st["lineage"].append(cid); st["champion"] = cid; st["champion_weights"] = cdir
+        print(f"WINNER: {winner['name']} -> new champion {cid}")
+    else:
+        print("no candidate passed the rule: the champion survives (elitism)")
+    st["history"].append({k: rec[k] for k in ("gen", "parent", "winner", "rule")} | {
+        "champion_acc": champ["acc"], "candidates": [{k: t.get(k) for k in ("name", "acc", "acc_diff", "acc_diff_se", "z",
+        "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed", "description")} for t in table]})
+    save_state(st)
+    json.dump(rec, open(os.path.join(gd, "decision.json"), "w"), indent=1)
+
+
+def heldout_ids(n):
+    ids = sorted(data.splits()["heldout"]); random.Random("heldout-fixed").shuffle(ids)
+    return ids[:n]
+
+
+def cmd_heldout(a):
+    st = state()
+    who = a.who
+    if who == "champion": who = st["champion"]
+    weights = [] if who == "base" else [os.path.join(RUNS, "champions", who, "weights")]
+    if a.set == "gpqa":
+        qids = data.gpqa_ids(); a.n = "gpqa"
+        if not qids: sys.exit("GPQA not built: HF_TOKEN=... python -c 'from wsp.data import build_gpqa; build_gpqa()'")
+    else:
+        qids = heldout_ids(a.n)
+    os.makedirs(os.path.join(RUNS, "heldout"), exist_ok=True)
+    out = os.path.join(RUNS, "heldout", f"{who}_n{a.n}.jsonl")
+    if not os.path.exists(out):
+        jid = f"heldout_{who}_n{a.n}"
+        enqueue_eval(jid, weights, qids, out, priority=1)
+        r = wait_jobs([jid])[jid]
+        if "error" in r: sys.exit(r["error"])
+    rows = load_rows(out); s = summarize(rows)
+    print(f"{who}: held-out acc {s['acc']} (SE {s['se']}) on {s['n']}")
+    base_out = os.path.join(RUNS, "heldout", f"base_n{a.n}.jsonl")
+    print("by category:", {c: v for c, v in s["by_category"].items()})
+    if who != "base" and os.path.exists(base_out):
+        print("paired vs base:", paired(load_rows(base_out), rows))
+
+
+def history_text(st, upto_gen):
+    parts = ["HISTORY OF THE LOOP."]
+    if not st["lineage"]:
+        parts.append("No edit has been accepted yet: the parent is the unedited LFM3-1.7B.")
+    else:
+        parts.append("Accepted edits so far (the parent contains all of them, in this order):")
+        for cid in st["lineage"]:
+            info = json.load(open(os.path.join(RUNS, "champions", cid, "info.json")))
+            s = info["selection"]
+            parts.append(f"- {cid} (from {info['from']}): hidden-selection gain {s['acc_diff']:+.2f} points "
+                         f"(SE {s['acc_diff_se']}, +{s['wrong_to_right']}/-{s['right_to_wrong']}). Description: "
+                         f"{info['description'][:1500]}")
+    prev = [h for h in st["history"] if h["gen"] < upto_gen]
+    for h in prev[-2:]:
+        parts.append(f"\nGeneration {h['gen']} (parent {h['parent']}, parent accuracy {h['champion_acc']} on its hidden "
+                     f"selection questions). Winner: {h['winner'] or 'none, the parent survived'}. Candidates:")
+        for c in h["candidates"]:
+            if c.get("acc_diff") is None: continue
+            parts.append(f"- {c['name']}: {c['acc_diff']:+.2f} points (SE {c['acc_diff_se']}, z {c['z']:+.2f}), "
+                         f"{c['weights_changed']} weights. {c['description'][:700]}")
+        rep_root = os.path.join(gen_dir(h["gen"]), "editors")
+        for ed in sorted(os.listdir(rep_root)):
+            rp = os.path.join(rep_root, ed, "report.md")
+            if os.path.exists(rp):
+                parts.append(f"\nReport of editor {ed} (generation {h['gen']}):\n{open(rp).read()[:3500]}")
+    return "\n".join(parts)
+
+
+def cmd_brief(a):
+    st = state(); g = st["gen"]; gd = gen_dir(g)
+    gen = json.load(open(os.path.join(gd, "gen.json")))
+    tpl = open(os.path.join(ROOT, "prompts", "editor_task.md")).read()
+    eds = [a.editor] if a.editor else gen["editors"]
+    for ed in eds:
+        edir = os.path.join(gd, "editors", ed)
+        note = ("It is the unedited model." if not st["lineage"] else
+                "It already contains the accepted edits listed in the history below; load_base() gives the unedited model.")
+        txt = (tpl.replace("{EDITOR}", ed).replace("{GEN}", str(g)).replace("{MAX_CANDS}", str(gen["max_candidates"]))
+               .replace("{PARENT}", st["champion"]).replace("{PARENT_NOTE}", note).replace("{EDIR}", edir)
+               .replace("{BUDGET}", str(gen["budget"])).replace("{HISTORY}", history_text(st, g)))
+        if gen.get("focus", {}).get(ed):
+            txt += ("\n\nSUGGESTED STARTING POINT (to diversify the generation; abandon it if the evidence points "
+                    "elsewhere): " + gen["focus"][ed])
+        open(os.path.join(edir, "TASK.md"), "w").write(txt)
+        print(f"wrote {edir}/TASK.md ({len(txt)} chars)")
+
+
+def cmd_status(a):
+    st = state()
+    print(json.dumps({k: st[k] for k in ("gen", "champion", "lineage")}, indent=1))
+    for h in st["history"]:
+        print(f"gen {h['gen']}: champion acc {h['champion_acc']}, winner {h['winner']}")
+
+
+def main():
+    ap = argparse.ArgumentParser(); sp = ap.add_subparsers(dest="cmd", required=True)
+    p = sp.add_parser("init"); p.add_argument("--force", action="store_true")
+    p = sp.add_parser("new-gen"); p.add_argument("--editors", required=True); p.add_argument("--budget", type=int, default=6)
+    p.add_argument("--max-cands", type=int, default=2); p.add_argument("--sel-n", type=int, default=800)
+    p.add_argument("--focus", default=None, help="JSON {editor: suggested starting point}")
+    sp.add_parser("candidates")
+    p = sp.add_parser("select"); p.add_argument("--wait", action="store_true")
+    p = sp.add_parser("decide"); p.add_argument("--z", type=float, default=2.0); p.add_argument("--force")
+    p.add_argument("--keep", action="store_true")
+    p = sp.add_parser("heldout"); p.add_argument("who", nargs="?", default="champion"); p.add_argument("--n", type=int, default=1000)
+    p.add_argument("--set", choices=["mmlupro", "gpqa"], default="mmlupro")
+    sp.add_parser("status")
+    p = sp.add_parser("brief"); p.add_argument("editor", nargs="?")
+    a = ap.parse_args()
+    os.makedirs(RUNS, exist_ok=True)
+    with open(os.path.join(RUNS, "events.jsonl"), "a") as f:
+        f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "cmd": a.cmd,
+                            "args": {k: v for k, v in vars(a).items() if k != "cmd"}}) + "\n")
+    {"init": cmd_init, "new-gen": cmd_new_gen, "candidates": cmd_candidates, "select": cmd_select,
+     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief}[a.cmd](a)
+
+
+if __name__ == "__main__":
+    main()

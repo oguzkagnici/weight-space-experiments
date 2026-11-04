@@ -1,0 +1,71 @@
+TASK. You are given the weights of a language model, LFM3-1.7B (Liquid AI, October 2026). Text part: 24 layers of width 2,048. Each layer has one token mixer and one MLP:
+- 13 gated short-convolution layers (0, 1, 3, 5, ..., 23): `conv.in_proj` (2048 -> 6144, split into three 2048-wide parts B, C, x), a depthwise causal convolution `conv.conv` (kernel 7) and `conv.out_proj` (2048 -> 2048);
+- 6 full-attention layers (2, 6, 10, 14, 18, 22) and 5 sliding-window attention layers (4, 8, 12, 16, 20; window 256): 16 query heads and 4 key/value heads of size 128, RMS-normed queries and keys (`q_norm`, `k_norm`), a per-head sigmoid output gate (`self_attn.gate_proj`, 2048 -> 16) and `o_proj` (2048 -> 2048, input = 16 heads x 128);
+- a SwiGLU MLP in every layer: `feed_forward.w1` (gate) and `feed_forward.w3` (up), 2048 -> 7680; `feed_forward.w2` (down), 7680 -> 2048;
+- RMSNorm in sandwich form: `operator_norm` before the mixer, `post_operator_norm` after it, `ffn_norm` before the MLP, `post_ffn_norm` after it (both post-norms are applied before the residual add).
+Vocabulary 128,000; input embedding and output layer tied; the final norm is called `model.embedding_norm`.
+Your job is to make it better at answering broad multiple-choice questions on knowledge and reasoning (MMLU-Pro: 10 options, 14 subjects from law and history to physics and math) by EDITING ITS WEIGHTS DIRECTLY: find out what goes wrong inside the network when it answers wrongly, and repair that with targeted changes.
+
+THIS IS ONE GENERATION OF A GENETIC LOOP. You are editor `claude` in generation 1. Several editors work in parallel on the same parent model; each submits up to 2 candidate edits. The candidates are then compared with the parent on hidden questions, and the best one becomes the parent of the next generation, but only if its gain is clearly significant. Otherwise the parent survives. The parent of this generation is `base`; "original" below always means the parent. It is the unedited model.
+
+HOW IT WILL BE MEASURED. Every candidate is evaluated with this fixed protocol. The user message is the question, a blank line, the options as lines "(A) ...", "(B) ...", ..., a blank line and "Answer with the letter of the correct option." It goes through the chat template with thinking disabled (enable_thinking=False), and the assistant turn is opened with "The answer is (". The model's answer is the option letter with the highest logit at the next token (only the letters of the question's options compete). Weights are cast to bfloat16. The score is accuracy. Selection compares the candidate with the parent on the same hidden MMLU-Pro questions, as a paired difference with its standard error; the bar is z >= 2. Later, champions are also evaluated on untouched held-out MMLU-Pro questions and on GPQA Diamond (4 options, graduate-level science), so edits that exploit something specific to 10-option MMLU-Pro will not carry over. You never see the selection or held-out questions. The config, tokenizer, chat template and protocol are fixed: only weight values can change (same tensor names and shapes).
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when it answers wrongly, identify the components responsible (specific neurons, heads, directions or circuits) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model systematically over-picks early letters regardless of content, or a component suppresses the correct answer once it has been retrieved, finding and fixing what drives that counts. Out of scope, and refused by save_edit: the final norm (`model.embedding_norm.weight`), the input embedding / output layer (`model.embed_tokens.weight`), and any edit that only multiplies a whole tensor by a constant. Global knobs (making the whole output distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. Python over the weights (no GPU, no internet). Your folder is `/home/user/weight-space-experiments/runs/gen_001/editors/claude`: `edited/` (your current edit), `work/` (scratch, forward-pass outputs), `code/` (your scripts), `candidates/`, `notes.md`. Run Python with `/home/user/weight-space-experiments/runs/gen_001/editors/claude/py <script>` (working directory = your folder). Write every script you run to `code/NNN_short_name.py` (numbered in order) so the code is kept, and state its hypothesis in its first comment line. Use `-c` only for one-line checks. There is no persistent kernel: save intermediate arrays in `work/` as .npy. In a script, `from wsp.editor import *` gives you:
+   - NAMES and SHAPES (all tensors);
+   - load(name), a float32 torch tensor: your current edit if there is one, else the original (= parent);
+   - load_original(name) and load_base(name) (the unedited LFM3-1.7B);
+   - save_edit(name, tensor) (it reports how many entries change after bfloat16 rounding), drop_edit(name), edited();
+   - submit_candidate(label, description);
+   - tok (the tokenizer);
+   - questions() (the practice questions);
+   - render(qid) (the exact evaluation string of a practice question);
+   - LETTER_IDS (token ids of A..J as the token after "The answer is (").
+   Available: numpy, scipy, scikit-learn, PyTorch (CPU), pandas, sympy, safetensors, tokenizers. Gradients are disabled. The machine has 4 CPU cores and 15 GB of RAM, shared with the forward-pass server (about 4 GB) and the other editors. Keep each script under about 3 GB and a few minutes of compute: load the tensors you need, not the whole model.
+2. Practice questions with answers (none of them is used for selection or held-out evaluation): questions() returns 3,007 MMLU-Pro questions, {id: {id, category, src, question, options, answer, answer_index}}, across all 14 categories.
+3. A forward-pass tool with a budget of 10 forward passes in total. Write a request as JSON to a file and run `/home/user/weight-space-experiments/runs/gen_001/editors/claude/fwd <file.json>`. A request that fails or is refused does not count. Each request counts as one pass, whatever its size:
+ (a) SCORE: {"type": "score", "model": "original" | "edited" | "both", "questions": ["<practice id>", ...] or "sample": {"n": 256, "seed": 0, "categories": [...] (optional)}, "activations": {"hidden_states": [0..24], "mlp": [0..23], "inputs": [module names], "outputs": [module names]} (optional)}
+    - This runs the evaluation protocol on at most 512 practice questions per model (at most 256 with "both").
+    - You get accuracy (overall and by category), mean log-probability of the correct letter, margin, how much probability the full vocabulary puts on the option letters, and predicted versus true letter counts.
+    - "both" runs the parent and your current edit on the same questions and adds the paired difference (edited - original) with its standard error, plus how many questions went wrong->right and right->wrong.
+    - Per-question rows (prediction, correctness, the probabilities of all letters) are in `work/fwd_<k>/score_<k>_<model>.jsonl`.
+    - With "activations", these are saved at the answer position (the last token) for every question, with its grade, in `work/fwd_<k>/score_<k>_acts/<model>/`: the residual stream (0 = embeddings, l = after layer l), the MLP's w2 inputs (7,680 per layer), or the input/output of any named module (e.g. "model.layers.14.self_attn.o_proj" gives the 16 heads x 128 before mixing).
+ (b) READ (teacher-forced): {"type": "read", "model": "original" | "edited", "texts": ["raw text", ...] or "questions": [ids] (rendered evaluation strings) with optional "suffixes": [...], "return": {"token_logprobs": true, "topk": k (<= 50), "hidden_states": [...], "mlp": [...], "inputs": [...], "outputs": [...], "positions": "last" | "mean" | "all", "attn_layers": [attention layer indices]}}
+    - This reads up to 1,024 texts, at most 200,000 tokens in total and 4,096 per text.
+    - Results are .npy files with meta.json in `work/fwd_<k>/`.
+    - With "all" positions, activations are concatenated over texts, with offsets.
+    - Attention probabilities are returned for the first 4 texts only.
+ Timing: about 0.75 s per question per model. Results for the parent are cached, so a "both" pass without activations only costs the edited model's time. One full 256-question "both" pass takes a few minutes, plus waiting while other editors' passes run (one queue for everyone). `fwd` waits up to 9 minutes; if the pass is not done, it prints `fwd wait <id>`, which you run to keep waiting. `/home/user/weight-space-experiments/runs/gen_001/editors/claude/fwd status` shows the queue and your budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the model fails on practice questions:
+   - the correct answer ranked second (near misses) versus confidently wrong answers;
+   - systematic letter preferences (compare predicted and true letter counts);
+   - categories where it is weak;
+   - questions where a middle layer already "knows" the answer and later layers lose it. You can read the residual stream through the output layer, since the embedding is tied; apply the final norm first.
+   Go after the largest failure category you can explain.
+2. Localize causally. That a component is more active on correct answers is not enough (correct answers come from easier questions). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. Accuracy over n questions has a standard error of about 50/sqrt(n) percentage points (about 3.1 points at 256). Compare original and edited on the SAME questions: a "both" pass reports the paired difference with its standard error, which is much smaller than that of two separate measurements. Keep an edit only if its gain is clearly larger than its standard error on questions that were not used to choose it: split the practice questions into a DEV part you analyse and a HOLDOUT part you only use to confirm. The continuous mean log-probability of the correct letter is a much less noisy signal than accuracy, so use it to screen. Edits that change a tensor by a fraction of a percent usually have effects too small to see: test strengths large enough to matter, and back off if they hurt.
+4. Plan your forward passes. For example: one diagnostic score pass with activations, a few read passes or "both" passes for dose-response, and a final "both" pass on HOLDOUT questions you have not used, to confirm.
+5. Work efficiently.
+   - Print compact summaries, never whole arrays.
+   - Never print raw lists of vocabulary tokens (the vocabulary contains offensive strings); print token ids, letters or common words instead.
+   - Keep `notes.md` up to date: findings with numbers, edits tried and their measured effect, the current best edit. Before every pass, write the exact current edit (tensors, what was changed, strength) and the question set.
+   - Copy good edits (for example `cp -r edited work/best_1`).
+
+RULES. Not allowed:
+- (a) Gradient descent or any other training: no backward passes, autograd or optimizers. No fitting of weights to a loss on data, whether iterative or in closed form (for example, solving a weight matrix by least squares so that it reproduces target outputs).
+- (b) Running the model other than through the forward-pass tool: do not implement or simulate the network's computation on any input in Python. Reading the residual stream through the tied output layer is the one exception: it is one matrix product.
+- (c) Internet access or search.
+- (d) Looking outside your folder and the API: no reading of other editors' folders, the data files or the GA's state.
+Allowed: any analysis of the weights and of forward-pass results, any use of the practice questions, and any direct edit of the weights that you compute and that is in scope. That includes directions computed from recorded activations as means, differences or principal components, projections, rank-one edits, and switching or rescaling specific neurons, heads or channels.
+
+HOW YOUR WORK ENDS. Use your forward passes. Then submit your best edit or edits with submit_candidate(label, description), at most 2. That is the candidate with the best measured paired gain, on HOLDOUT if you measured it there, even if the gain is not statistically significant; do not submit an empty edit. In each description, say what was changed (tensors, indices, strength), the mechanism, and the measured paired gain with its standard error and the questions it was measured on. Finally, write a short report to `/home/user/weight-space-experiments/runs/gen_001/editors/claude/report.md` and reply with it: what the model gets wrong, what you changed and why, the evidence, and what you would try next with more passes. The report is read by the next generation's editors.
+
+HISTORY OF THE LOOP.
+No edit has been accepted yet: the parent is the unedited LFM3-1.7B.
+
+
+SUGGESTED STARTING POINT (to diversify the generation; abandon it if the evidence points elsewhere): How the answer is routed from the option text to the answer position: which attention heads at the last token attend to the option lines, whether they select by content or by position, and whether some heads systematically move the wrong option.

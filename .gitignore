@@ -1,0 +1,16 @@
+# large / reproducible / private
+data/mmlupro_test.jsonl
+data/gpqa_diamond.jsonl
+cache/
+queue/
+**/__pycache__/
+*.safetensors
+*.npy
+runs/**/work/
+runs/**/edited/
+runs/champions/*/weights/
+# GPQA asks not to publish its questions; per-question rows hold no text but keep only summaries public
+runs/heldout/*gpqa*.jsonl
+.hf_token
+*.lock
+*.tmp
