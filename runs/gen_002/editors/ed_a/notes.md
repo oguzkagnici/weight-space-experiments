@@ -26,3 +26,8 @@
   - code/013: cross-fitted constant-letter debias of BOTH models: orig .371 vs edit .394 (10-opt, n=213) -> gain is not only a letter offset.
   - saved as work/edit_E1_a1.0
 ## Pass 4 (both, S1): E1 alpha=0.5 (dose-response), same tensor/heads.
+- Pass 4 result (S1): E1 alpha=0.5: paired +1.95 (SE 1.03), 6 w->r / 1 r->w; logp +0.129 (SE 0.031). Centred bias [.38 .9 .33 -.04 .36 1.07 .29 -.58 -1.69 -1.01]. Debiased-acc orig .371 edit .379.
+  - Dose-response logp: alpha .5 -> +.129, alpha 1 -> +.165. Keep alpha=1 for L22 (principled full removal).
+## Pass 5 (read, original, same 120 questions as pass 2): L20 q_norm/k_norm all positions + attn_last 20 -> does sliding-window L20 have the same primacy mechanism?
+- Pass-5 findings (code/014-015): L20 uses RoPE (half-rotation, theta 1e4, full head dim; fit resid 0.000; NoPE 0.11). Slot-mean keys again have a reliable PC1 (split-half r .95-.96) living mostly in low-frequency RoPE pairs (kv1: 67% in pairs 48-63), so rotated slot scores ~= pre-rope ones. L20 slot preference is "A first": e.g. L20h1 A +1.02, B +.13, rest ~-0.1..-0.3; h12/h13/h15 A +1, B +.3-.5. q fraction along v1 .2-.37.
+## Pass 6 (both, S1): E1 (L22 alpha=1, all heads) + E2 (L20 q_proj, same construction with L20 slot-key PC1, alpha=1, all 16 heads; code/016)

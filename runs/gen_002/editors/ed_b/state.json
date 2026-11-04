@@ -1,7 +1,7 @@
 {
- "passes_used": 2,
+ "passes_used": 4,
  "pending": [
-  "gen_002_ed_b_p03_717cd7"
+  "gen_002_ed_b_p05_d17197"
  ],
  "passes": [
   {
@@ -15,6 +15,18 @@
    "id": "gen_002_ed_b_p02_ec1492",
    "type": "read",
    "seconds": 113.4
+  },
+  {
+   "k": 3,
+   "id": "gen_002_ed_b_p03_717cd7",
+   "type": "score",
+   "seconds": 345.6
+  },
+  {
+   "k": 4,
+   "id": "gen_002_ed_b_p04_b88ce6",
+   "type": "score",
+   "seconds": 205.3
   }
  ]
 }

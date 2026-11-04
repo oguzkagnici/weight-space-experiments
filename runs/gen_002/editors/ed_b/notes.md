@@ -25,3 +25,19 @@
 
 ## Pass 3 (score, parent, DEV[700:1212], 512 q) -- current edit: none
 - activations: hidden 18,20-24; mlp 20-23; o_proj input L22.
+- Results pass 3 (code/017-024), 512 DEV[700:1212], parent acc 34.2%: pred A77 B96 C77 D50 E47 F56 G38 H33 I20 J18 vs gold A49 B67 C41 D57 E50 F60 G39 H53 I49 J47.
+  Final-logit decomposition (10-opt, centered): prior at h22 A+1.0 B+1.2 .. J-.7; L22.H12 copies with its own late-letter tilt (A -.75 B -1.44 G +1.27); mlp22 re-adds early tilt (A +.82 .. J -.83).
+  Stage accuracies (lens): h22 24.2, +attn22 34.4, +mlp22 32.4, +conv23 34.2, final 34.8; H12 alone 34.0.
+  2-fold CV constant debias ceiling: only +0.6 pt on this set (34.8 -> 35.4). Lens removal/scaling of mlp22, mlp23, conv23, non-H12 L22 heads: all within +-1 pt.
+  Surface heuristics: model over-picks long options (pred longest 26% vs gold 19%), but a CV length correction gives no gain. Lexical overlap: no effect after tie-aware ranks.
+  L14.H12 & L22.H12 agree 63%; ensembles <= +2/160.
+  => Errors are knowledge-limited; no large repairable mechanism visible. Remaining passes: causal tests of the content path (nonlinear effects lens cannot predict) + pick best.
+
+## Pass 4 (both, S1 = DEV[1212:1468], 256 q) -- edit X1: model.layers.12.self_attn.o_proj.weight columns 1664:1792 (head 13) x2.0
+- Result pass 4 (X1, L12.H13 x2) on S1: parent 28.9%, edited 30.5%: acc +1.56 (SE 1.46), 9 w->r / 5 r->w, dlogp(correct) -0.319 (SE .044).
+  Paired analysis (code/026): mean gold rank unchanged (diff +0.004 +- 0.055); entropy .99 -> .90; dlogp on orig-wrong -0.56, orig-correct -0.01.
+  => doubling the strongest belief writer only SHARPENS the output; it does not improve the ranking (as the lens predicted). Saved in work/best_x1.
+- code/027: L22 MLP leader-suppressor bank (pass 3): when X leads after attn22, its suppressor DLA on X: A n389 -.76, B n6620 -.61 + n5859 -.43, C n1812 -1.73, D n464 -3.43, E n7357 -4.13, F n6492 -3.09, G n3344 -3.56, H n397 -3.35, I n2786 -3.97, J n3310 -3.15 (matches g1). L23 bank weaker (-1.0..-1.7) and more even.
+- code/028 lens screen of equalizing this bank (down C-J x.5 / up A-C / all to -2 logits): acc .326-.346 vs base .348; no variant gains. Output stage is near-optimal for accuracy on this set.
+
+## Pass 5 (both, S1) -- edit X0: model.layers.12.self_attn.o_proj.weight columns 1664:1792 (head 13) x0.0 (ablation, dose-response of the content path)
