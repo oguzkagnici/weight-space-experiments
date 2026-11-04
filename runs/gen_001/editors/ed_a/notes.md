@@ -40,3 +40,6 @@
 - paired acc +3.12 +- 1.55 (12 w->r, 4 r->w, 42 changed); logp_correct +0.247 +- 0.047. Pred letters A36 B29 C34 D33 E25 F24 G19 H19 I24 J13. Better than v1 on same S (+2.34 / +0.190). Saved work/best_v2.
 
 ## Pass 5 (planned): EDIT v2 (unchanged), both on HOLDOUT[0:256]. Pass 6: v2 on HOLDOUT[256:512].
+- Pass 5 result (v2, HOLDOUT[0:256]): acc 36.72 -> 38.67, paired +1.95 +- 1.61 (11 w->r, 6 r->w); logp_correct +0.188 +- 0.044. Pred I 11->24, H 12->18, B 36->26.
+- Pass 6 result (v2, HOLDOUT[256:512]): acc 34.38 -> 35.94, paired +1.56 +- 1.56 (10 w->r, 6 r->w); logp +0.168 +- 0.043.
+- HOLDOUT[0:512] combined v2: acc +1.76 +- ~1.12 ; logp +0.178 +- ~0.031.

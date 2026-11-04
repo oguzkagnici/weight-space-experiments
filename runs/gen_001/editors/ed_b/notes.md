@@ -35,3 +35,7 @@
 ## Pass 5: E1 alpha 1.0 (work/edit_E1), both, HOLD[0:256]
 - RESULT pass 5 (E1 a=1.0, HOLD[0:256]): acc 34.38 -> 34.77, +0.39 +- 1.52 (8 w->r, 7 r->w); logp +0.230 +- 0.043 (z 5.3). Pred counts orig A..J 46 55 36 33 18 27 16 7 7 11 -> 50 42 28 24 19 27 24 13 15 14 (gold 33 27 24 25 22 24 26 21 27 27).
 ## Pass 6: E1 alpha 1.5 (work/edit_E1a15), both, HOLD[0:256]
+- RESULT pass 6 (E1 a=1.5, HOLD[0:256]): acc +2.34 +- 1.91 (15 w->r, 9 r->w, 59 changed); logp +0.291 +- 0.064.
+- code/016: mean centered letter log-prob (10-opt q). Orig HOLD1: A..J +1.15 +1.30 +.80 +.45 -.06 +.89 -.10 -.86 -2.08 -1.49. a=1.0: +.82 +.05 -.25 -.51 -.25 +.72 +.20 +.32 -.76 -.33. a=1.5: +.67 -.49 -.84 -.97 -.29 +.64 +.27 +.92 -.16 +.25.
+  Acc by gold A-E / F-J: orig .42/.26, a=1.0 .37/.32, a=1.5 .37/.36. The monotone early-letter gradient is gone; A and F residual preferences remain (not targeted).
+## Pass 7: E1 alpha 2.0 (dose-response end), both, DEV[512:768]

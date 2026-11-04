@@ -29,3 +29,5 @@
 - Pass 4: alpha 0.0 (full removal of the 8 L22 suppressors' letter readout), both, screen256.
 - Pass 4 RESULT (alpha 0, L22 only): paired acc +1.56 (SE 1.23), +7/-3, 27 changed; dlogp -0.298 (SE 0.047). No gain beyond alpha 0.5 and noisier: alpha 0.5 is the better strength. Edit saved in work/edit_a0.
 - Pass 5: alpha 0.5 on L22 AND the 8 L23 late-letter suppressors (C n1192, D n1876, E n2758, F n3520, G n1107, H n358, I n6512, J n1041), both, screen256.
+- Pass 5 RESULT (alpha 0.5 L22 + L23): paired +1.17 (SE 1.41), +8/-5, 39 changed; dlogp -0.434. Adding L23 adds churn, not accuracy: keep L23 untouched.
+- Pass 6: alpha 0.5 L22 suppressors + early-letter boosters' letter readout x0.5 (L22 n2212 A; L23 n1685 A, n2595 A, n1439 B), both, screen256.
