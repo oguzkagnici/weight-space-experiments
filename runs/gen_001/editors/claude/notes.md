@@ -36,3 +36,5 @@
 - Passes 7-8: HOLDOUT confirmation of the best edit on holdout[0:256] and [256:512] (work/req_hold1.json, req_hold2.json). Passes 9-10: the L22-only alpha 0.5 edit (work/edit_a05) on the same questions.
 - Passes 7-8 RESULT (best edit "equalize_boost" on HOLDOUT 512): pass 7 +1.95 (SE 1.41) +9/-4; pass 8 +0.78 (SE 1.46) +8/-6; combined parent 32.62 -> 33.98, **+1.37 (SE 1.01)**, +17/-10, dlogp -0.126. Positive, not significant on its own (z 1.35).
 - Passes 9-10: L22-only alpha 0.5 (work/edit_a05) on the same HOLDOUT 512.
+- Passes 9-10 RESULT (L22-only alpha 0.5 on HOLDOUT 512): +0.98 (SE 0.85), +12/-7, dlogp -0.153.
+- SUBMITTED: equalize_boost (24,398 weights; HOLDOUT +1.37 SE 1.01) and equalize_l22 (16,254 weights; HOLDOUT +0.98 SE 0.85). Report in report.md.

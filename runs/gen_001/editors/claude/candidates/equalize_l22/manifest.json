@@ -1,0 +1,14 @@
+{
+ "label": "equalize_l22",
+ "editor": "claude",
+ "gen": 1,
+ "time": 1793828857.5726058,
+ "tensors": {
+  "model.layers.22.feed_forward.w2.weight": {
+   "changed_bf16": 16254,
+   "numel": 15728640,
+   "rel_change": 0.007287817075848579,
+   "sha_bf16": "3d63b2b1b9b9a1de"
+  }
+ }
+}

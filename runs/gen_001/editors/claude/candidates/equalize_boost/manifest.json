@@ -1,0 +1,20 @@
+{
+ "label": "equalize_boost",
+ "editor": "claude",
+ "gen": 1,
+ "time": 1793828852.769658,
+ "tensors": {
+  "model.layers.22.feed_forward.w2.weight": {
+   "changed_bf16": 18285,
+   "numel": 15728640,
+   "rel_change": 0.007853278890252113,
+   "sha_bf16": "bc84cd14a9a70bd2"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 6113,
+   "numel": 15728640,
+   "rel_change": 0.005953501909971237,
+   "sha_bf16": "91bfb3315f4af956"
+  }
+ }
+}

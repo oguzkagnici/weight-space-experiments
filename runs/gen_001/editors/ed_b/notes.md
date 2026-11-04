@@ -44,3 +44,6 @@
 ## Pass 8: E1 alpha 1.5 (work/edit_E1a15), both, HOLD[256:512]
 - RESULT pass 8 (E1 a=1.5, HOLD[256:512]): acc -0.39 +- 1.52 (7/8, 44 changed); logp +0.129 +- 0.067. On this set the original was NOT disadvantaged on late letters (acc gold A-E .378, F-J .407); edit trades A-E (.336) for F-J (.451).
 ## Pass 9: E1 alpha 1.0 (work/edit_E1), both, HOLD[256:512]
+- RESULT pass 9 (E1 a=1.0, HOLD[256:512]): acc -1.56 +- 1.10 (2 w->r, 6 r->w, 27 changed); logp +0.120 +- 0.045.
+- HOLDOUT totals (HOLD[0:512]): a=1.0 acc -0.59 +- ~0.94, logp +0.175 +- ~0.031; a=1.5 acc +0.98 +- ~1.22, logp +0.21 +- ~0.046.
+## Pass 10: E1 alpha 1.5, both, all practice q with <=5 options (169 q; GPQA-like 4-option format check)

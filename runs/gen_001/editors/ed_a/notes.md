@@ -53,3 +53,7 @@
 - Pass 8 result (v3 on S): +2.73 +- 1.60 (12 w->r, 5 r->w), logp +0.197 +- 0.050. WORSE than v2 on S (+3.12 / +0.247). Equalizing the L22 suppressor bank does not help; v3 dropped. work/best_v3 kept for reference.
 
 ## Pass 9 (planned): EDIT v2 (re-made with code/018), both on HOLDOUT[512:768].
+- Pass 9 result (v2, HOLDOUT[512:768]): acc 35.94 -> 37.50, paired +1.56 +- 1.83 (13 w->r, 9 r->w); logp +0.193 +- 0.046.
+- v2 on HOLDOUT[0:768] (3 passes pooled): acc +1.69 +- ~0.96 pp ; logp_correct +0.183 +- ~0.026.
+
+## Pass 10 (planned): EDIT v1 (code/008 "1.0 12"), both on HOLDOUT[0:256] (same Qs as pass 5 for v2: +1.95).

@@ -1,0 +1,2 @@
+Edit: the same as equalize_boost but only part (a): the direct letter readout of the 8 layer-22 late-letter leader suppressors (model.layers.22.feed_forward.w2.weight columns 1812, 464, 7357, 6492, 3344, 397, 2786, 3310) is scaled by 0.5. 16,254 weights differ in bf16.
+Evidence: screen256 DEV +1.56 (SE 0.95), +5/-1; HOLDOUT 512: +0.98 (SE 0.85), +12/-7, dlogp(correct) -0.153.

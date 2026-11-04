@@ -1,9 +1,6 @@
 {
- "passes_used": 8,
- "pending": [
-  "gen_001_claude_p09_4b7650",
-  "gen_001_claude_p10_6a1f0b"
- ],
+ "passes_used": 10,
+ "pending": [],
  "passes": [
   {
    "k": 1,
@@ -52,6 +49,18 @@
    "id": "gen_001_claude_p08_674e38",
    "type": "score",
    "seconds": 266.8
+  },
+  {
+   "k": 9,
+   "id": "gen_001_claude_p09_4b7650",
+   "type": "score",
+   "seconds": 186.0
+  },
+  {
+   "k": 10,
+   "id": "gen_001_claude_p10_6a1f0b",
+   "type": "score",
+   "seconds": 176.4
   }
  ]
 }
