@@ -34,3 +34,5 @@
 - Pass 6 RESULT (alpha 0.5 L22 + boosters x0.5): paired +2.34 (SE 1.35), +9/-3, 27 changed; dlogp -0.122 (SE 0.027). BEST on screen256. Saved in work/edit_best_boost.
 - CURRENT BEST EDIT (cand "equalize_boost"): model.layers.22.feed_forward.w2.weight columns 1812, 464, 7357, 6492, 3344, 397, 2786, 3310 (letter readout x0.5) + 2212 (x0.5); model.layers.23.feed_forward.w2.weight columns 1685, 2595, 1439 (letter readout x0.5). Built by `py code/010_edit_suppressors.py 0.5 none 0.5`.
 - Passes 7-8: HOLDOUT confirmation of the best edit on holdout[0:256] and [256:512] (work/req_hold1.json, req_hold2.json). Passes 9-10: the L22-only alpha 0.5 edit (work/edit_a05) on the same questions.
+- Passes 7-8 RESULT (best edit "equalize_boost" on HOLDOUT 512): pass 7 +1.95 (SE 1.41) +9/-4; pass 8 +0.78 (SE 1.46) +8/-6; combined parent 32.62 -> 33.98, **+1.37 (SE 1.01)**, +17/-10, dlogp -0.126. Positive, not significant on its own (z 1.35).
+- Passes 9-10: L22-only alpha 0.5 (work/edit_a05) on the same HOLDOUT 512.

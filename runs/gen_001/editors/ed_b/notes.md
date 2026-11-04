@@ -42,3 +42,5 @@
 - RESULT pass 7 (E1 a=2.0, DEV[512:768]): acc +1.17 +- 2.03 (15/12, 77 changed); logp +0.272 +- 0.092. Overshoot: C/D now -1.7..-1.9, H-J positive.
   Dose curve DEV[512:768]: alpha 0.5/1.0/1.5/2.0 -> acc +1.17/+2.73/+2.73/+1.17, logp +.118/+.207/+.255/+.272 (se grows .024->.092). Best compromise alpha 1.5.
 ## Pass 8: E1 alpha 1.5 (work/edit_E1a15), both, HOLD[256:512]
+- RESULT pass 8 (E1 a=1.5, HOLD[256:512]): acc -0.39 +- 1.52 (7/8, 44 changed); logp +0.129 +- 0.067. On this set the original was NOT disadvantaged on late letters (acc gold A-E .378, F-J .407); edit trades A-E (.336) for F-J (.451).
+## Pass 9: E1 alpha 1.0 (work/edit_E1), both, HOLD[256:512]

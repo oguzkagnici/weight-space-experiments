@@ -50,3 +50,6 @@
 - Pass 7 result (v2, all 195 practice Qs with <=6 options; 142 not used in DEV[:768]): acc 43.59 -> 45.13, paired +1.54 +- 0.88 (3 w->r, 0 r->w); logp -0.052 +- 0.030 (slightly worse). 4-option subset (151): acc 45.7 -> 47.7; A-D bias [.64 .34 .33 -1.31] -> [.58 -.05 .2 -.74] (D under-pick halved). Transfers in accuracy; logp mixed.
 
 ## Pass 8 (planned): EDIT v3 = v2 + L22 suppressor bank equalized: w2 columns scaled 1812 x.81, 464 x.42, 7357 x.33, 6492 x.52, 3344 x.50, 397 x.66, 2786 x.48, 3310 x.53 (A389, B6620/5859 untouched) (code/022). Both on S, compare to v2 on S (+3.12 / logp +.247).
+- Pass 8 result (v3 on S): +2.73 +- 1.60 (12 w->r, 5 r->w), logp +0.197 +- 0.050. WORSE than v2 on S (+3.12 / +0.247). Equalizing the L22 suppressor bank does not help; v3 dropped. work/best_v3 kept for reference.
+
+## Pass 9 (planned): EDIT v2 (re-made with code/018), both on HOLDOUT[512:768].
