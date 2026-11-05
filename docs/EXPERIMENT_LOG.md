@@ -183,3 +183,28 @@ Paired against base on GPQA Diamond (198 questions, 4 options); `results/gpqa_tr
 
 - **The confidence-writer edits (L12.H13) transfer their calibration gain to a different benchmark and format, with no accuracy change.** The likely reason: L12.H13 sets how strongly the option-correctness belief is written, which is format-independent.
 - **The letter-prior removals do not transfer and slightly hurt.** Their prior is specific to 10-option lists, as `ed_b` warned in generation 1.
+
+## 2026-11-05 — Disk cleanup (finished generations 1–3)
+
+- The session's disk allowance filled up while downloading the GGUF model.
+- Deleted from the finished generations' editor `work/` folders (all gitignored scratch, about 30 GB):
+  - the large activation arrays (`*.npy` > 1 MB, 349 files);
+  - the per-pass weight snapshots (`fwd_*_snapshot/`).
+- Also deleted the unused Qwen3.5-0.8B download.
+- Kept: per-question score files, every submitted candidate's weights (`candidates/*/edited`), notes, code, requests and reports.
+- Intermediate edits can be rebuilt from each editor's `code/` scripts; the findings drawn from the activations are recorded in the notes and reports.
+
+## 2026-11-05 — Phase 2 (thinking mode on CPU): engine measurements
+
+- The user authorised building llama.cpp from the official repository (commit 2ada830, CPU, `-march=native`). The PyPI `llama-cpp-python` 0.3.36 predates LFM3.
+- Measured on this CPU (4 threads):
+
+  | Engine | Format | Prefill | Decode bs 1 | Decode bs 8 | Decode bs 16 | Decode bs 32 |
+  |---|---|---|---|---|---|---|
+  | PyTorch (transformers) | bf16 | 336 tok/s | 6.6 | 41.8 | | |
+  | llama.cpp | BF16 | 60 | 6.4 | | | |
+  | llama.cpp | Q8_0 | 55–64 | 10.2 | 33.4 | 39.4 | 46.3 |
+
+- Generation throughput is limited to about 40–50 tok/s on this machine either way.
+- llama.cpp's continuous batching avoids PyTorch's batch padding (a batch waits for its longest trace), which matters for variable-length thinking. It is therefore used for thinking-mode generation, with the Q8_0 format. PyTorch's bf16 two-pass probes (`scripts/think_probe.py`) were too slow: 8 questions × 2,048 tokens did not finish in 35 minutes.
+- Thinking-length probe: llama-server, 16 parallel slots, 32 practice questions, a 3,072-token cap, temperature 0.6, top-p 0.95, top-k 20 (results below).
