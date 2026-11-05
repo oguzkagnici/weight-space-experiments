@@ -61,3 +61,9 @@
   Ensemble MC logprob + 0.25*z(cloze) 35.2% vs 33.3% (+2/108; small n). Lead for next generation, not exploitable in my remaining budget.
 
 ## Pass 9 (both, HOLD[256:512]) -- edit X1: L12 o_proj cols 1664:1792 x2.0
+- Result pass 9 (X1 on HOLD[256:512]): acc -0.78 (SE 1.56), 7 w->r / 9 r->w, dlogp -0.307 (SE .045). X1 on HOLD[0:512]: -0.78 acc (pooled SE ~1.0), dlogp -0.31.
+
+## Pass 10 (both, HOLD[256:512]) -- edit X0: L12 o_proj cols 1664:1792 x0.0
+- Result pass 10 (X0 on HOLD[256:512]): acc +0.39 (SE 2.11), dlogp +0.555.
+- Pooled HOLDOUT[0:512] (code/031): X1 acc -0.78 (SE 1.00) dlogp -0.306 (SE .030); X0 acc -0.59 (SE 1.42) 25/28, dlogp +0.513 (SE .054). Parent 35.16%.
+- SUBMITTED: ed_b_g2_L12H13_ablate (X0). X1 not submitted (worse on both metrics). All 10 passes used. Report in report.md.

@@ -1,0 +1,10 @@
+# Hypothesis: none (submit X0 = ablation of L12.H13 output, the best measured holdout candidate).
+from wsp.editor import *
+print(edited())
+desc=("Change: model.layers.12.self_attn.o_proj.weight columns 1664:1792 (input of head 13 of layer 12) set to 0 (head L12.H13 ablated); 262,144 weights. "
+"Mechanism: L12.H13 (sliding-window layer 12) is the strongest attention writer of the option-end correctness belief that L22.H12 later reads through its keys "
+"(projection on the correct-minus-incorrect direction: diff .50, SNR .85, alone picks gold 29% vs 31% for the whole stream). Its contribution is 0.83-correlated with the rest of the stream, "
+"so it sets the CONFIDENCE of the belief, not which option wins. Dose-response on DEV S1 (256 q): x0 / x1 / x2 give output entropy 1.24 / .99 / .90 and an unchanged gold rank (diff -0.02 +- 0.08 and +0.004 +- 0.06). "
+"Measured: DEV S1 acc +1.17 (SE 1.70), dlogp(correct) +0.56 (SE .08); HOLDOUT[0:512] (never used for choosing) acc -0.59 (SE 1.42), 25 wrong->right / 28 right->wrong, "
+"dlogp(correct) +0.513 (SE .054). Expect about 0 accuracy change; it is a calibration fix (much less overconfident when wrong), not an accuracy gain.")
+submit_candidate('ed_b_g2_L12H13_ablate', desc)

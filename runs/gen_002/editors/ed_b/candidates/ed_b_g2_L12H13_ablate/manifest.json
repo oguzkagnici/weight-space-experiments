@@ -1,0 +1,14 @@
+{
+ "label": "ed_b_g2_L12H13_ablate",
+ "editor": "ed_b",
+ "gen": 2,
+ "time": 1793838372.6014452,
+ "tensors": {
+  "model.layers.12.self_attn.o_proj.weight": {
+   "changed_bf16": 262144,
+   "numel": 4194304,
+   "rel_change": 0.23730885982513428,
+   "sha_bf16": "321914cb304c42dc"
+  }
+ }
+}

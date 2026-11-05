@@ -1,8 +1,6 @@
 {
- "passes_used": 8,
- "pending": [
-  "gen_002_ed_b_p09_603cd0"
- ],
+ "passes_used": 10,
+ "pending": [],
  "passes": [
   {
    "k": 1,
@@ -51,6 +49,18 @@
    "id": "gen_002_ed_b_p08_ac6262",
    "type": "read",
    "seconds": 702.1
+  },
+  {
+   "k": 9,
+   "id": "gen_002_ed_b_p09_603cd0",
+   "type": "score",
+   "seconds": 193.3
+  },
+  {
+   "k": 10,
+   "id": "gen_002_ed_b_p10_494c67",
+   "type": "score",
+   "seconds": 147.6
   }
  ]
 }
