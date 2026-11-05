@@ -58,3 +58,4 @@
 ## Pass 5 (generate both, HOLDOUT 32 = work/split.json holdout, same edit E3, no changes after DEV).
 ## Pass 6 (generate both, HOLDOUT2 = 32 fresh non-bank practice questions, work/holdout2.json, seed 2026; same edit E3).
 - code/023 on pass 4: post-conclusion commit rate 0.16 -> 0.24 (11/68 -> 11/46); reconsideration episodes after a conclusion 57 -> 35; conclusion points per 1k tokens 0.85 -> 0.60; share of trace after first conclusion 0.38 -> 0.32.
+- Pass 5 (HOLDOUT) FAILED on 'No space left on device' (disk full machine-wide; not charged). Deleted my regenerable work/r1_neuron_contrib_L*.npy and the failed job's snapshot to free space. Pass 6 (HOLDOUT2) is running; HOLDOUT to be resubmitted after it (its output dir would collide: copy fwd_06 first).

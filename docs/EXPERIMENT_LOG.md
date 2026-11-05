@@ -285,3 +285,9 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - `fwd wait` now says when the server process is down.
 - New `scripts/watchdog.py` (running detached, PID in `queue/watchdog.pid`): restarts the server within about 30 s if its process dies. It requeues the interrupted request. A request that was running during two crashes is moved to `failed/`, not charged, with an explanation, so a crashing request cannot loop.
 - The server was down for about 15 minutes before this was noticed. Pass 2 was requeued (not charged).
+
+### 2026-11-05 — gen 4: disk-full incident
+- The per-session disk allowance ran out while llama-quantize built a Q8_0 GGUF: claude pass 6 and ed_a pass 5 failed (not charged).
+- Freed about 9 GB by deleting the regenerable scratch tensors of finished generations 1–3 (`work/*.safetensors`, large `work/*.npy`, editors' staging `edited/` dirs). Candidates' frozen tensors are kept.
+- `wsp/gen.py build_gguf` now evicts old cache entries *before* building (one build needs about 5.3 GB of scratch) and removes its scratch files in a `finally`, so a failed build no longer leaves 3–4 GB behind. The running server picks this up at its next restart.
+- claude pass 6 was requeued unchanged. ed_a had already deleted its pass-5 snapshot and resubmits the pass itself.

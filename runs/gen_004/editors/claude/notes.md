@@ -50,3 +50,9 @@
 ## Pass 5 (generate both, HOLDOUT A: 32 random practice questions not in the bank, work/holdout_ids.json). Same edit.
 
 ## Pass 6 (generate both, HOLDOUT B: 32 more random practice questions, work/holdout_b_ids.json). Same edit.
+
+## Pass 5 result (HOLDOUT A, 32 fresh practice questions, same edit, target -9), code/016
+- acc 0.312 -> 0.344 (paired +3.1, SE 3.1; +1/-0: mmlupro_2705 cut -> finished correct F). Cut share 0.62 -> 0.62. Tokens 2512 -> 2462 (-50, SE 76).
+- Much weaker than DEV (+9.4). HOLDOUT A has few cut-with-statement traces (most cut traces never state an answer: 0 statements), and those are the only place the gate acts. Finished traces mostly got shorter (e.g. 5458 2964 -> 1770, 3198 1158 -> 872) with the same answer.
+- One right->? check: mmlupro_6268 was finished-wrong (D) and is now cut (still wrong), so no loss.
+## Pass 6 (HOLDOUT B) failed on a machine-wide full disk (GGUF scratch); not charged; requeued unchanged (same snapshot).

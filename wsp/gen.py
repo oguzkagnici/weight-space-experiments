@@ -59,15 +59,21 @@ def build_gguf(weight_dirs, key):
         for fn in sorted(os.listdir(d)):
             if fn.endswith(".safetensors"):
                 edits[fn[:-12]] = load_file(os.path.join(d, fn))["tensor"]
-    tmp = os.path.join(GGUF_CACHE, f"{key}.bf16.gguf")
-    patch(edits, tmp)
-    subprocess.run([f"{LLAMA}/llama-quantize", tmp, out + ".tmp", "Q8_0", "4"], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    os.replace(out + ".tmp", out); os.remove(tmp)
+    # evict before building (a build needs ~5.3 GB of scratch: bf16 GGUF + Q8_0) so a full disk cannot fail it
     files = sorted((f for f in os.listdir(GGUF_CACHE) if f.endswith(".q8_0.gguf")),
                    key=lambda f: os.path.getmtime(os.path.join(GGUF_CACHE, f)))
-    for f in files[:-MAX_GGUF_CACHE]:
+    for f in files[:-(MAX_GGUF_CACHE - 1)]:
         os.remove(os.path.join(GGUF_CACHE, f))
+    tmp = os.path.join(GGUF_CACHE, f"{key}.bf16.gguf")
+    try:
+        patch(edits, tmp)
+        subprocess.run([f"{LLAMA}/llama-quantize", tmp, out + ".tmp", "Q8_0", "4"], check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        os.replace(out + ".tmp", out)
+    finally:   # never leave multi-GB scratch files behind
+        for f in (tmp, out + ".tmp"):
+            if os.path.exists(f):
+                os.remove(f)
     return out
 
 
