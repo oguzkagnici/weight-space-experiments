@@ -1,0 +1,186 @@
+{
+ "gen": 3,
+ "parent": "base",
+ "champion_selection": {
+  "n": 800,
+  "acc": 36.38,
+  "se": 1.7,
+  "mean_logp_correct": -2.8027,
+  "mean_margin": -0.958,
+  "mean_letter_mass": 0.9989,
+  "mean_gold_rank": 2.2837,
+  "mean_entropy": 0.9033,
+  "by_category": {
+   "biology": [
+    69.8,
+    53
+   ],
+   "business": [
+    38.0,
+    50
+   ],
+   "chemistry": [
+    33.8,
+    74
+   ],
+   "computer science": [
+    24.1,
+    29
+   ],
+   "economics": [
+    49.1,
+    55
+   ],
+   "engineering": [
+    42.6,
+    61
+   ],
+   "health": [
+    26.8,
+    56
+   ],
+   "history": [
+    36.7,
+    30
+   ],
+   "law": [
+    22.7,
+    75
+   ],
+   "math": [
+    25.0,
+    96
+   ],
+   "other": [
+    34.0,
+    53
+   ],
+   "philosophy": [
+    32.4,
+    37
+   ],
+   "physics": [
+    33.3,
+    75
+   ],
+   "psychology": [
+    50.0,
+    56
+   ]
+  },
+  "pred_letter_counts": {
+   "A": 145,
+   "B": 129,
+   "C": 134,
+   "D": 78,
+   "E": 56,
+   "F": 73,
+   "G": 74,
+   "H": 51,
+   "I": 32,
+   "J": 28
+  },
+  "answer_letter_counts": {
+   "A": 96,
+   "B": 98,
+   "C": 92,
+   "D": 101,
+   "E": 68,
+   "F": 57,
+   "G": 79,
+   "H": 80,
+   "I": 75,
+   "J": 54
+  }
+ },
+ "candidates": [
+  {
+   "name": "claude/l12h13_ablate_retest",
+   "acc": 35.12,
+   "n": 800,
+   "acc_diff": -1.25,
+   "acc_diff_se": 1.22,
+   "wrong_to_right": 43,
+   "right_to_wrong": 53,
+   "pred_changed": 207,
+   "logp_correct_diff": 0.5136,
+   "logp_correct_diff_se": 0.0464,
+   "gold_rank_diff": -0.065,
+   "gold_rank_diff_se": 0.0513,
+   "z": -1.02,
+   "weights_changed": 262144,
+   "description": "Edit: ablate L12.H13 (its 128 o_proj input columns set to 0), rebuilt from the published description of generation-2 candidate ed_b/ed_b_g2_L12H13_ablate. 262,144 weights.\nPurpose: an unbiased re-test, on a fresh hidden subset, of the best hidden candidate of generation 2 (there +1.25, SE 1.20, z 1.04; gold rank -0.11; dlogp +0.50), whose estimate is inflated by being the best of five.\nMy evidence: DEV 512 -1.37 (SE 1.45), gold rank +0.076 (SE 0.057), dlogp +0.40; HOLDOUT 512 -0.20 (SE 1.40), +25/-26, gold rank -0.104 (SE 0.058), dlogp +0.535 (SE 0.054)."
+  },
+  {
+   "name": "claude/l12h13_half",
+   "acc": 36.12,
+   "n": 800,
+   "acc_diff": -0.25,
+   "acc_diff_se": 0.75,
+   "wrong_to_right": 17,
+   "right_to_wrong": 19,
+   "pred_changed": 77,
+   "logp_correct_diff": 0.2496,
+   "logp_correct_diff_se": 0.0199,
+   "gold_rank_diff": -0.05,
+   "gold_rank_diff_se": 0.0237,
+   "z": -0.33,
+   "weights_changed": 262144,
+   "description": "Edit: scale the output of attention head L12.H13 by 0.5 (input columns 13*128..14*128-1 of model.layers.12.self_attn.o_proj.weight). 262,144 weights.\nMechanism: L12.H13 is the main attention writer of the option-correctness belief at the option-end tokens (generation 2, ed_b); its strength sets the CONFIDENCE of the final answer more than its ranking. Halving it is a dose the generation-2 search never tested (x0 and x2 were tested).\nEvidence (paired; chosen on DEV): DEV 512 +0.39 (SE 0.87), gold rank -0.002 (SE 0.027), dlogp +0.19. HOLDOUT 768 (measured once per question, never used for choosing): +0.39 (SE 0.65), +14/-11; gold rank -0.048 (SE 0.026); dlogp(correct) +0.262 (SE 0.020). Expect ~0 accuracy and a robust calibration gain."
+  },
+  {
+   "name": "ed_a/ed_a_g3_prior17",
+   "acc": 35.75,
+   "n": 800,
+   "acc_diff": -0.62,
+   "acc_diff_se": 0.78,
+   "wrong_to_right": 17,
+   "right_to_wrong": 22,
+   "pred_changed": 84,
+   "logp_correct_diff": 0.1094,
+   "logp_correct_diff_se": 0.0138,
+   "gold_rank_diff": -0.0213,
+   "gold_rank_diff_se": 0.0241,
+   "z": -0.79,
+   "weights_changed": 34233,
+   "description": "Removes the content-free answer-letter prior written by 17 near-constant late MLP neurons. Change: model.layers.22.feed_forward.w2.weight columns 190, 1449, 2820, 4543, 5653, 2212, 3998 and model.layers.23.feed_forward.w2.weight columns 1047, 4597, 1903, 6518, 4531, 514, 3073, 2189, 1439, 7466: in post_ffn_norm-scaled space (u = g_post * col) the component in the 9-dim centered letter-readout subspace (span of embedding_norm.weight * E[A..J] minus their mean) is projected out at strength 1, col <- (u - QQ^T u)/g_post; the rest of each column is unchanged (34,233 weights differ in bf16). Mechanism: these neurons fire nearly constantly at the answer position and write a fixed A/B/C/F-up, H/I/J-down letter preference (gen-1 ed_a list, L22/L23 subset); the parent predicts A..J 174 164 162 119 96 99 73 50 34 29 vs gold 134 104 115 115 74 95 83 101 95 84 on HOLDOUT. Removing their letter write flattens this without self-repair (DLA screen predicted logp +0.14, measured +0.13). Evidence (paired edited - parent): DEV2[0:256] -0.39 (SE 1.30), DEV pass1[0:256] +0.39 (SE 1.30); HOLDOUT[0:1000], measured once after choosing on DEV: +0.80 (SE 0.65, z 1.23), 25 wrong->right / 17 right->wrong, logp(correct) +0.133 (SE 0.0125), gold rank -0.08. Gains come from gold H/I/J (+4-6 pts each) at a cost on gold B (-7). Expect accuracy ~+0.5-1 (not significant alone); calibration gain is robust.\n"
+  },
+  {
+   "name": "ed_b/letterproj_L22_all",
+   "acc": 35.38,
+   "n": 800,
+   "acc_diff": -1.0,
+   "acc_diff_se": 0.59,
+   "wrong_to_right": 7,
+   "right_to_wrong": 15,
+   "pred_changed": 51,
+   "logp_correct_diff": 0.0268,
+   "logp_correct_diff_se": 0.0122,
+   "gold_rank_diff": -0.01,
+   "gold_rank_diff_se": 0.0206,
+   "z": -1.69,
+   "weights_changed": 2964771,
+   "description": "Removes the content-free 'option letter token' vote from all layer-22 attention queries. Change: model.layers.22.self_attn.q_proj.weight only; for every head h (16 heads, rows h*128:(h+1)*128): W_h <- W_h - a w_g w_g^T W_h, rank 1 per head, a = 1.0 (head 12: a = 1.5), w_g = normalize(q_norm.weight * u_g), u_g = mean over 240 DEV questions of (mean k_norm key at the option letter tokens '(X' minus mean key at the option end and newline tokens) for kv group g = h//4. Mechanism: L22 is NoPE (q.k reproduces attention); its answer-copy head H12 puts 12% of its attention on the letter tokens '(X', whose keys precede the option text (causal) and so carry only a slot code, not the option's content; many other L22 heads do the same (7-50%). Lens (DEV, recorded attention): dropping letter tokens raises H12's option pick +5/-2 and that of H0/H3/H11 by +8 to +20 net; q_norm renormalizes the query after the projection. Evidence (paired, edited - parent): DEV3 256 q: acc +0.39 (SE 1.17), 5/4, dlogp(correct) +0.040 (SE 0.023), gold rank -0.078 (SE 0.039). HOLDOUT 512 q (measured once, after choosing on DEV): acc 0.00 (SE ~0.74), 7 wrong->right / 7 right->wrong, dlogp(correct) +0.047 (SE ~0.017), gold rank -0.031 (SE ~0.027). Accuracy-neutral; small replicated calibration gain."
+  },
+  {
+   "name": "ed_b/letterproj_L22_h12",
+   "acc": 35.88,
+   "n": 800,
+   "acc_diff": -0.5,
+   "acc_diff_se": 0.5,
+   "wrong_to_right": 6,
+   "right_to_wrong": 10,
+   "pred_changed": 43,
+   "logp_correct_diff": 0.0133,
+   "logp_correct_diff_se": 0.0129,
+   "gold_rank_diff": -0.0088,
+   "gold_rank_diff_se": 0.0224,
+   "z": -1.0,
+   "weights_changed": 191645,
+   "description": "Removes the content-free 'option letter token' vote from the answer-copy head L22.H12 only. Change: model.layers.22.self_attn.q_proj.weight rows 1536:1664 (head 12): W_h <- W_h - 1.5 w w^T W_h (rank 1), w = normalize(q_norm.weight * u), u = mean over 240 DEV questions of (mean group-3 k_norm key at the option letter tokens '(X' minus mean key at the option end and newline tokens). Mechanism: L22 is NoPE; H12 (the head whose attention picks the answer, +2.9 logits to gold) puts 12% of its attention on letter tokens whose keys precede the option text (causal), i.e. a content-free slot vote (B over-picked). Lens: dropping letter tokens from H12's option vote +5/-2 (recorded attention) / +8/-0 (recomputed q.k), letter-token mass .116 -> .026 at this strength. Evidence (paired): DEV3 256 q: acc +1.17 (SE 0.87), 4/1, dlogp +0.022 (SE 0.023), gold rank -0.055 (SE 0.037). HOLDOUT 512 q (measured once): acc 0.00 (SE ~0.73), 7/7, dlogp +0.020 (SE ~0.017), gold rank -0.025 (SE ~0.027). Accuracy-neutral."
+  }
+ ],
+ "winner": null,
+ "rule": "z >= 2.0",
+ "time": 1793851500.9556496
+}
