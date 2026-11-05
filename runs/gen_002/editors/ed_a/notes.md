@@ -44,3 +44,9 @@
 ## Candidate 2 choice: E1 alpha=0.5 (L22 only). Chosen from DEV/S1 evidence: same +1.95 acc with SE 1.03 (6/1), and gold-A acc on S1 kept at .42 (alpha=1: .31). (Caveat: I chose to measure it after seeing that A collapses on holdout for candidate 1, which was already visible on S1.)
 ## Passes 9-10: E1 alpha=0.5 on HOLD[0:256], HOLD[256:512].
 - Pass 9 (E1 a0.5, HOLD[0:256]): acc -0.39 (SE 1.52), 7/8, logp +0.112 (SE 0.039).
+- Pass 10 (E1 a0.5, HOLD[256:512], requeued after machine restart): acc -0.78 (SE 1.24), 4/6, logp +0.118 (SE 0.035).
+- HOLDOUT 512 pooled, E1 a0.5: 34.96 -> 34.38, -0.59 (SE 0.98), 11/14, logp +0.115 (SE 0.026).
+## Submitted (code/017)
+- ed_a_qprimacy_L22L20 = work/edit_E1E2 (HOLD512 +0.39 SE 1.46, logp +0.197 SE 0.055). 6.26M bf16 weights differ (rank-1 per head, 2 tensors).
+- ed_a_qprimacy_L22_half = work/edit_E1_a0.5_final (HOLD512 -0.59 SE 0.98, logp +0.115 SE 0.026).
+- Conclusion: the primacy mechanism is real and causal (bias flattens, logp up robustly), but there is no reliable accuracy gain; A gets under-picked. See report.md.

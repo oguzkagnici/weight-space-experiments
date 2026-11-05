@@ -55,3 +55,9 @@
 - Result pass 7 (X0 on HOLD[0:256]): acc -1.56 (SE 1.91), 10 w->r / 14 r->w, dlogp +0.470 (SE .075). Again a confidence knob only.
 
 ## Pass 8 (read, parent, cloze) -- 108 questions from the pass-3 set (prompt <=250 tokens), 1024 texts = question + "Answer with the correct answer." + assistant "The answer is: <option text>"; token_logprobs.
+- Result pass 8 (cloze, code/030; pass was interrupted by a machine restart and requeued, counted once): 108 questions, MC acc 33.3%.
+  Option-text likelihood (mean per token) picks gold 25.9% overall, 25.0% on MC-WRONG questions (18/72; chance ~10%), 27.8% on MC-right; sum-logprob 20.4%.
+  => the model holds some answer knowledge that the letter-selection circuit does not use (cloze correctness ~ independent of MC correctness).
+  Ensemble MC logprob + 0.25*z(cloze) 35.2% vs 33.3% (+2/108; small n). Lead for next generation, not exploitable in my remaining budget.
+
+## Pass 9 (both, HOLD[256:512]) -- edit X1: L12 o_proj cols 1664:1792 x2.0

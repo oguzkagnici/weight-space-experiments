@@ -1,0 +1,20 @@
+{
+ "label": "ed_a_qprimacy_L22L20",
+ "editor": "ed_a",
+ "gen": 2,
+ "time": 1793838030.3649738,
+ "tensors": {
+  "model.layers.20.self_attn.q_proj.weight": {
+   "changed_bf16": 3534317,
+   "numel": 4194304,
+   "rel_change": 0.08274373412132263,
+   "sha_bf16": "276adba1e8064f3f"
+  },
+  "model.layers.22.self_attn.q_proj.weight": {
+   "changed_bf16": 2725089,
+   "numel": 4194304,
+   "rel_change": 0.07618320733308792,
+   "sha_bf16": "8eb7245fe1dbc3de"
+  }
+ }
+}

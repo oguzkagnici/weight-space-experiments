@@ -1,0 +1,14 @@
+{
+ "label": "ed_a_qprimacy_L22_half",
+ "editor": "ed_a",
+ "gen": 2,
+ "time": 1793838031.7554183,
+ "tensors": {
+  "model.layers.22.self_attn.q_proj.weight": {
+   "changed_bf16": 2421150,
+   "numel": 4194304,
+   "rel_change": 0.03809160366654396,
+   "sha_bf16": "4ba6def0e098d064"
+  }
+ }
+}
