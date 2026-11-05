@@ -52,3 +52,6 @@
 - Revised plan: X0 and X1 each on HOLD[0:512] (2 passes each); 1 read pass to test whether the model has knowledge the MC format does not use (option-likelihood "cloze" scoring on model-wrong questions).
 
 ## Pass 7 (both, HOLD[0:256]) -- edit X0: L12 o_proj cols 1664:1792 x0.0
+- Result pass 7 (X0 on HOLD[0:256]): acc -1.56 (SE 1.91), 10 w->r / 14 r->w, dlogp +0.470 (SE .075). Again a confidence knob only.
+
+## Pass 8 (read, parent, cloze) -- 108 questions from the pass-3 set (prompt <=250 tokens), 1024 texts = question + "Answer with the correct answer." + assistant "The answer is: <option text>"; token_logprobs.

@@ -104,3 +104,11 @@ Parent on the hidden selection: 35.0%. No candidate reached z ≥ 2. **Elitism:*
 4. **All three reports name the next lever:** the content selection of L22 head 12 (which option it attends to).
 
 **Bug found and fixed after generation 1.** Attention outputs were indexed by layer number, but the model returns attentions only for its 11 attention layers. No generation-1 editor used the option, so no result is affected. Attention requests are now validated and mapped. New tool: `attn_last` (attention from the answer position for every text) for studying head 12's selection.
+
+## 2026-11-05 — Container restart during generation 2
+
+- The container restarted while `ed_a` (9 passes used, pass 10 queued) and `ed_b` (7 used, pass 8 running) were working. `claude` had already submitted.
+- The disk was intact: data, cache, editors' folders and the queue files all survived. Processes were lost.
+- Recovery:
+  - the server was restarted, and the interrupted pass was requeued (passes count only on completion, so no budget was lost or double-counted);
+  - both sub-agents were resumed from their saved transcripts with a note about the restart.

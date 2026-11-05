@@ -37,3 +37,10 @@
 ## Decision (DEV only): candidate 1 = E1+E2 (L22+L20 q-side ordinal removal, alpha 1); candidate 2 = E1 (L22 only, alpha 1).
 ## Passes 7-8: E1+E2 on HOLDOUT[0:256], HOLDOUT[256:512]. Passes 9-10: E1 on the same.
 - Pass 7 (E1+E2, HOLD[0:256]): acc +0.00 (SE 2.14), 15/15, pred_changed 74, logp +0.197 (SE 0.080).
+- Pass 8 (E1+E2, HOLD[256:512]): acc +0.78 (SE 2.0), 14/12, pred_changed 55, logp +0.196 (SE 0.076).
+- HOLDOUT 512 (passes 7+8 pooled) for E1+E2: acc 34.96 -> 35.35, paired +0.39 (SE 1.46), 29 w->r / 27 r->w; logp(correct) +0.197 (SE 0.055) (10-opt: +0.47 pts, +0.23 logp; <10-opt: 0.0, +0.04).
+  - Bias flattened as on DEV (centred I -2.1 -> -0.6), but gold-A accuracy falls (.43->.27, .42->.16): A becomes under-picked (centred -0.5/-0.66), F stays +1. Cross-fitted debiased acc shows no content gain on holdout (.366->.326, .359->.357), unlike S1.
+  - The logp gain replicates; the accuracy gain does not.
+## Candidate 2 choice: E1 alpha=0.5 (L22 only). Chosen from DEV/S1 evidence: same +1.95 acc with SE 1.03 (6/1), and gold-A acc on S1 kept at .42 (alpha=1: .31). (Caveat: I chose to measure it after seeing that A collapses on holdout for candidate 1, which was already visible on S1.)
+## Passes 9-10: E1 alpha=0.5 on HOLD[0:256], HOLD[256:512].
+- Pass 9 (E1 a0.5, HOLD[0:256]): acc -0.39 (SE 1.52), 7/8, logp +0.112 (SE 0.039).
