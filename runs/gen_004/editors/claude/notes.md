@@ -15,3 +15,28 @@
 - Conclusion: the "answer just stated" condition is distributed, so a linear (rank-one W2) edit would leak onto ordinary paragraph ends. Plan: repurpose one quiet MLP-20 neuron as a gated detector (gate = commit direction minus threshold via the near-constant component of the normed input; up = constant component; out = wrap-up direction). Needs the MLP-20 input at all tokens to set the threshold -> pass 2.
 
 ## Pass 2 (read, original): 10 full bank traces (5 cut with a statement, 5 finished), all positions: h20, h21, mlp20, token log-probs.
+### Pass 2 results (read, original, 10 full traces, all positions)
+- MLP-20 input x-hat reconstructed from recorded h21 and mlp20 (h21 - post_ffn_norm(W2 a), then ffn_norm): recomputed neuron activations match the recorded ones (corr 0.99999).
+- Commit score s = v.x-hat (v = mean commit - mean control x-hat at the decision points, orthogonalised to the mean x-hat): commit points mean 13.4, controls -2.0, all 24,845 tokens mean 0, all-token percentiles 99 / 99.8 / 99.9 = 3.7 / 10.3 / 12.5. Out of sample (2-fold), the 99.9-pct threshold passes 66% of commit points and 8% of controls.
+
+### Current edit (candidate "gate_wrapup_L20", pass 3 = first test)
+- Layer 20 MLP neuron 5414 (the quietest by max |a|*|w2 col| over all recorded tokens; max contribution 0.087 vs median neuron 0.20) repurposed:
+  - w1 row (gate) = v - th * mu_hat / m (th = 10.28, the all-token 99.8th percentile of s; mu_hat / m = normalised mean x-hat, ~1 on typical tokens);
+  - w3 row (up) = mu_hat / m;
+  - w2 column = 0.083 * w, w = regularised (gpost / (gpost^2 + 0.02^2)) map of the residual direction -(gF * (mean E[reopen words] - mean E[wrap-up words])); wrap-up words: Thus, Hence, Therefore, So, We, Final, Answer; NOT </think>.
+- Pre-screen (linear read-out through post_ffn_norm and the final norm, ignoring layers 21-23): commit points median -3.0 logits on (reopen - close) (25% of them untouched), controls median 0.0 (8% below -1), all tokens: 0.12% with |change| > 1.
+
+## Pass 3 (read, edited): 108 decision texts (last position: top-30, mlp20) + 5 finished full traces (token log-probs vs pass 2).
+### Pass 3 results (read, edited at target -3; in-sample decision points)
+- P(reopen) / P(close) at the next token, original -> edited:
+  - commit points that reopened (n 31): 0.812 -> 0.684 / 0.112 -> 0.236
+  - commit points that wrapped up (n 20): 0.320 -> 0.155 / 0.610 -> 0.783
+  - controls (paragraph ends) that reopened (n 25): 0.707 -> 0.692 / 0.087 -> 0.101
+  - controls that wrapped up (n 25): 0.042 -> 0.042 / 0.711 -> 0.711
+  - P(</think>) stays 0.000 everywhere
+- New neuron activation: commit points median 7.2 (71% > 0.5); controls median 0.0 (10% > 0.5).
+- Side effects on 5 finished full traces (8,076 tokens, token log-probs vs pass 2): mean change < 0.001 per token; one position with |change| > 0.5, and it is a commit point ("Hence the answer is (D).\n\n" -> "But": -0.71).
+- The real shift (~ -1 logit odds) is about 1/3 of the read-out estimate (-3): layers 21-23 dilute it.
+- Dose for pass 4: estimate target -9 (w2 scale 0.40; scale 0.187 at -6; saturation beyond, at scale 50 80% of tokens are perturbed). Expected real shift ~ -3.
+
+## Pass 4 (generate both, DEV): 17 cut bank traces with an in-think statement + 15 random finished ones (work/dev_split.json). Edit = gate_wrapup_L20 at target -9.

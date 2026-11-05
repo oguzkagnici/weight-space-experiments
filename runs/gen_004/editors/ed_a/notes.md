@@ -35,3 +35,9 @@
 
 ## Edit E1 (current): model.layers.18.feed_forward.w3.weight row 5407 -= 0.3 * d  (d = work/d_concl_l18.npy, unit norm, 2048 weights). code/015.
 ## Pass 2 (read, edited E1): 50 shortest read-1 prefixes (work/read2_sel.json), topk 50, mlp 18/19/22 at last position.
+
+## Pass 2 result (read, edited E1 beta .3), code/017-018
+- n5407 activation at post-conclusion reconsider (fin) -0.88 -> -3.26 (as predicted), but P(C) only .14 -> .18 (first-order predicted .48); commit points .44->.53; controls unchanged.
+- Cancellation: L18 block gives -1.31 logits on R-C at conclusion points, L19 n50 takes back +0.91 (act -0.09 -> +0.78; +2.1 at commit points). L22 n3686 did not react. Unrecorded L20/L21/attn presumably take the rest.
+## Edit E2 (current): E1 with beta 0.6 + model.layers.19.feed_forward.w2.weight column 50 set to 0 (code/019, args 0.6 0.0).
+## Pass 3 (read, edited E2): same 50 prefixes, topk 50, mlp 18-22.
