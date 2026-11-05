@@ -49,3 +49,12 @@
 - Weak point: in cut traces the conclusion direction projects less (their "conclusions" are more tentative), so the edit moves them little.
 ## Edit E3 (current): E2 + model.layers.22.feed_forward.w2.weight column 3686 set to 0 (code/020). Tensors: L18 w3 row 5407 (-0.6 d), L19 w2 col 50 = 0, L22 w2 col 3686 = 0.
 ## Pass 4 (generate both, DEV32 = work/dev32.json: all 15 DEV cut traces with a conclusion, 3 cut without, 14 finished; enriched for the target).
+
+## Pass 4 result (generate both, DEV32, edit E3), code/021
+- Accuracy 28.1% -> 40.6%, paired +12.5 pp (SE 7.4), 5 wrong->right / 1 right->wrong. Cut share 56% -> 47% (-9.4, SE 9.4). Mean tokens 2509 -> 2414 (-95, SE 108).
+- Of 18 originally-cut traces, 6 now finish (4 correct: 1171 C, 10018 D, 11121 C, 4192 J; 2 wrong: 4811 A, 10935 H). Of 14 originally-finished: accuracy unchanged 64%, 5822 B->J (w->r), 2147 J -> cut (r->w); 6800 and 1643 (both wrong) became cut. Tokens on that subset 1785 -> 1978 (trajectories diverge once a token differs).
+- No lexical degeneration: therefore/thus/hence density per 1k tokens unchanged (no repeated words).
+- DEV32 is enriched (all 15 cut traces with a conclusion), so the gain overstates the natural-distribution effect.
+## Pass 5 (generate both, HOLDOUT 32 = work/split.json holdout, same edit E3, no changes after DEV).
+## Pass 6 (generate both, HOLDOUT2 = 32 fresh non-bank practice questions, work/holdout2.json, seed 2026; same edit E3).
+- code/023 on pass 4: post-conclusion commit rate 0.16 -> 0.24 (11/68 -> 11/46); reconsideration episodes after a conclusion 57 -> 35; conclusion points per 1k tokens 0.85 -> 0.60; share of trace after first conclusion 0.38 -> 0.32.
