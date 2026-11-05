@@ -1,0 +1,14 @@
+{
+ "label": "l12h13_half",
+ "editor": "claude",
+ "gen": 3,
+ "time": 1793845545.2840037,
+ "tensors": {
+  "model.layers.12.self_attn.o_proj.weight": {
+   "changed_bf16": 262144,
+   "numel": 4194304,
+   "rel_change": 0.11865442991256714,
+   "sha_bf16": "2615bebb9fcafe50"
+  }
+ }
+}

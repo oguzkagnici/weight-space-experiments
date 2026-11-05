@@ -7,3 +7,5 @@
 - CHOSEN ON DEV: primary x0.5; x0 submitted as an explicit re-test of the generation-2 result. Passes 6-7: x0.5 on HOLDOUT[0:512]; passes 8-9: x0 on the same.
 - Passes 6-9 RESULT (HOLDOUT 512, once): x0.5 +1.17 (SE 0.78), +11/-5, gold rank -0.082 (SE 0.033), dlogp +0.255 (SE 0.023); x0 -0.20 (SE 1.40), +25/-26, gold rank -0.104 (SE 0.058), dlogp +0.535.
 - Pass 10: x0.5 on HOLDOUT[512:768] (more data for the chosen candidate).
+- Pass 10 RESULT (x0.5, HOLDOUT[512:768]): -1.17 (SE 1.17), +3/-6, dlogp +0.276. Pooled HOLDOUT 768: +0.39 (SE 0.65), gold rank -0.048 (SE 0.026), dlogp +0.262 (SE 0.020).
+- SUBMITTED l12h13_half (primary) and l12h13_ablate_retest. Report in report.md.

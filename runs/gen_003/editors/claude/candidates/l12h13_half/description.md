@@ -1,0 +1,3 @@
+Edit: scale the output of attention head L12.H13 by 0.5 (input columns 13*128..14*128-1 of model.layers.12.self_attn.o_proj.weight). 262,144 weights.
+Mechanism: L12.H13 is the main attention writer of the option-correctness belief at the option-end tokens (generation 2, ed_b); its strength sets the CONFIDENCE of the final answer more than its ranking. Halving it is a dose the generation-2 search never tested (x0 and x2 were tested).
+Evidence (paired; chosen on DEV): DEV 512 +0.39 (SE 0.87), gold rank -0.002 (SE 0.027), dlogp +0.19. HOLDOUT 768 (measured once per question, never used for choosing): +0.39 (SE 0.65), +14/-11; gold rank -0.048 (SE 0.026); dlogp(correct) +0.262 (SE 0.020). Expect ~0 accuracy and a robust calibration gain.

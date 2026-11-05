@@ -1,0 +1,3 @@
+Edit: ablate L12.H13 (its 128 o_proj input columns set to 0), rebuilt from the published description of generation-2 candidate ed_b/ed_b_g2_L12H13_ablate. 262,144 weights.
+Purpose: an unbiased re-test, on a fresh hidden subset, of the best hidden candidate of generation 2 (there +1.25, SE 1.20, z 1.04; gold rank -0.11; dlogp +0.50), whose estimate is inflated by being the best of five.
+My evidence: DEV 512 -1.37 (SE 1.45), gold rank +0.076 (SE 0.057), dlogp +0.40; HOLDOUT 512 -0.20 (SE 1.40), +25/-26, gold rank -0.104 (SE 0.058), dlogp +0.535 (SE 0.054).

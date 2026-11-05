@@ -1,0 +1,14 @@
+{
+ "label": "l12h13_ablate_retest",
+ "editor": "claude",
+ "gen": 3,
+ "time": 1793845549.0890634,
+ "tensors": {
+  "model.layers.12.self_attn.o_proj.weight": {
+   "changed_bf16": 262144,
+   "numel": 4194304,
+   "rel_change": 0.23730885982513428,
+   "sha_bf16": "321914cb304c42dc"
+  }
+ }
+}
