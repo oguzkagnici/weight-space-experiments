@@ -41,3 +41,11 @@
 - Cancellation: L18 block gives -1.31 logits on R-C at conclusion points, L19 n50 takes back +0.91 (act -0.09 -> +0.78; +2.1 at commit points). L22 n3686 did not react. Unrecorded L20/L21/attn presumably take the rest.
 ## Edit E2 (current): E1 with beta 0.6 + model.layers.19.feed_forward.w2.weight column 50 set to 0 (code/019, args 0.6 0.0).
 ## Pass 3 (read, edited E2): same 50 prefixes, topk 50, mlp 18-22.
+
+## Pass 3 result (read, edited E2), code/017-018
+- P(C) at post-conclusion breaks: reconsider(fin) .14 -> .29 (P(R) .65 -> .50), commit .44 -> .70, reconsider(cut, n=8) .11 -> .13; controls flat (.29->.31, .34->.33); top-1 unchanged at controls except 1 of 7.
+- n5407 act: rec(fin) -0.88 -> -5.64, rec(cut) -0.44 -> -1.95, ctrl -0.85 -> -1.60 / -0.43 -> -0.22.
+- New cancellation: L22 n3686 act 1.56 -> 6.83 at conclusion points, giving back +0.59 of the -1.96 logits from L18. L19 n50 ablated (no output).
+- Weak point: in cut traces the conclusion direction projects less (their "conclusions" are more tentative), so the edit moves them little.
+## Edit E3 (current): E2 + model.layers.22.feed_forward.w2.weight column 3686 set to 0 (code/020). Tensors: L18 w3 row 5407 (-0.6 d), L19 w2 col 50 = 0, L22 w2 col 3686 = 0.
+## Pass 4 (generate both, DEV32 = work/dev32.json: all 15 DEV cut traces with a conclusion, 3 cut without, 14 finished; enriched for the target).
