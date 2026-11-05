@@ -89,6 +89,9 @@ def cmd_new_gen(a):
            "editors": a.editors.split(","), "budget": a.budget, "max_candidates": a.max_cands,
            "selection_questions": sel, "created": time.time(), "focus": json.loads(a.focus) if a.focus else {},
            "protocol": a.protocol, "template": a.template}
+    if a.trace_bank:
+        tb = os.path.abspath(a.trace_bank)
+        gen["trace_bank"] = tb; gen["trace_n"] = sum(1 for _ in open(tb))
     json.dump(gen, open(os.path.join(gd, "gen.json"), "w"), indent=1)
     for ed in gen["editors"]:
         edir = os.path.join(gd, "editors", ed)
@@ -417,6 +420,7 @@ def main():
     p.add_argument("--focus", default=None, help="JSON {editor: suggested starting point}")
     p.add_argument("--protocol", choices=["direct", "think"], default="direct")
     p.add_argument("--template", default="editor_task.md")
+    p.add_argument("--trace-bank", default=None, help="jsonl of base-model thinking traces shared with editors (phase 2)")
     sp.add_parser("candidates")
     p = sp.add_parser("select"); p.add_argument("--wait", action="store_true")
     p = sp.add_parser("decide"); p.add_argument("--z", type=float, default=2.0); p.add_argument("--force")
