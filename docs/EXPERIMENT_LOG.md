@@ -233,3 +233,26 @@ Paired against base on GPQA Diamond (198 questions, 4 options); `results/gpqa_tr
 - **Editor API:** `render_think(qid)`, `trace_text(row)` (teacher-force a generated trace in read passes).
 - **Phase-2 brief:** `prompts/editor_task_think.md`. Same rules as the paper, plus: making the model close its thinking early regardless of the problem, or shortening all traces uniformly, is out of scope; repairing a specific wasteful behaviour inside the thinking is in scope.
 - **Incident:** the container restarted silently at about 08:17 UTC (uptime). The forward-pass server died with it and was restarted at 10:30; no editor work was running. A probe command that ran `pkill -f` on a pattern contained in its own command line killed its own shell (the second time this happened; avoid `pkill -f` with patterns that appear in the calling command).
+
+## 2026-11-05 — Shared trace bank (base model, thinking mode, 96 practice questions)
+
+Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue time for 96 answers (about 85 s per answer). File: `runs/shared/trace_bank_base_cap3072.jsonl`.
+
+- **Accuracy 37.5% (SE 4.9)**; **55.2% cut** at the cap (53 of 96). Finished answers: 43, of which 36 are correct (**83.7%**; the 32-question probe's 11/11 was lucky). Mean tokens 2,412; finished 1,600.
+- Cut / n / correct by subject: law 10/12/1, philosophy 3/3/0, engineering 4/5/1, health 7/11/3, physics 7/13/6, psychology 5/9/4, economics 4/10/3, chemistry 3/6/3, math 3/7/4, business 2/7/5, biology 0/3/3, computer science 2/3/1, history 1/2/1, other 2/5/1.
+- Words per 1,000 tokens, truncated vs finished traces:
+
+  | | maybe | perhaps | Alternatively | Hmm | Actually | But | Wait | "Option X" | "=" |
+  |---|---|---|---|---|---|---|---|---|---|
+  | truncated | 4.15 | 1.03 | 0.45 | 0.16 | 1.74 | 3.91 | 0.71 | 4.08 | 13.7 |
+  | finished | 1.85 | 0.32 | 0.16 | 0.04 | 1.13 | 2.75 | 0.52 | 3.98 | 13.1 |
+
+  Hedging and reconsideration markers are 2–4× denser in truncated traces. Arithmetic density and option-by-option mentions are the same. So the extra length is indecision, not computation.
+- **Every finished trace states its answer inside the thinking before closing it.** 17 of 53 truncated traces also stated an answer inside the thinking (median at 75% of the trace; 9 of the 17 correct) and then kept going until the cap: post-commitment continuation.
+- Hypotheses for generation 4: (H1) a component reopens settled answers after the first in-think commitment; (H2) hedging episodes are started by identifiable components that fire on points already settled. Both are "specific wasteful behaviours" in scope under D31, as long as the edit does not shorten every trace.
+
+## 2026-11-05 — Generation 4 started (thinking mode)
+
+- Configuration D34: editors `claude` and `ed_a`, 6 passes each, ≤ 1 candidate each, hidden selection subset 96 (seed `selection-gen-4`), starting points as in D34.
+- Brief: `prompts/editor_task_think.md` with the trace-bank facts above. `ga new-gen` gained `--trace-bank` (it fills `{TRACE_BANK}` and `{TRACE_N}`).
+- Parent selection answers prewarmed in low-priority chunks (D35).

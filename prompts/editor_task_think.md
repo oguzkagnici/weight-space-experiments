@@ -17,9 +17,12 @@ HOW IT WILL BE MEASURED (thinking mode, phase 2 of the experiment). Every candid
 - Selection compares each candidate with the parent on the same hidden MMLU-Pro questions (paired, same seeds); the bar is z >= 2. Champions are later also evaluated on untouched held-out questions and GPQA Diamond.
 - You never see the selection or held-out questions. The config, tokenizer, chat template, sampling and budget are fixed: only weight values can change.
 
-WHAT IS KNOWN ABOUT THE PARENT IN THIS MODE (32 practice questions):
-- Accuracy 34%. 66% of answers run into the 3,072-token cap without answering, and every answer that finished was correct (11 of 11, 389 to 2,986 tokens).
-- The truncated traces do NOT loop: no repeated lines, no repeated 40-character windows. They are long because the model computes explicitly, re-derives formulas, re-checks itself and deliberates option by option.
+WHAT IS KNOWN ABOUT THE PARENT IN THIS MODE (the shared trace bank, 96 practice questions; see item 3 below):
+- Accuracy 37.5% (SE 4.9). 55% of answers (53 of 96) run into the 3,072-token cap without answering. Of the 43 that finished, 36 were correct (84%); finished answers used 1,600 tokens on average.
+- Cut share by subject: law 10 of 12, philosophy 3 of 3, engineering 4 of 5, health 7 of 11, physics 7 of 13; biology 0 of 3, business 2 of 7.
+- The truncated traces do NOT loop (no repeated lines or 40-character windows in the traces inspected). They are long because the model computes explicitly, re-derives, re-checks itself and deliberates option by option.
+- Hedging is denser in truncated traces than in finished ones (per 1,000 tokens): "maybe" 4.2 vs 1.9, "perhaps" 1.0 vs 0.3, "Alternatively" 0.45 vs 0.16, "Hmm" 0.16 vs 0.04, "Actually" 1.7 vs 1.1. Arithmetic ("=" 13.7 vs 13.1) and option mentions ("Option X" 4.1 vs 4.0) are about equally dense.
+- Every finished trace states its answer inside the thinking ("the answer is ...") before closing it. 17 of the 53 truncated traces also stated an answer inside the thinking (at a median of 75% of the trace; 9 of those 17 correct) and then kept going until the cap.
 - The binding failure is therefore running out of budget before committing to an answer. Find WHY specific traces take so long and repair the specific mechanism.
 - Generations 1-3 (direct-answer mode, history below) mapped the answer circuit: docs/MODEL_FINDINGS.md summarises it. Read it if useful.
 
