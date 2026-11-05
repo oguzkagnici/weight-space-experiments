@@ -53,18 +53,24 @@ def build_gpqa():
     return len(ds)
 
 
+import threading
 _Q = None
 _QSIG = None
+_QLOCK = threading.Lock()
 def questions():
+    """All questions by id (thread-safe; reloads if the data files change)."""
     global _Q, _QSIG
     sig = tuple(os.path.getmtime(f) if os.path.exists(f) else 0 for f in (QFILE, GPQA_FILE))
-    if _Q is None or sig != _QSIG:
-        _QSIG = sig
-        _Q = {}
-        for fn in (QFILE, GPQA_FILE):
-            if os.path.exists(fn):
-                for line in open(fn):
-                    q = json.loads(line); _Q[q["id"]] = q
+    if _Q is not None and sig == _QSIG:
+        return _Q
+    with _QLOCK:
+        if _Q is None or sig != _QSIG:
+            new = {}
+            for fn in (QFILE, GPQA_FILE):
+                if os.path.exists(fn):
+                    for line in open(fn):
+                        q = json.loads(line); new[q["id"]] = q
+            _Q, _QSIG = new, sig            # publish the complete dict atomically
     return _Q
 
 
