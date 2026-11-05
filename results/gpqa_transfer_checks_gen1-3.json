@@ -1,0 +1,50 @@
+{
+ "L12H13_ablate (g2 ed_b)": {
+  "acc": 27.27,
+  "acc_diff": 1.01,
+  "acc_diff_se": 2.02,
+  "wrong_to_right": 9.0,
+  "right_to_wrong": 7.0,
+  "pred_changed": 41.0,
+  "logp_correct_diff": 0.3222,
+  "logp_correct_diff_se": 0.0558,
+  "gold_rank_diff": -0.0556,
+  "gold_rank_diff_se": 0.0492
+ },
+ "L12H13_half (g3 claude)": {
+  "acc": 25.76,
+  "acc_diff": -0.51,
+  "acc_diff_se": 1.13,
+  "wrong_to_right": 2.0,
+  "right_to_wrong": 3.0,
+  "pred_changed": 19.0,
+  "logp_correct_diff": 0.1429,
+  "logp_correct_diff_se": 0.0242,
+  "gold_rank_diff": 0.0,
+  "gold_rank_diff_se": 0.0277
+ },
+ "prior17 (g3 ed_a)": {
+  "acc": 26.26,
+  "acc_diff": 0.0,
+  "acc_diff_se": 1.43,
+  "wrong_to_right": 4.0,
+  "right_to_wrong": 4.0,
+  "pred_changed": 16.0,
+  "logp_correct_diff": -0.0252,
+  "logp_correct_diff_se": 0.0214,
+  "gold_rank_diff": -0.0152,
+  "gold_rank_diff_se": 0.0291
+ },
+ "letterbias27h (g1 ed_a v2)": {
+  "acc": 24.75,
+  "acc_diff": -1.52,
+  "acc_diff_se": 1.82,
+  "wrong_to_right": 5.0,
+  "right_to_wrong": 8.0,
+  "pred_changed": 24.0,
+  "logp_correct_diff": -0.0691,
+  "logp_correct_diff_se": 0.0331,
+  "gold_rank_diff": -0.0606,
+  "gold_rank_diff_se": 0.0403
+ }
+}

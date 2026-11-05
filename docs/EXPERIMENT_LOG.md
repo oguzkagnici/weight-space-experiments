@@ -169,3 +169,17 @@ Full report: `runs/gen_003/REPORT.md`. Hidden selection on 800 questions; the pa
 **Interpretation across three generations.** In direct-answer mode, the model's answer pathway is close to the best its option-end beliefs allow. Weight edits change confidence and letter distribution reliably but not accuracy: 15 candidates, 0 significant accuracy gains on fresh hidden questions. That matches the paper's Gemma follow-up: edits remove obstacles; they do not add knowledge.
 
 Process note: `ed_a`'s sandbox refused to write report.md, so the orchestrator saved its returned text, with a provenance note.
+
+## 2026-11-05 — GPQA transfer check of calibration edits (not part of any selection)
+
+Paired against base on GPQA Diamond (198 questions, 4 options); `results/gpqa_transfer_checks_gen1-3.json`.
+
+| Edit | GPQA acc (base 26.26) | dlogp(correct) | d gold rank |
+|---|---|---|---|
+| L12.H13 ablation (gen-2 ed_b) | 27.27 (+1.01, SE 2.02) | **+0.32 (SE 0.06)** | −0.06 |
+| L12.H13 ×0.5 (gen-3 claude) | 25.76 (−0.51, SE 1.13) | **+0.14 (SE 0.02)** | 0.00 |
+| prior17 (gen-3 ed_a) | 26.26 (±0) | −0.03 (SE 0.02) | −0.02 |
+| letterbias27h (gen-1 ed_a v2) | 24.75 (−1.52, SE 1.82) | −0.07 (SE 0.03) | −0.06 |
+
+- **The confidence-writer edits (L12.H13) transfer their calibration gain to a different benchmark and format, with no accuracy change.** The likely reason: L12.H13 sets how strongly the option-correctness belief is written, which is format-independent.
+- **The letter-prior removals do not transfer and slightly hurt.** Their prior is specific to 10-option lists, as `ed_b` warned in generation 1.
