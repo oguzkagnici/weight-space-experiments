@@ -277,3 +277,11 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - Measured with the server paused: 1,024-token forward in bf16 38 s (27 tok/s); raw matmul bf16 68 vs fp32 264 GFLOP/s; fp32 engine read 70 tok/s.
 - Change (D36): float32 compute on the bf16 weight values; score caches keyed by dtype; the server unloads the PyTorch model (6.8 GB in fp32) during generation jobs and reloads it for the next PyTorch pass. Pass 1 was restarted (not charged) so that all generation-4 analysis passes share one compute dtype.
 - Consequence for planning: score/read passes are now about 6× slower than in generations 1-3 (about 5 s per 400-token question per model). Thinking-mode generation (llama.cpp, about 85 s per answer) is unchanged.
+
+### Incident: second out-of-memory kill (gen 4, about 16:40 UTC) and a server watchdog
+
+- `claude`'s pass 2 (10 full traces of up to 3,560 tokens, all positions, per-token log-probs) grew the server to 13 GB and it was killed. The float32 model (D36) doubled the resident model to 6.8 GB, and per-token log-probs materialised T × 128,000 logits plus a log-softmax copy.
+- Fix: reads run with `logits_to_keep=1`, capture the final-normed hidden states, and compute per-token log-probs and top-k in chunks of 256 positions through the tied output layer. Verified against full logits: max log-prob difference 4e-6, identical top-k. Two full traces of 3,294 and 3,564 tokens with all positions: 84 s.
+- `fwd wait` now says when the server process is down.
+- New `scripts/watchdog.py` (running detached, PID in `queue/watchdog.pid`): restarts the server within about 30 s if its process dies. It requeues the interrupted request. A request that was running during two crashes is moved to `failed/`, not charged, with an explanation, so a crashing request cannot loop.
+- The server was down for about 15 minutes before this was noticed. Pass 2 was requeued (not charged).

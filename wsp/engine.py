@@ -208,9 +208,13 @@ class Engine:
             if want_attn:
                 self.model.set_attn_implementation("eager")
             keep_all = bool(ret.get("token_logprobs")) or (positions == "all" and topk)
+            fin = {}
+            if keep_all:   # capture the final-normed hidden states; logits are computed in chunks below (memory)
+                hooks.append(self.model.model.embedding_norm.register_forward_hook(
+                    lambda m, i, o: fin.__setitem__("h", o.detach()[0])))
             try:
                 with torch.inference_mode():
-                    out = self.model(ids, logits_to_keep=0 if keep_all else 1)
+                    out = self.model(ids, logits_to_keep=1)
             finally:
                 for h in hooks: h.remove()
                 if want_attn:
@@ -218,17 +222,31 @@ class Engine:
             for l in need_last:
                 if ("last", l) not in attn_store:
                     raise RuntimeError(f"attention weights of layer {l} were not returned by the attention module")
-            logits = out.logits[0].float()
-            lsm = torch.log_softmax(logits, -1)
-            if ret.get("token_logprobs"):
-                tgt = ids[0, 1:]
-                tok_lp.append(lsm[:-1].gather(1, tgt[:, None])[:, 0].numpy().astype(np.float32))
-            if topk:
+            if keep_all:
+                W = self.model.lm_head.weight
+                H = fin.pop("h"); T = H.shape[0]
+                lp_rows, ti_rows, tv_rows = [], [], []
+                with torch.inference_mode():
+                    for c0 in range(0, T, 256):
+                        lsm = torch.log_softmax((H[c0:c0 + 256] @ W.T).float(), -1)
+                        if ret.get("token_logprobs"):
+                            tgt = ids[0, c0 + 1:c0 + 257]
+                            lp_rows.append(lsm[:len(tgt)].gather(1, tgt[:, None])[:, 0].numpy().astype(np.float32))
+                        if topk:
+                            v, i = lsm.topk(topk, -1); ti_rows.append(i.numpy().astype(np.int32)); tv_rows.append(v.numpy().astype(np.float32))
+                        del lsm
+                if ret.get("token_logprobs"):
+                    tok_lp.append(np.concatenate(lp_rows))
+                if topk:
+                    I, V = np.concatenate(ti_rows), np.concatenate(tv_rows)
+                    if positions == "all":
+                        topk_ids.append(I); topk_lp.append(V)
+                    else:
+                        topk_ids.append(I[-1]); topk_lp.append(V[-1])
+            elif topk:
+                lsm = torch.log_softmax(out.logits[0, -1].float(), -1)
                 v, i = lsm.topk(topk, -1)
-                if positions == "all":
-                    topk_ids.append(i.numpy().astype(np.int32)); topk_lp.append(v.numpy().astype(np.float32))
-                else:
-                    topk_ids.append(i[-1].numpy().astype(np.int32)); topk_lp.append(v[-1].numpy().astype(np.float32))
+                topk_ids.append(i.numpy().astype(np.int32)); topk_lp.append(v.numpy().astype(np.float32))
             for key, v in store.items():
                 if positions == "all":
                     acts.setdefault(key, []).append(v.half().numpy())

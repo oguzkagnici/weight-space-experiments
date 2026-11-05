@@ -1,6 +1,14 @@
 {
- "passes_used": 0,
+ "passes_used": 1,
  "pending": [
-  "gen_004_claude_p01_db2ffc"
+  "gen_004_claude_p02_edc4e1"
+ ],
+ "passes": [
+  {
+   "k": 1,
+   "id": "gen_004_claude_p01_db2ffc",
+   "type": "read",
+   "seconds": 2268.5
+  }
  ]
 }

@@ -156,7 +156,13 @@ def wait(jid, timeout=WAIT):
         time.sleep(3)
     where = "running" if os.path.exists(os.path.join(QUEUE, "running", jid + ".json")) else "queued"
     ahead = len(os.listdir(os.path.join(QUEUE, "pending")))
-    print(f"STILL {where.upper()} after {timeout}s ({ahead} jobs pending in queue). Run: fwd wait {jid}")
+    note = ""
+    try:
+        hb = json.load(open(os.path.join(QUEUE, "heartbeat.json"))); os.kill(int(hb["pid"]), 0)
+    except Exception:
+        note = (" NOTE: the server process is not running right now (it is restarted automatically within a few "
+                "minutes; queued and interrupted requests are kept and nothing is charged).")
+    print(f"STILL {where.upper()} after {timeout}s ({ahead} jobs pending in queue). Run: fwd wait {jid}{note}")
     return False
 
 
