@@ -194,6 +194,10 @@ class Server:
             self.beat(f"running {job['id']} ({job['type']})")
             t = time.time()
             try:
+                if job["type"] in ("score", "read", "eval") and self.llama is not None:
+                    # free llama-server's memory (about 5 GB) before a PyTorch pass; it restarts on the next
+                    # generation job (about 10 s). Two models plus long-text activations exceeded the RAM once.
+                    self.llama.stop()
                 if job["type"] == "score":
                     result = self.run_score(job)
                 elif job["type"] == "read":

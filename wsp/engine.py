@@ -76,7 +76,7 @@ class Engine:
         return key
 
     # ------------------------------------------------------------------ hooks
-    def _hooks(self, spec, store):
+    def _hooks(self, spec, store, last_only=False):
         """spec: {"hidden_states": [l...] (0=embeddings, l=after layer l), "mlp": [layer idx 0..23] (input of w2),
         "inputs": [module names] (input of that module), "outputs": [module names]}"""
         hs = []
@@ -84,7 +84,7 @@ class Engine:
         def cap(key, which):
             def f(mod, inp, out):
                 x = inp[0] if which == "in" else (out[0] if isinstance(out, tuple) else out)
-                store[key] = x.detach()[0].float()
+                store[key] = (x.detach()[0, -1:] if last_only else x.detach()[0]).float()
             return f
         for l in spec.get("hidden_states", []) or []:
             if l == 0:
@@ -165,17 +165,38 @@ class Engine:
             ids = self.tok(text, return_tensors="pt", add_special_tokens=False).input_ids
             meta["n_tokens"].append(int(ids.shape[1]))
             store = {}
-            hooks = self._hooks(ret, store)
-            want_attn = (bool(attn_layers) and ti < MAX_ATTN_TEXTS) or bool(attn_last)
+            hooks = self._hooks(ret, store, last_only=(positions == "last"))
+            # attention: captured per layer by hooks on the attention modules (only the rows that are needed are
+            # kept, the full matrix of a layer is freed right after that layer), so memory stays bounded
+            need_full = set(attn_layers) if ti < MAX_ATTN_TEXTS else set()
+            need_last = set(attn_last)
+            want_attn = bool(need_full or need_last)
+            attn_store = {}
+            def attn_hook(l):
+                def f(mod, inp, out):
+                    w = out[1] if isinstance(out, tuple) and len(out) > 1 else None
+                    if w is not None:
+                        if l in need_full:
+                            attn_store[("full", l)] = w[0].float().numpy().astype(np.float16)
+                        if l in need_last:
+                            attn_store[("last", l)] = w[0, :, -1, :].float().numpy().T.astype(np.float16)  # T x heads
+                        return (out[0], None) + tuple(out[2:])
+                return f
+            for l in need_full | need_last:
+                hooks.append(self.layers[l].self_attn.register_forward_hook(attn_hook(l)))
             if want_attn:
                 self.model.set_attn_implementation("eager")
+            keep_all = bool(ret.get("token_logprobs")) or (positions == "all" and topk)
             try:
                 with torch.inference_mode():
-                    out = self.model(ids, output_attentions=want_attn)
+                    out = self.model(ids, logits_to_keep=0 if keep_all else 1)
             finally:
                 for h in hooks: h.remove()
                 if want_attn:
                     self.model.set_attn_implementation("sdpa")
+            for l in need_last:
+                if ("last", l) not in attn_store:
+                    raise RuntimeError(f"attention weights of layer {l} were not returned by the attention module")
             logits = out.logits[0].float()
             lsm = torch.log_softmax(logits, -1)
             if ret.get("token_logprobs"):
@@ -194,14 +215,12 @@ class Engine:
                     acts.setdefault(key, []).append(v.mean(0).half().numpy())
                 else:
                     acts.setdefault(key, []).append(v[-1].half().numpy())
-            if attn_last and out.attentions is not None:
-                for l in attn_last:
-                    attn_last_rows[l].append(out.attentions[pos_of[l]][0, :, -1, :].float().numpy().T.astype(np.float16))  # T x heads
-            if want_attn and out.attentions is not None and ti < MAX_ATTN_TEXTS:
-                for l in attn_layers:
-                    a = out.attentions[pos_of[l]]
-                    if a is not None:
-                        attn_out[f"attn_L{l}_text{ti}"] = a[0].float().numpy().astype(np.float16)
+            for l in need_last:
+                attn_last_rows[l].append(attn_store[("last", l)])
+            for l in need_full:
+                if ("full", l) in attn_store:
+                    attn_out[f"attn_L{l}_text{ti}"] = attn_store[("full", l)]
+            del out, attn_store
         def save(name, arr):
             np.save(os.path.join(out_dir, name + ".npy"), arr); meta["files"][name] = list(arr.shape)
         lens = np.array(meta["n_tokens"])

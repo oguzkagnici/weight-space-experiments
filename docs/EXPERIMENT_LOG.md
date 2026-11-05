@@ -256,3 +256,17 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - Configuration D34: editors `claude` and `ed_a`, 6 passes each, ≤ 1 candidate each, hidden selection subset 96 (seed `selection-gen-4`), starting points as in D34.
 - Brief: `prompts/editor_task_think.md` with the trace-bank facts above. `ga new-gen` gained `--trace-bank` (it fills `{TRACE_BANK}` and `{TRACE_N}`).
 - Parent selection answers prewarmed in low-priority chunks (D35).
+
+### Incident: out-of-memory kill of the forward-pass server (gen 4, about 14:15 UTC)
+
+- `claude`'s pass 1 (read: 108 long trace prefixes up to 3,463 tokens, all residual/MLP layers, `attn_last` on 4 layers) grew the server to 8.5 GB. The idle llama-server held another 4.9 GB, and the kernel killed the server. The pass was not charged (budget is counted on success); the orphaned llama-server was stopped by PID and the server restarted (PID 9722); the running job was re-queued.
+- Causes in the engine (none affects any earlier result):
+  1. `attn_last` switched to eager attention with `output_attentions=True`, which keeps every attention layer's full T×T matrices until the end of the forward pass (11 layers × 16 heads × T² ≈ 4 GB at T = 3,400).
+  2. Activation hooks stored all positions in float32 even when only the last position was requested (about 3 GB for 24 MLP layers).
+  3. The full-vocabulary logits were materialised for every position (T × 128,000 floats ≈ 1.8 GB, plus a log-softmax copy).
+- Fixes:
+  1. Attention is captured by per-layer hooks that keep only the requested rows; each layer's full matrix is freed as soon as that layer finishes.
+  2. With `positions: "last"`, the hooks keep only the last position.
+  3. `logits_to_keep=1` is used unless per-token log-probs or all-position top-k are requested.
+  4. The server stops llama-server before every PyTorch pass; it restarts on the next generation job in about 10 s.
+- Verified: attention rows and full matrices are identical to the old path (max diff 0.0); top-k identical. A 2,325-token trace with every layer requested peaks at 4.9 GB RSS, including the model.
