@@ -160,3 +160,43 @@ Compensating effects:
 | Remove letter-token attention (L22) | "(X" attention | −0.5 / −1.0 | +0.01 / +0.03 |
 
 **Overall picture.** In direct-answer mode the answer pathway is a clean but limited circuit. Mid-layer blocks build a relational belief at the option tokens. One head in L22 reads it out, a few biases tilt the letter, and a negative-feedback MLP calibrates the result. Every bias found is real and causal, but removing them moves probability between letters rather than adding correct answers. The errors are in the belief itself, which is to say in the model's knowledge.
+
+---
+
+# Thinking mode (phase 2): how LFM3-1.7B spends its thinking budget
+
+Evidence: the 96-question trace bank (D33) and generation 4's analysis passes. The protocol is D30: 3,072-token cap, temperature 0.6.
+
+## Behaviour
+
+- **Running out of budget is the main failure.** 55% of answers hit the 3,072-token cap. 84% of finished answers are correct. The written answer after `</think>` costs about 245 tokens, so the thinking really has about 2,800.
+- **Indecision, not computation.** Truncated and finished traces have the same density of arithmetic ("=") and of option-by-option mentions. Hedging words are 2–4× denser in truncated traces ("maybe", "perhaps", "Alternatively", "Hmm").
+- **Post-commitment re-checking.** Every finished trace states an answer inside the thinking ("the answer is (X)") before closing.
+  - After such a statement, the next line reopens the question ("But let's double-check ...") 31 times out of 58, and wraps up ("We'll output ...", "Thus ...") 20 times.
+  - The re-check rarely changes the answer: 2 of 43 finished traces changed, a net gain of +1.
+  - 17 truncated traces had stated an answer, and 9 of those statements were correct, before running out of budget while re-checking.
+
+## Mechanism (generation 4, editor `claude`)
+
+```mermaid
+flowchart LR
+    S["line ends with<br/>'... the answer is (X).'"] --> NL["'\n\n' token<br/>(decision point)"]
+    NL --> D{"next line?"}
+    D -- "P ≈ 0.6 (diffuse: many<br/>MLP neurons and heads,<br/>each ≤ 0.14 logit)" --> R["'But let's double-check ...'<br/>(reopen: ~350–750 tokens)"]
+    D -- "P ≈ 0.4" --> W["'Thus / We'll output ...'<br/>then &lt;/think&gt;"]
+    C["commit signal in the residual stream<br/>(linearly decodable at every layer,<br/>AUC ≈ 0.87–0.90; no single neuron or head)"] -.-> NL
+    G["edit: gated neuron L20 n5414<br/>gate = commit direction − threshold<br/>out = wrap-up − reopen direction"] -. "fires on 71% of commit points,<br/>10% of other paragraph ends,<br/>~0.2% of tokens" .-> W
+```
+
+- **The parent predicts its own continuation well.** At the token after a statement line, next-token mass on reopening words is 0.81 where the trace reopened and 0.32 where it wrapped up.
+- **The "reopen" push is distributed.** Direct logit attribution through the sandwich norms and the final norm finds no component that pushes reopening specifically after a commitment. The largest commit-specific contributions are under 0.14 logit each (L20.H8, L16.H15, L19 neuron 1851).
+- **The "answer just stated" condition is distributed.**
+  - No single MLP neuron detects it (best AUC 0.90, early-layer lexical features with small activations), and no attention head isolates it (attention to the statement span differs by at most 0.03).
+  - It is linearly decodable from the residual stream at every layer: AUC about 0.9; cross-validated AUC 0.83–0.89 from MLP activations; head outputs separate by at most 3 sd (L22.H10).
+  - At the input of MLP 20, a mean-difference direction scores commit points at +13.4, paragraph-end controls at −2.0, and all tokens at 0. Its 99.8th percentile is 10.3.
+- **A conditional repair is possible without touching anything else.** The repair repurposes one quiet neuron (L20 n5414) as a gated detector: its gate reads the commit direction minus a threshold, and its output writes "wrap-up minus reopen".
+  - At commit points, P(reopen) falls from 0.81 to 0.68 and P(wrap-up) rises from 0.11 to 0.24.
+  - At ordinary paragraph ends, nothing changes.
+  - Along finished traces, the per-token log-prob change is under 0.001 on average, and the only change above 0.5 is at a commit point.
+  - Layers 21–23 dilute the edit to about ⅓ of its direct (read-out) effect.
+  - Generation-level effects (accuracy, truncation) are being measured; see `runs/gen_004/`.

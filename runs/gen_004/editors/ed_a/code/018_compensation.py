@@ -7,9 +7,10 @@ E=load('model.embed_tokens.weight'); gf=load('model.embedding_norm.weight')
 R=[3911,7731,12108,8952,23671,8175,37967,93222,91780,39188,29747]; C=[43129,25705,21009,4597,24081]
 dvec=(E[R].mean(0)-E[C].mean(0)); del E
 h24=torch.tensor(np.load('work/fwd_01/h24.npy').astype(np.float32))[sel]; rf=h24.pow(2).mean(-1).add(1e-5).sqrt()
-for l in [18,19,22]:
+K2=__import__('sys').argv[1] if len(__import__('sys').argv)>1 else '02'
+for l in [18,19,20,21,22]:
     W2=load(f'model.layers.{l}.feed_forward.w2.weight'); gp=load(f'model.layers.{l}.post_ffn_norm.weight')
-    a1=torch.tensor(np.load(f'work/fwd_01/mlp{l}.npy').astype(np.float32))[sel]; a2=torch.tensor(np.load(f'work/fwd_02/mlp{l}.npy').astype(np.float32))
+    a1=torch.tensor(np.load(f'work/fwd_01/mlp{l}.npy').astype(np.float32))[sel]; a2=torch.tensor(np.load(f'work/fwd_{K2}/mlp{l}.npy').astype(np.float32))
     per=(W2.T*gp)@(gf*dvec)  # per unit act
     tot=[]
     for a in (a1,a2):
