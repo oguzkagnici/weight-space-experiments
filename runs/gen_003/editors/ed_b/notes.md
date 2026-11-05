@@ -44,3 +44,9 @@
 - Lens (2-fold CV): alpha .5/1/1.5/2: +6/-1, +8/-3, +10/-4, +9/-6; letter mass .071/.043/.026/.016.
 
 ## Pass 4 (score both, DEV3 = dev[752:1008], 256 q): edit = letterproj alpha 1.5, head 12 (only tensor: model.layers.22.self_attn.q_proj.weight)
+- Pass 4 result: parent 27.73 on DEV3 (hard sample). Edited 28.91: paired +1.17 (SE .87), 4 w->r / 1 r->w, 14 preds changed; dlogp(correct) +.022 (SE .023); gold rank -.055 (SE .037); A preds 44 -> 38, H 17 -> 21. Small, consistent sign. Saved as work/best_1_letterproj_h12_a15.
+
+## Pass 5 (score both, DEV3 again, 256 q): edit = letterproj on ALL 16 L22 heads (per-kv-group direction u_g, w_g = normalize(q_norm.weight*u_g)), alpha 1.0, except H12 alpha 1.5 (code/028). Tensor: model.layers.22.self_attn.q_proj.weight only.
+- Pass 5 result (all heads a1.0, H12 a1.5): acc +0.39 (SE 1.17), 5/4, 20 preds changed; dlogp +.040 (SE .023); gold rank -.078 (SE .039). Better continuous signals than H12-only, accuracy noisier. Saved work/best_2_letterproj_all_a10.
+
+## Pass 6 (score both, DEV3, 256 q): all 16 L22 heads alpha 1.5 (dose step). Tensor: model.layers.22.self_attn.q_proj.weight.

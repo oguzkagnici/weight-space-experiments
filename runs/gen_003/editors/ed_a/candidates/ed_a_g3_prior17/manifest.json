@@ -1,0 +1,20 @@
+{
+ "label": "ed_a_g3_prior17",
+ "editor": "ed_a",
+ "gen": 3,
+ "time": 1793847498.8751702,
+ "tensors": {
+  "model.layers.22.feed_forward.w2.weight": {
+   "changed_bf16": 14039,
+   "numel": 15728640,
+   "rel_change": 0.009221303276717663,
+   "sha_bf16": "f024186a72cd2537"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 20194,
+   "numel": 15728640,
+   "rel_change": 0.04765891283750534,
+   "sha_bf16": "69e2b20d79fa0167"
+  }
+ }
+}
