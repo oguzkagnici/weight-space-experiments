@@ -1,0 +1,174 @@
+{
+ "gen": 2,
+ "parent": "base",
+ "champion_selection": {
+  "n": 800,
+  "acc": 37.0,
+  "se": 1.71,
+  "mean_logp_correct": -2.707,
+  "mean_margin": -0.839,
+  "mean_letter_mass": 0.999,
+  "by_category": {
+   "biology": [
+    67.9,
+    53
+   ],
+   "business": [
+    27.3,
+    44
+   ],
+   "chemistry": [
+    39.2,
+    74
+   ],
+   "computer science": [
+    35.7,
+    28
+   ],
+   "economics": [
+    46.4,
+    56
+   ],
+   "engineering": [
+    42.9,
+    63
+   ],
+   "health": [
+    30.8,
+    65
+   ],
+   "history": [
+    48.0,
+    25
+   ],
+   "law": [
+    28.2,
+    78
+   ],
+   "math": [
+    28.3,
+    99
+   ],
+   "other": [
+    29.2,
+    65
+   ],
+   "philosophy": [
+    24.2,
+    33
+   ],
+   "physics": [
+    34.2,
+    73
+   ],
+   "psychology": [
+    50.0,
+    44
+   ]
+  },
+  "pred_letter_counts": {
+   "A": 140,
+   "B": 128,
+   "C": 140,
+   "D": 81,
+   "E": 53,
+   "F": 83,
+   "G": 65,
+   "H": 57,
+   "I": 30,
+   "J": 23
+  },
+  "answer_letter_counts": {
+   "A": 87,
+   "B": 98,
+   "C": 95,
+   "D": 95,
+   "E": 72,
+   "F": 74,
+   "G": 73,
+   "H": 81,
+   "I": 66,
+   "J": 59
+  }
+ },
+ "candidates": [
+  {
+   "name": "claude/routers_x1p5",
+   "acc": 35.25,
+   "n": 800,
+   "acc_diff": -1.75,
+   "acc_diff_se": 0.77,
+   "wrong_to_right": 12,
+   "right_to_wrong": 26,
+   "pred_changed": 71,
+   "logp_correct_diff": -0.148,
+   "logp_correct_diff_se": 0.0167,
+   "z": -2.27,
+   "weights_changed": 786432,
+   "description": "Edit: scale the outputs of three weak \"early router\" heads by 1.5: model.layers.14.self_attn.o_proj.weight columns of head 15 (15*128..16*128-1) and head 12 (12*128..13*128-1), and model.layers.20.self_attn.o_proj.weight columns of head 7 (7*128..8*128-1). 786,432 weights.\nMechanism (H5): besides the main answer-routing head L22.H12 (own-choice accuracy .371), these heads write a weak, partly independent vote for an option (own-choice accuracy .26-.28, agreeing with H12 only 31-36%, right on 15-16% of H12's mistakes; direct effect ~0.1 logit). Amplifying them gives the ensemble more say.\nEvidence (paired, chosen on DEV): DEV screen256 +1.17 (SE 0.87), DEV screen2 +1.17 (SE 1.30); dose-response x1.5 +1.17, x2 +1.95, x3 +1.95 (log-prob cost grows: -0.15, -0.20, -0.55). HOLDOUT (measured once, never used to choose): 768 questions, about +0.78 (SE ~0.55): HOLDOUT[0:512] +0.59 (SE 0.70) +8/-5, HOLDOUT[512:768] +1.17 (SE 0.87) +4/-1. The correct letter's log-prob falls by ~0.14."
+  },
+  {
+   "name": "claude/routers_x2",
+   "acc": 35.38,
+   "n": 800,
+   "acc_diff": -1.62,
+   "acc_diff_se": 0.93,
+   "wrong_to_right": 21,
+   "right_to_wrong": 34,
+   "pred_changed": 111,
+   "logp_correct_diff": -0.2753,
+   "logp_correct_diff_se": 0.0282,
+   "z": -1.74,
+   "weights_changed": 786432,
+   "description": "Edit: the same three heads (L14.H15, L14.H12, L20.H7; o_proj input columns of each head) scaled by 2. 786,432 weights.\nEvidence: DEV screen2 +1.95 (SE 1.51), +10/-5. HOLDOUT[0:512] (once): +0.20 (SE 1.09), +16/-15, dlogp -0.303. Submitted as the stronger dose; HOLDOUT shows it is about null."
+  },
+  {
+   "name": "ed_a/ed_a_qprimacy_L22L20",
+   "acc": 35.38,
+   "n": 800,
+   "acc_diff": -1.62,
+   "acc_diff_se": 1.19,
+   "wrong_to_right": 39,
+   "right_to_wrong": 52,
+   "pred_changed": 222,
+   "logp_correct_diff": 0.1918,
+   "logp_correct_diff_se": 0.0403,
+   "z": -1.36,
+   "weights_changed": 6259406,
+   "description": "Removes the option-ordinal (\"primacy\") query component from the answer-selecting attention layers L22 and L20.\nChange: model.layers.22.self_attn.q_proj.weight and model.layers.20.self_attn.q_proj.weight, all 16 heads. For head h: W_h <- W_h - t t^T W_h (alpha = 1), where W_h = rows h*128:(h+1)*128 and t = normalize(q_norm.weight * v1_g). v1_g is PC1 of the slot-mean key vectors (k_norm outputs averaged over the tokens of options A..J, 120 DEV questions) of kv group g = h//4. Rank-1 per head, 2 tensors.\nMechanism: L22 is NoPE-like (q.k on recorded q_norm/k_norm reproduces the attention logits, residual var 0.3%). Option keys carry an ordinal position signal along v1 (slot means A -5.7, B -3.8, ..., J +0.3; split-half r .97). The answer-position query has a near-constant large component along v1 (about 32% of |q|), so every option-reading L22 head prefers early options by about 2.2 nats (A vs I). L20 (RoPE, but v1 sits in low-frequency pairs) has the same mechanism with an A-first preference of about 1 nat. Removing it flattens the letter prior: centred I goes from -2.1 to -0.6.\nEvidence (paired edited - parent): DEV S1 (DEV[512:768], 256 q): +1.95 (SE 1.87), logp(correct) +0.186 (SE 0.060). HOLDOUT 512 practice questions (never used for any choice): +0.39 (SE 1.46), 29 w->r / 27 r->w, logp +0.197 (SE 0.055). The log-prob gain is robust, but the accuracy gain is not significant. A becomes under-picked (gold-A accuracy .43 -> .22)."
+  },
+  {
+   "name": "ed_a/ed_a_qprimacy_L22_half",
+   "acc": 36.5,
+   "n": 800,
+   "acc_diff": -0.5,
+   "acc_diff_se": 0.88,
+   "wrong_to_right": 23,
+   "right_to_wrong": 27,
+   "pred_changed": 110,
+   "logp_correct_diff": 0.1265,
+   "logp_correct_diff_se": 0.0202,
+   "z": -0.57,
+   "weights_changed": 2421150,
+   "description": "Half-strength version, L22 only: model.layers.22.self_attn.q_proj.weight, all 16 heads, W_h <- W_h - 0.5 t t^T W_h, where t = normalize(q_norm.weight * v1_g) and v1_g = PC1 of the L22 slot-mean option keys of kv group h//4. This halves the constant query component that makes L22 heads prefer early options (primacy bias A > ... > J of about 2.2 nats). Rank-1 per head.\nEvidence (paired): DEV S1 (DEV[512:768], 256 q): +1.95 (SE 1.03), 6 w->r / 1 r->w, logp +0.129 (SE 0.031). HOLDOUT 512: -0.59 (SE 0.98), 11 w->r / 14 r->w, logp(correct) +0.115 (SE 0.026). The logp gain is robust; there is no accuracy gain."
+  },
+  {
+   "name": "ed_b/ed_b_g2_L12H13_ablate",
+   "acc": 38.25,
+   "n": 800,
+   "acc_diff": 1.25,
+   "acc_diff_se": 1.2,
+   "wrong_to_right": 51,
+   "right_to_wrong": 41,
+   "pred_changed": 196,
+   "logp_correct_diff": 0.5002,
+   "logp_correct_diff_se": 0.0426,
+   "z": 1.04,
+   "weights_changed": 262144,
+   "description": "Change: model.layers.12.self_attn.o_proj.weight columns 1664:1792 (input of head 13 of layer 12) set to 0 (head L12.H13 ablated); 262,144 weights. Mechanism: L12.H13 (sliding-window layer 12) is the strongest attention writer of the option-end correctness belief that L22.H12 later reads through its keys (projection on the correct-minus-incorrect direction: diff .50, SNR .85, alone picks gold 29% vs 31% for the whole stream). Its contribution is 0.83-correlated with the rest of the stream, so it sets the CONFIDENCE of the belief, not which option wins. Dose-response on DEV S1 (256 q): x0 / x1 / x2 give output entropy 1.24 / .99 / .90 and an unchanged gold rank (diff -0.02 +- 0.08 and +0.004 +- 0.06). Measured: DEV S1 acc +1.17 (SE 1.70), dlogp(correct) +0.56 (SE .08); HOLDOUT[0:512] (never used for choosing) acc -0.59 (SE 1.42), 25 wrong->right / 28 right->wrong, dlogp(correct) +0.513 (SE .054). Expect about 0 accuracy change; it is a calibration fix (much less overconfident when wrong), not an accuracy gain."
+  }
+ ],
+ "winner": null,
+ "rule": "z >= 2.0",
+ "time": 1793841017.7710397
+}

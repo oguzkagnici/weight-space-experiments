@@ -25,6 +25,15 @@ def locked_update(path, fn):
         return st
 
 
+def gold_rank(r):
+    """rank of the correct option among the question's options (0 = top), from the stored letter probabilities"""
+    p = r["probs"]; return int(sum(x > p[r["answer"]] for x in p))
+
+
+def entropy(r):
+    p = np.array(r["probs"]); p = p[p > 0]; return float(-(p * np.log(p)).sum())
+
+
 def summarize(rows):
     n = len(rows)
     if not n:
@@ -39,6 +48,8 @@ def summarize(rows):
             "mean_logp_correct": round(float(np.mean([r["logp_correct"] for r in rows])), 4),
             "mean_margin": round(float(np.mean([r["margin"] for r in rows])), 3),
             "mean_letter_mass": round(float(np.mean([r["letter_mass"] for r in rows])), 4),
+            "mean_gold_rank": round(float(np.mean([gold_rank(r) for r in rows])), 4),
+            "mean_entropy": round(float(np.mean([entropy(r) for r in rows])), 4),
             "by_category": {c: [round(100 * np.mean(v), 1), len(v)] for c, v in sorted(cats.items())},
             "pred_letter_counts": dict(zip("ABCDEFGHIJ", map(int, dist))),
             "answer_letter_counts": dict(zip("ABCDEFGHIJ", map(int, adist)))}
@@ -50,11 +61,14 @@ def paired(ro, re_):
     n = len(pairs)
     d = np.array([b["correct"] - a["correct"] for a, b in pairs], float)
     dl = np.array([b["logp_correct"] - a["logp_correct"] for a, b in pairs], float)
+    dr = np.array([gold_rank(b) - gold_rank(a) for a, b in pairs], float)
     return {"n": n, "acc_diff": round(100 * d.mean(), 2), "acc_diff_se": round(100 * d.std(ddof=1) / math.sqrt(n), 2) if n > 1 else None,
             "wrong_to_right": int((d > 0).sum()), "right_to_wrong": int((d < 0).sum()),
             "pred_changed": int(sum(a["pred"] != b["pred"] for a, b in pairs)),
             "logp_correct_diff": round(float(dl.mean()), 4),
-            "logp_correct_diff_se": round(float(dl.std(ddof=1) / math.sqrt(n)), 4) if n > 1 else None}
+            "logp_correct_diff_se": round(float(dl.std(ddof=1) / math.sqrt(n)), 4) if n > 1 else None,
+            "gold_rank_diff": round(float(dr.mean()), 4),
+            "gold_rank_diff_se": round(float(dr.std(ddof=1) / math.sqrt(n)), 4) if n > 1 else None}
 
 
 class Server:

@@ -1,0 +1,9 @@
+{
+ "editor": "ed_b",
+ "gen": 3,
+ "gen_name": "gen_003",
+ "parent": "base",
+ "parent_weights": null,
+ "budget": 10,
+ "max_candidates": 2
+}
