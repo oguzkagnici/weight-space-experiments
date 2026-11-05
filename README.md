@@ -14,6 +14,11 @@ A replication of Experiment 8 of *Sparks of Weight-Space Programming*
 | Rules | no training, no running the model in the kernel, no embedding/lm_head/final-norm edits, no whole-tensor scaling | identical (enforced in save_edit + stated in the brief) |
 | Loop | one run | **generations**: N editors -> ≤ N×M candidates -> hidden paired selection -> winner (z ≥ 2) becomes parent; else parent survives |
 
+## Documents
+- `docs/MODEL_FINDINGS.md`: how LFM3-1.7B answers multiple-choice questions, as a circuit map with a diagram, assembled from all generations.
+- `docs/EXPERIMENT_LOG.md`: chronological journal. `docs/DECISIONS.md`: every decision, with its rationale. `docs/IDEAS.md`: ideas for later.
+- `runs/gen_NNN/REPORT.md`: per-generation reports. `results/`: baselines, the ledger, transfer checks.
+
 ## Splits (MMLU-Pro test, 12,032 questions, stratified per subject, fixed seeds)
 - `practice` 3,007: editors see these with answers.
 - `selection` pool 2,046: hidden; each generation samples its own subset to choose winners (limits overfitting to one set).
