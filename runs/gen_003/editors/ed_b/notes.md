@@ -50,3 +50,28 @@
 - Pass 5 result (all heads a1.0, H12 a1.5): acc +0.39 (SE 1.17), 5/4, 20 preds changed; dlogp +.040 (SE .023); gold rank -.078 (SE .039). Better continuous signals than H12-only, accuracy noisier. Saved work/best_2_letterproj_all_a10.
 
 ## Pass 6 (score both, DEV3, 256 q): all 16 L22 heads alpha 1.5 (dose step). Tensor: model.layers.22.self_attn.q_proj.weight.
+- Pass 6 result (all heads a1.5): acc 0.00 (SE .96), 3/3, 19 changed; dlogp +.065 (SE .023); rank -.055 (SE .037). Saved work/best_3_letterproj_all_a15.
+- DEV3 summary: the letter-token projection gives a consistent small gold-rank improvement (-.055 to -.078) and a dose-dependent logp gain (+.022/+.040/+.065); accuracy changes are within noise (+1.17/+.39/0).
+- CHOICE (made on DEV3 only, before any HOLDOUT): candidate 1 = H12-only alpha 1.5 (most targeted, the only head whose lens justifies it, best DEV acc); candidate 2 = all heads alpha 1.0 / H12 1.5 (best DEV gold rank). Each measured once on HOLDOUT[0:512] (two 256 passes each).
+
+## Pass 7 (score both, HOLDOUT[0:256]): candidate 1 = H12-only letterproj alpha 1.5 (q_proj L22 rows 1536:1664)
+- Pass 7 result: acc -0.78 (SE 1.11), 3/5, 21 changed; dlogp +.046 (SE .025); rank +.016 (SE .040).
+
+## Pass 8 (score both, HOLDOUT[256:512]): candidate 1 (same edit)
+- Pass 8 result: acc +0.78 (SE .96), 4/2, 12 changed; dlogp -.006 (SE .023); rank -.066 (SE .037).
+- Candidate 1 HOLDOUT[0:512] combined: acc 0.00 (SE ~.73), 7 w->r / 7 r->w; dlogp +.020 (SE ~.017); gold rank -.025 (SE ~.027). Null.
+
+## Pass 9 (score both, HOLDOUT[0:256]): candidate 2 = all L22 heads letterproj alpha 1.0, H12 alpha 1.5 (work/best_2)
+- Pass 9 result: acc 0.00 (SE 1.11), 4/4, 25 changed; dlogp +.070 (SE .025); rank -.020 (SE .040).
+
+## Pass 10 (score both, HOLDOUT[256:512]): candidate 2 (same edit)
+- Pass 10 result: acc 0.00 (SE .96), 3/3, 13 changed; dlogp +.024 (SE .022); rank -.043 (SE .038).
+- Candidate 2 HOLDOUT[0:512] combined: acc 0.00 (SE ~.74), 7 w->r / 7 r->w; dlogp +.047 (SE ~.017, z~2.8); gold rank -.031 (SE ~.027).
+
+## Submitted (code/029)
+- letterproj_L22_all (candidate 2 above; HOLDOUT 512: acc 0.00, dlogp +.047) and letterproj_L22_h12 (candidate 1; HOLDOUT 512: acc 0.00, dlogp +.020). edited/ currently = H12-only edit.
+- Report: report.md. Budget: 10/10 passes used.
+
+## Submitted (code/029)
+- letterproj_L22_all (candidate 2; HOLDOUT 512: acc 0.00, dlogp +.047) and letterproj_L22_h12 (candidate 1; HOLDOUT 512: acc 0.00, dlogp +.020). edited/ currently = H12-only edit.
+- Report in report.md. Budget: 10 of 10 passes used.

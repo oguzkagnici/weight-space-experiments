@@ -1,0 +1,14 @@
+{
+ "label": "letterproj_L22_h12",
+ "editor": "ed_b",
+ "gen": 3,
+ "time": 1793848496.0182083,
+ "tensors": {
+  "model.layers.22.self_attn.q_proj.weight": {
+   "changed_bf16": 191645,
+   "numel": 4194304,
+   "rel_change": 0.03488493338227272,
+   "sha_bf16": "79d3298e02b0aa89"
+  }
+ }
+}
