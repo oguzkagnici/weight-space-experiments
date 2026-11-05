@@ -1,7 +1,8 @@
 {
- "passes_used": 3,
+ "passes_used": 4,
  "pending": [
-  "gen_004_claude_p04_bc7998"
+  "gen_004_claude_p05_2146df",
+  "gen_004_claude_p06_390510"
  ],
  "passes": [
   {
@@ -21,6 +22,12 @@
    "id": "gen_004_claude_p03_db6448",
    "type": "read",
    "seconds": 2256.6
+  },
+  {
+   "k": 4,
+   "id": "gen_004_claude_p04_bc7998",
+   "type": "generate",
+   "seconds": 2188.6
   }
  ]
 }

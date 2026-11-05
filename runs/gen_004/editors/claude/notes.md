@@ -40,3 +40,13 @@
 - Dose for pass 4: estimate target -9 (w2 scale 0.40; scale 0.187 at -6; saturation beyond, at scale 50 80% of tokens are perturbed). Expected real shift ~ -3.
 
 ## Pass 4 (generate both, DEV): 17 cut bank traces with an in-think statement + 15 random finished ones (work/dev_split.json). Edit = gate_wrapup_L20 at target -9.
+### Pass 4 results (generate both, DEV 32, edit at target -9)
+- ALL 32: acc 0.375 -> 0.469 (paired +9.4 pts, SE 6.9; +4/-1); cut share 0.53 -> 0.31; tokens 2,356 -> 1,979 (-377, SE 113).
+- 17 cut traces with an in-think statement: 0/17 -> 4/17 correct (+4/-0); cut 17 -> 9; tokens -540 (SE 175). Several now close right after the first statement (some wrong first answers: 10935, 4811, 7187, 1375).
+- 15 finished: 12 -> 11 correct (+0/-1: 9424 closed on a wrong first statement, E instead of J); tokens -191 (SE 126); one became cut (6800, wrong before).
+- 8 of the 17 still produce no in-think statement before the cap (unchanged by design).
+- Expectation for random questions: about 18% of questions are cut-with-statement (+0.24 each) and 45% finished (-0.07 each) -> roughly +1 to +4 pts net; a 32-question HOLDOUT has SE ~5 pts, so passes 5 and 6 both go to HOLDOUT (64 questions in total) at this dose.
+
+## Pass 5 (generate both, HOLDOUT A: 32 random practice questions not in the bank, work/holdout_ids.json). Same edit.
+
+## Pass 6 (generate both, HOLDOUT B: 32 more random practice questions, work/holdout_b_ids.json). Same edit.
