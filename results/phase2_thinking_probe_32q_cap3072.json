@@ -1,0 +1,322 @@
+[
+ {
+  "id": "mmlupro_9091",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 9047,
+  "pred": null,
+  "gold": "A",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_12194",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 9995,
+  "pred": null,
+  "gold": "D",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_4933",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 11645,
+  "pred": null,
+  "gold": "H",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_2148",
+  "tokens": 2986,
+  "finish": "stop",
+  "think_chars": 11248,
+  "pred": "F",
+  "gold": "F",
+  "correct": true,
+  "answer_tail": "ed later versions like Stanford-Binet and other intelligence tests.\n\nThus, the correct answer is (F).\n\nThe answer is (F)"
+ },
+ {
+  "id": "mmlupro_9229",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 10403,
+  "pred": null,
+  "gold": "A",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_5327",
+  "tokens": 840,
+  "finish": "stop",
+  "think_chars": 2650,
+  "pred": "B",
+  "gold": "B",
+  "correct": true,
+  "answer_tail": "on.\n3. Historical sources indicate there were eleven such states.\n4. Match this number to option (B).\n\nThe answer is (B)"
+ },
+ {
+  "id": "mmlupro_3034",
+  "tokens": 1375,
+  "finish": "stop",
+  "think_chars": 5019,
+  "pred": "G",
+  "gold": "G",
+  "correct": true,
+  "answer_tail": "accurate reason among the choices is the growth of psychrophilic bacteria in refrigerated conditions.\n\nThe answer is (G)"
+ },
+ {
+  "id": "mmlupro_8485",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 10192,
+  "pred": null,
+  "gold": "D",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_11442",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 12844,
+  "pred": null,
+  "gold": "A",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_9595",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 7691,
+  "pred": null,
+  "gold": "D",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_248",
+  "tokens": 1555,
+  "finish": "stop",
+  "think_chars": 5623,
+  "pred": "I",
+  "gold": "I",
+  "correct": true,
+  "answer_tail": "al  \n= \\$240 \u2212 \\$225 = \\$15\n\nThus, the financing charge is \\$15, which corresponds to option (I).\n\n**The answer is (I)**"
+ },
+ {
+  "id": "mmlupro_4511",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 11205,
+  "pred": null,
+  "gold": "H",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_3782",
+  "tokens": 1884,
+  "finish": "stop",
+  "think_chars": 4443,
+  "pred": "J",
+  "gold": "J",
+  "correct": true,
+  "answer_tail": "s is **3.6\u202fg** of baking soda.\n\nThe option closest to this value is **(J) 3.6 g of baking soda**.\n\n**The answer is (J)**"
+ },
+ {
+  "id": "mmlupro_1568",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 15096,
+  "pred": null,
+  "gold": "I",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_7805",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 7730,
+  "pred": null,
+  "gold": "F",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_11409",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 9138,
+  "pred": null,
+  "gold": "H",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_1579",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 15023,
+  "pred": null,
+  "gold": "B",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_5863",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 12239,
+  "pred": null,
+  "gold": "D",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_3934",
+  "tokens": 1441,
+  "finish": "stop",
+  "think_chars": 2933,
+  "pred": "A",
+  "gold": "A",
+  "correct": true,
+  "answer_tail": "o two significant figures gives \\( 2.9 \\times 10^{-22} \\text{ cm}^3 \\).\n\nThis matches option **(A)**.\n\nThe answer is (A)"
+ },
+ {
+  "id": "mmlupro_5976",
+  "tokens": 734,
+  "finish": "stop",
+  "think_chars": 1620,
+  "pred": "F",
+  "gold": "F",
+  "correct": true,
+  "answer_tail": "and humanist/etc., are broader philosophical positions.\n\nThus, the correct choice is **(F) atheist**.\n\nThe answer is (F)"
+ },
+ {
+  "id": "mmlupro_11611",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 11245,
+  "pred": null,
+  "gold": "E",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_3022",
+  "tokens": 719,
+  "finish": "stop",
+  "think_chars": 2584,
+  "pred": "A",
+  "gold": "A",
+  "correct": true,
+  "answer_tail": ") or are contrary to what is known about arthropod anatomy.\n\n**Therefore the correct choice is (A).**\n\nThe answer is (A)"
+ },
+ {
+  "id": "mmlupro_2637",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 15138,
+  "pred": null,
+  "gold": "G",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_6868",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 15805,
+  "pred": null,
+  "gold": "E",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_1694",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 14428,
+  "pred": null,
+  "gold": "I",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_12053",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 11232,
+  "pred": null,
+  "gold": "F",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_10745",
+  "tokens": 1602,
+  "finish": "stop",
+  "think_chars": 6323,
+  "pred": "C",
+  "gold": "C",
+  "correct": true,
+  "answer_tail": "spection.\n\nThus, the most appropriate initial procedure for checking storage locations is option (C).\n\nThe answer is (C)"
+ },
+ {
+  "id": "mmlupro_884",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 14852,
+  "pred": null,
+  "gold": "B",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_3630",
+  "tokens": 1210,
+  "finish": "stop",
+  "think_chars": 4160,
+  "pred": "B",
+  "gold": "B",
+  "correct": true,
+  "answer_tail": " most readily with chlorine gas due to its highly reactive double bond toward electrophilic addition.\n\nThe answer is (B)"
+ },
+ {
+  "id": "mmlupro_777",
+  "tokens": 389,
+  "finish": "stop",
+  "think_chars": 933,
+  "pred": "J",
+  "gold": "J",
+  "correct": true,
+  "answer_tail": " = \\$3.75\n\\]\n\nSo the manufacturer\u2019s increase over the cost is $3.75, which corresponds to option (J).\n\nThe answer is (J)"
+ },
+ {
+  "id": "mmlupro_3880",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 9281,
+  "pred": null,
+  "gold": "A",
+  "correct": false,
+  "answer_tail": ""
+ },
+ {
+  "id": "mmlupro_9619",
+  "tokens": 3072,
+  "finish": "length",
+  "think_chars": 10979,
+  "pred": null,
+  "gold": "E",
+  "correct": false,
+  "answer_tail": ""
+ }
+]

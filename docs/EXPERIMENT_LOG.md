@@ -208,3 +208,10 @@ Paired against base on GPQA Diamond (198 questions, 4 options); `results/gpqa_tr
 - Generation throughput is limited to about 40–50 tok/s on this machine either way.
 - llama.cpp's continuous batching avoids PyTorch's batch padding (a batch waits for its longest trace), which matters for variable-length thinking. It is therefore used for thinking-mode generation, with the Q8_0 format. PyTorch's bf16 two-pass probes (`scripts/think_probe.py`) were too slow: 8 questions × 2,048 tokens did not finish in 35 minutes.
 - Thinking-length probe: llama-server, 16 parallel slots, 32 practice questions, a 3,072-token cap, temperature 0.6, top-p 0.95, top-k 20 (results below).
+
+### Thinking-length probe result (llama-server, Q8_0, 32 practice questions, 3,072-token cap)
+
+- **Accuracy 34.4%.** 21 of 32 answers (66%) hit the 3,072-token cap with no answer. **All 11 answers that finished were correct.** Finished lengths: 389–2,986 tokens.
+- Throughput with 16 long parallel sequences: **24 tok/s**. One question costs about 100 s of machine time at this cap.
+- Implication: in thinking mode the dominant failure is running out of budget, the same structure as the paper's Qwen3.5-0.8B (93% cut at 32k). Next step is to check whether truncated traces loop (a repairable failure) or reason slowly.
+- Per-question results: `results/phase2_thinking_probe_32q_cap3072.json`.
