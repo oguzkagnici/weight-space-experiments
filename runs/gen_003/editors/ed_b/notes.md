@@ -24,3 +24,23 @@
 
 ## Pass 2 (score, original, DEV2 = dev[240:752], 512 q) -- diagnostic, no edit
 - activations at answer position: h20-24, mlp20-23, L22 o_proj input (heads), post-norm inputs (L20-23), L22 gate. Purpose: exact DLA of the letter stage (L22 heads, MLP neurons) to design a letter-stage edit.
+
+## Pass 2 results (DEV2, 512 q, original): letter stage
+- acc 35.16; preds A82 B93 C98 D54 E41 F44 G36 H26 I21 J17 vs gold 64 63 54 70 39 47 51 45 42 37.
+- Exact DLA (code/016), centered 10-opt mean letter logits: h22 [1.14 1.16 .18 .09 .45 -.04 -.70 -.79 -.81 -.69]; attn22 [-1.07 -1.08 .96 -.31 -.64 -.02 1.26 .35 -.36 .91] (gold-help 2.79; H12 alone 2.86 with its own tilt A -.59 B -1.41 G +1.18); mlp22 [.8 .78 .23 .4 ...-.89] (gold-help -1.14); L23 [.13 .44 -.43 .02 .18 .98 ...-.83] (F +.98 comes from layer 23). Stage acc: h22 .268, +attn22 .361, +mlp22 .355, final .350.
+- KEY: cross-fitted constant per-letter debias at the final logits gains +0.1 pt (sd .7 over 20 splits) on the 424 10-option DEV2 questions (code/017). The letter bias is real but costs (almost) no accuracy here; consistent with gens 1-2 letter fixes ~0 on hidden.
+- No off-by-one (neighbour) error excess (code/019). No format anomaly by category (code/018).
+
+## Pass 3 (read, original, DEV[:120], residual h10..h22 all positions)
+- "Key lens": H12's option pick if its keys were read from earlier residual layers (operator_norm/k_proj/k_norm of L22 applied to h_l, same query). Tests whether a middle layer at the option tokens holds a better belief than h22 (knows-then-loses at option positions). Linear readout analysis only.
+
+## Pass 3 results (key lens, DEV[:120])
+- H12 gold pick with keys read from h10/12/14/16/18/20/22: .158 .200 .275 .375 .383 .383 .425. Monotone build-up, no "knows then loses" at option positions (h20 vs h22: right only at h20 3, only at h22 8). (code/021)
+- Scaling single blocks' contributions in the key lens: all within +-3 of 120 (code/022). The belief is distributed.
+
+## New finding: H12 attends to content-free option letter tokens
+- H12 puts .116 of attention on "(X" letter tokens. These precede the option text (causal), so their keys have no option content. Dropping them from H12's option vote: recomputed q.k lens +8/-0 (B over-pick 36 -> 26), recorded attention +5/-2 (code/023, 024). Many L22 heads gain from dropping letter tokens (H3 +25/-5, H0 +11/-3, H11 +14/-4), but only H12 (gold-help 2.86) and H15 (.43) copy letters positively; H15 lens neutral (code/025).
+- Edit (code/027): u = mean over DEV[:240] of (mean letter-token key - mean option end/newline key), group 3 keys; w = normalize(q_norm.weight * u); head-12 rows of model.layers.22.self_attn.q_proj.weight: W_h <- W_h - alpha w (w^T W_h). Rank-1, head 12 only. q_norm renormalizes.
+- Lens (2-fold CV): alpha .5/1/1.5/2: +6/-1, +8/-3, +10/-4, +9/-6; letter mass .071/.043/.026/.016.
+
+## Pass 4 (score both, DEV3 = dev[752:1008], 256 q): edit = letterproj alpha 1.5, head 12 (only tensor: model.layers.22.self_attn.q_proj.weight)

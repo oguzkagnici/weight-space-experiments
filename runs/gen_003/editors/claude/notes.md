@@ -5,3 +5,5 @@
 - Pass 1: read original, residual stream after layers 7-15 at all positions (38,930 tokens).
 - Passes 2-5 RESULT (DEV 512 = screen256 + screen2): x0 (full ablation) -1.37 (SE 1.45), +24/-31, gold rank +0.076 (SE 0.057, worse), dlogp +0.40; x0.5 +0.39 (SE 0.87), +11/-9, gold rank -0.002 (SE 0.027), dlogp +0.19. The generation-2 hidden gains (+1.25, rank -0.11) do NOT replicate on my DEV: likely winner's curse; the calibration gain replicates.
 - CHOSEN ON DEV: primary x0.5; x0 submitted as an explicit re-test of the generation-2 result. Passes 6-7: x0.5 on HOLDOUT[0:512]; passes 8-9: x0 on the same.
+- Passes 6-9 RESULT (HOLDOUT 512, once): x0.5 +1.17 (SE 0.78), +11/-5, gold rank -0.082 (SE 0.033), dlogp +0.255 (SE 0.023); x0 -0.20 (SE 1.40), +25/-26, gold rank -0.104 (SE 0.058), dlogp +0.535.
+- Pass 10: x0.5 on HOLDOUT[512:768] (more data for the chosen candidate).
