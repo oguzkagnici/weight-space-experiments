@@ -34,9 +34,9 @@ def gen_dir(g):
     return os.path.join(RUNS, f"gen_{g:03d}")
 
 
-def enqueue_eval(jid, weights, qids, out, priority=0):
-    job = {"id": jid, "type": "eval", "priority": priority, "created": time.time(), "weights": weights,
-           "questions": qids, "out": out}
+def enqueue_eval(jid, weights, qids, out, priority=0, protocol="direct"):
+    job = {"id": jid, "type": "eval_gen" if protocol == "think" else "eval", "priority": priority,
+           "created": time.time(), "weights": weights, "questions": qids, "out": out}
     p = os.path.join(QUEUE, "pending", jid + ".json")
     json.dump(job, open(p + ".tmp", "w")); os.replace(p + ".tmp", p)
 
@@ -87,7 +87,8 @@ def cmd_new_gen(a):
     os.makedirs(os.path.join(gd, "editors")); os.makedirs(os.path.join(gd, "selection"))
     gen = {"gen": g, "name": f"gen_{g:03d}", "parent": st["champion"], "parent_weights": st["champion_weights"],
            "editors": a.editors.split(","), "budget": a.budget, "max_candidates": a.max_cands,
-           "selection_questions": sel, "created": time.time(), "focus": json.loads(a.focus) if a.focus else {}}
+           "selection_questions": sel, "created": time.time(), "focus": json.loads(a.focus) if a.focus else {},
+           "protocol": a.protocol, "template": a.template}
     json.dump(gen, open(os.path.join(gd, "gen.json"), "w"), indent=1)
     for ed in gen["editors"]:
         edir = os.path.join(gd, "editors", ed)
@@ -133,19 +134,23 @@ def cmd_select(a):
     jid = f"{gen['name']}_sel_champion"
     out = os.path.join(gd, "selection", "champion.jsonl")
     if not os.path.exists(out):
-        enqueue_eval(jid, parent, sel, out); jobs["champion"] = jid
+        enqueue_eval(jid, parent, sel, out, protocol=gen.get("protocol", "direct")); jobs["champion"] = jid
     for c in candidates(g):
         safe = c["name"].replace("/", "__")
         out = os.path.join(gd, "selection", f"{safe}.jsonl")
         if os.path.exists(out): continue
         jid = f"{gen['name']}_sel_{safe}"
-        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out)
+        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out, protocol=gen.get("protocol", "direct"))
         jobs[c["name"]] = jid
     print(f"enqueued {len(jobs)} selection evaluations on {len(sel)} hidden questions: {list(jobs)}")
     if a.wait and jobs:
         res = wait_jobs(list(jobs.values()))
         for k, j in jobs.items():
             r = res[j]; print(k, "ERROR " + r["error"] if "error" in r else f"acc {r['result']['acc']} ({r['seconds']}s)")
+
+
+def gen_protocol(g):
+    return json.load(open(os.path.join(gen_dir(g), "gen.json"))).get("protocol", "direct")
 
 
 def selection_table(g):
@@ -155,17 +160,26 @@ def selection_table(g):
         return None, []
     ch = load_rows(champ_p)
     table = []
+    if gen_protocol(g) == "think":
+        from .gen import summarize_gen
+        champ_summary = summarize_gen(ch)
+    else:
+        champ_summary = summarize(ch)
     for c in candidates(g):
         p = os.path.join(gd, "selection", c["name"].replace("/", "__") + ".jsonl")
         if not os.path.exists(p):
             table.append({"name": c["name"], "status": "not evaluated"}); continue
         rows = load_rows(p)
-        pr = paired(ch, rows); s = summarize(rows)
+        if gen_protocol(g) == "think":
+            from .gen import paired_gen, summarize_gen
+            pr = paired_gen(ch, rows); s = summarize_gen(rows); pr.setdefault("logp_correct_diff", 0.0)
+        else:
+            pr = paired(ch, rows); s = summarize(rows)
         z = pr["acc_diff"] / pr["acc_diff_se"] if pr["acc_diff_se"] else 0.0
         table.append({"name": c["name"], "acc": s["acc"], **pr, "z": round(z, 2),
                       "weights_changed": sum(v["changed_bf16"] for v in c["manifest"]["tensors"].values()),
                       "description": c["description"]})
-    return summarize(ch), table
+    return champ_summary, table
 
 
 def cmd_decide(a):
@@ -227,21 +241,32 @@ def cmd_heldout(a):
     who = a.who
     if who == "champion": who = st["champion"]
     weights = [] if who == "base" else [os.path.join(RUNS, "champions", who, "weights")]
+    proto = getattr(a, "protocol", "direct")
     if a.set == "gpqa":
         qids = data.gpqa_ids(); a.n = "gpqa"
         if not qids: sys.exit("GPQA not built: HF_TOKEN=... python -c 'from wsp.data import build_gpqa; build_gpqa()'")
     else:
         qids = heldout_ids(a.n)
     os.makedirs(os.path.join(RUNS, "heldout"), exist_ok=True)
-    out = os.path.join(RUNS, "heldout", f"{who}_n{a.n}.jsonl")
+    out = os.path.join(RUNS, "heldout", f"{who}_n{a.n}{'_think' if proto == 'think' else ''}.jsonl")
     if not os.path.exists(out):
         jid = f"heldout_{who}_n{a.n}"
-        enqueue_eval(jid, weights, qids, out, priority=1)
+        jid += "_think" if proto == "think" else ""
+        enqueue_eval(jid, weights, qids, out, priority=1, protocol=proto)
         r = wait_jobs([jid])[jid]
         if "error" in r: sys.exit(r["error"])
-    rows = load_rows(out); s = summarize(rows)
+    rows = load_rows(out)
+    suffix = "_think" if proto == "think" else ""
+    base_out = os.path.join(RUNS, "heldout", f"base_n{a.n}{suffix}.jsonl")
+    if proto == "think":
+        from .gen import summarize_gen, paired_gen
+        s = summarize_gen(rows)
+        print(f"{who}: held-out thinking-mode {json.dumps(s)}")
+        if who != "base" and os.path.exists(base_out):
+            print("paired vs base:", paired_gen(load_rows(base_out), rows))
+        return
+    s = summarize(rows)
     print(f"{who}: held-out acc {s['acc']} (SE {s['se']}) on {s['n']}")
-    base_out = os.path.join(RUNS, "heldout", f"base_n{a.n}.jsonl")
     print("by category:", {c: v for c, v in s["by_category"].items()})
     if who != "base" and os.path.exists(base_out):
         print("paired vs base:", paired(load_rows(base_out), rows))
@@ -278,7 +303,7 @@ def history_text(st, upto_gen):
 def cmd_brief(a):
     st = state(); g = st["gen"]; gd = gen_dir(g)
     gen = json.load(open(os.path.join(gd, "gen.json")))
-    tpl = open(os.path.join(ROOT, "prompts", "editor_task.md")).read()
+    tpl = open(os.path.join(ROOT, "prompts", gen.get("template", "editor_task.md"))).read()
     eds = [a.editor] if a.editor else gen["editors"]
     for ed in eds:
         edir = os.path.join(gd, "editors", ed)
@@ -286,7 +311,8 @@ def cmd_brief(a):
                 "It already contains the accepted edits listed in the history below; load_base() gives the unedited model.")
         txt = (tpl.replace("{EDITOR}", ed).replace("{GEN}", str(g)).replace("{MAX_CANDS}", str(gen["max_candidates"]))
                .replace("{PARENT}", st["champion"]).replace("{PARENT_NOTE}", note).replace("{EDIR}", edir)
-               .replace("{BUDGET}", str(gen["budget"])).replace("{HISTORY}", history_text(st, g)))
+               .replace("{BUDGET}", str(gen["budget"])).replace("{HISTORY}", history_text(st, g))
+               .replace("{TRACE_BANK}", str(gen.get("trace_bank", ""))).replace("{TRACE_N}", str(gen.get("trace_n", ""))))
         if gen.get("focus", {}).get(ed):
             txt += ("\n\nSUGGESTED STARTING POINT (to diversify the generation; abandon it if the evidence points "
                     "elsewhere): " + gen["focus"][ed])
@@ -389,12 +415,15 @@ def main():
     p = sp.add_parser("new-gen"); p.add_argument("--editors", required=True); p.add_argument("--budget", type=int, default=6)
     p.add_argument("--max-cands", type=int, default=2); p.add_argument("--sel-n", type=int, default=800)
     p.add_argument("--focus", default=None, help="JSON {editor: suggested starting point}")
+    p.add_argument("--protocol", choices=["direct", "think"], default="direct")
+    p.add_argument("--template", default="editor_task.md")
     sp.add_parser("candidates")
     p = sp.add_parser("select"); p.add_argument("--wait", action="store_true")
     p = sp.add_parser("decide"); p.add_argument("--z", type=float, default=2.0); p.add_argument("--force")
     p.add_argument("--keep", action="store_true")
     p = sp.add_parser("heldout"); p.add_argument("who", nargs="?", default="champion"); p.add_argument("--n", type=int, default=1000)
     p.add_argument("--set", choices=["mmlupro", "gpqa"], default="mmlupro")
+    p.add_argument("--protocol", choices=["direct", "think"], default="direct")
     sp.add_parser("status")
     p = sp.add_parser("brief"); p.add_argument("editor", nargs="?")
     p = sp.add_parser("report"); p.add_argument("--gen", type=int)

@@ -140,7 +140,20 @@ def render(qid):
     return _data.render(_data.questions()[qid], tok)
 
 
+def render_think(qid):
+    """The exact thinking-mode prompt (phase 2) of a practice question; ends with "<think>"."""
+    if qid not in _PRACTICE:
+        raise KeyError("only practice questions are available")
+    from .gen import render_prompt
+    return render_prompt(_data.questions()[qid], tok)
+
+
+def trace_text(row):
+    """Prompt + exactly what the model generated, for a row of a generate pass (gen_<k>_<model>.jsonl)."""
+    return render_think(row["id"]) + row["raw"]
+
+
 LETTER_IDS = [tok.encode(_data.ASSISTANT_PREFIX + l, add_special_tokens=False)[-1] for l in LETTERS] if tok else None
 
 __all__ = ["NAMES", "SHAPES", "load", "load_original", "load_base", "save_edit", "drop_edit", "edited",
-           "submit_candidate", "tok", "questions", "render", "LETTER_IDS", "EDIR", "META"]
+           "submit_candidate", "tok", "questions", "render", "render_think", "trace_text", "LETTER_IDS", "EDIR", "META"]

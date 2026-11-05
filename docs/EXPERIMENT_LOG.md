@@ -215,3 +215,21 @@ Paired against base on GPQA Diamond (198 questions, 4 options); `results/gpqa_tr
 - Throughput with 16 long parallel sequences: **24 tok/s**. One question costs about 100 s of machine time at this cap.
 - Implication: in thinking mode the dominant failure is running out of budget, the same structure as the paper's Qwen3.5-0.8B (93% cut at 32k). Next step is to check whether truncated traces loop (a repairable failure) or reason slowly.
 - Per-question results: `results/phase2_thinking_probe_32q_cap3072.json`.
+
+### Phase-2 harness built
+
+- **Trace inspection.** 4 truncated traces were regenerated: 100% unique lines and 0% repeated 40-character windows. **No looping.** The traces are long because of explicit arithmetic, re-derivations, re-checking and option-by-option deliberation. So in thinking mode the binding failure is running out of a fixed budget, not a pathological loop (unlike the paper's Qwen).
+- **Weights → llama.cpp without the converter** (`wsp/gguf_patch.py`).
+  - The official BF16 GGUF is copied and the edited tensors' bytes are overwritten.
+  - The HF→GGUF name mapping was verified value-for-value: **286/286 tensors identical** (no permutations, no norm offsets; conv kernels only reshaped).
+  - Patching takes about 22 s and quantising to Q8_0 about 14 s.
+  - A patched model (L12.H13 ×0.5) loads and its greedy output diverges from the base model's as expected.
+- **Generation backend** (`wsp/gen.py`): one Q8_0 GGUF per weight state (cached), llama-server with 16 continuous-batching slots, raw completions so that `prompt + raw` reproduces the generated tokens exactly, grading of the last "answer is (X)" after "</think>". Fixed seeds per question (crc32 of id:sample), shared by every model.
+- **New pass and job types:**
+  - editors' `generate` pass (≤ 48 answers per model, ≤ 32 per model with "both"), with paired accuracy, cut-share and token differences;
+  - GA `eval_gen`;
+  - the GA's `new-gen --protocol think --template editor_task_think.md`;
+  - `heldout --protocol think`.
+- **Editor API:** `render_think(qid)`, `trace_text(row)` (teacher-force a generated trace in read passes).
+- **Phase-2 brief:** `prompts/editor_task_think.md`. Same rules as the paper, plus: making the model close its thinking early regardless of the problem, or shortening all traces uniformly, is out of scope; repairing a specific wasteful behaviour inside the thinking is in scope.
+- **Incident:** the container restarted silently at about 08:17 UTC (uptime). The forward-pass server died with it and was restarted at 10:30; no editor work was running. A probe command that ran `pkill -f` on a pattern contained in its own command line killed its own shell (the second time this happened; avoid `pkill -f` with patterns that appear in the calling command).

@@ -74,6 +74,7 @@ def paired(ro, re_):
 class Server:
     def __init__(self):
         self.e = Engine()
+        self.llama = None          # thinking-mode generation backend (llama-server), started on demand
         for d in ("pending", "running", "done", "failed"):
             os.makedirs(os.path.join(QUEUE, d), exist_ok=True)
         os.makedirs(CACHE, exist_ok=True)
@@ -115,6 +116,43 @@ class Server:
         self.e.set_weights(dirs)
         texts = job["texts_resolved"]
         return self.e.read(texts, job.get("return", {}), job["out_dir"])
+
+    def _gen(self, dirs, items):
+        from . import gen
+        if self.llama is None:
+            self.llama = gen.LlamaServer()
+        key = weights_key(dirs)
+        self.beat(f"building gguf {key}" if dirs else "base gguf")
+        path = gen.build_gguf(dirs, key)
+        self.beat(f"generating {len(items)} answers with {key or 'base'}")
+        return gen.generate(self.llama, path, items, cache_path=os.path.join(CACHE, f"gen_{key}_cap{gen.THINK_CAP}.jsonl")), key
+
+    def run_generate(self, job):
+        from . import gen
+        models = ["original", "edited"] if job["model"] == "both" else [job["model"]]
+        out_dir = job["out_dir"]; os.makedirs(out_dir, exist_ok=True)
+        items = [(q, s) for q in job["questions"] for s in range(job.get("n", 1))]
+        res, rows = {}, {}
+        for m in models:
+            t = time.time()
+            rows[m], key = self._gen(self.weights(job, m), items)
+            with open(os.path.join(out_dir, f"gen_{job['k']}_{m}.jsonl"), "w") as f:
+                for r in rows[m]: f.write(json.dumps(r) + "\n")
+            res[m] = gen.summarize_gen(rows[m]); res[m]["seconds"] = round(time.time() - t, 1)
+        if len(models) == 2:
+            res["paired_edited_minus_original"] = gen.paired_gen(rows["original"], rows["edited"])
+        return res
+
+    def run_eval_gen(self, job):
+        from . import gen
+        t = time.time()
+        items = [(q, s) for q in job["questions"] for s in range(job.get("n", 1))]
+        rows, key = self._gen(job["weights"], items)
+        os.makedirs(os.path.dirname(job["out"]), exist_ok=True)
+        with open(job["out"], "w") as f:
+            for r in rows: f.write(json.dumps(r) + "\n")
+        s = gen.summarize_gen(rows); s["seconds"] = round(time.time() - t, 1); s["weights_key"] = key
+        return s
 
     def run_eval(self, job):
         key = self.e.set_weights(job["weights"])
@@ -160,6 +198,10 @@ class Server:
                     result = self.run_score(job)
                 elif job["type"] == "read":
                     result = self.run_read(job)
+                elif job["type"] == "generate":
+                    result = self.run_generate(job)
+                elif job["type"] == "eval_gen":
+                    result = self.run_eval_gen(job)
                 elif job["type"] == "eval":
                     result = self.run_eval(job)
                 else:

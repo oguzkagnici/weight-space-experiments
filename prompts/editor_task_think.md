@@ -1,0 +1,87 @@
+TASK. You are given the weights of a language model, LFM3-1.7B (Liquid AI, October 2026). Text part: 24 layers of width 2,048. Each layer has one token mixer and one MLP:
+- 13 gated short-convolution layers (0, 1, 3, 5, ..., 23): `conv.in_proj` (2048 -> 6144, split into three 2048-wide parts B, C, x), a depthwise causal convolution `conv.conv` (kernel 7) and `conv.out_proj` (2048 -> 2048);
+- 6 full-attention layers (2, 6, 10, 14, 18, 22) and 5 sliding-window attention layers (4, 8, 12, 16, 20; window 256): 16 query heads and 4 key/value heads of size 128, RMS-normed queries and keys (`q_norm`, `k_norm`), a per-head sigmoid output gate (`self_attn.gate_proj`, 2048 -> 16) and `o_proj` (2048 -> 2048, input = 16 heads x 128);
+- a SwiGLU MLP in every layer: `feed_forward.w1` (gate) and `feed_forward.w3` (up), 2048 -> 7680; `feed_forward.w2` (down), 7680 -> 2048;
+- RMSNorm in sandwich form: `operator_norm` before the mixer, `post_operator_norm` after it, `ffn_norm` before the MLP, `post_ffn_norm` after it (both post-norms are applied before the residual add).
+Vocabulary 128,000; input embedding and output layer tied; the final norm is called `model.embedding_norm`.
+Your job is to make it better at answering broad multiple-choice questions (MMLU-Pro: 10 options, 14 subjects) WHEN IT THINKS FIRST, under a fixed thinking budget, by EDITING ITS WEIGHTS DIRECTLY: find out what goes wrong inside its thinking when it fails, and repair that with targeted changes.
+
+THIS IS ONE GENERATION OF A GENETIC LOOP. You are editor `{EDITOR}` in generation {GEN}. Several editors work in parallel on the same parent model; each submits up to {MAX_CANDS} candidate edits. The candidates are then compared with the parent on hidden questions, and the best one becomes the parent of the next generation, but only if its gain is clearly significant. Otherwise the parent survives. The parent of this generation is `{PARENT}`; "original" below always means the parent. {PARENT_NOTE}
+
+HOW IT WILL BE MEASURED (thinking mode, phase 2 of the experiment). Every candidate is evaluated with this fixed protocol:
+- The user message is the question, a blank line, the options as lines "(A) ...", "(B) ...", ..., a blank line and 'Think step by step, then finish with "The answer is (X)" where X is the letter of the correct option.'
+- The chat template is applied with thinking enabled (the model's default): the prompt ends with "<think>", the model reasons, closes with "</think>" and answers.
+- Sampling: temperature 0.6, top_p 0.95, top_k 20. The seed of every question is fixed and shared by all models, so the paired comparisons share their random numbers (long answers still drift apart once a token differs).
+- At most 3,072 new tokens for thinking and answer together. Generation runs in llama.cpp on your weights cast to bfloat16 and quantised to Q8_0 (the same for every model, so paired comparisons are fair).
+- Grading: the last 'answer is (X)' after "</think>" is the answer. An answer cut at 3,072 tokens, or with no such phrase, is wrong. The score is accuracy.
+- Selection compares each candidate with the parent on the same hidden MMLU-Pro questions (paired, same seeds); the bar is z >= 2. Champions are later also evaluated on untouched held-out questions and GPQA Diamond.
+- You never see the selection or held-out questions. The config, tokenizer, chat template, sampling and budget are fixed: only weight values can change.
+
+WHAT IS KNOWN ABOUT THE PARENT IN THIS MODE (32 practice questions):
+- Accuracy 34%. 66% of answers run into the 3,072-token cap without answering, and every answer that finished was correct (11 of 11, 389 to 2,986 tokens).
+- The truncated traces do NOT loop: no repeated lines, no repeated 40-character windows. They are long because the model computes explicitly, re-derives formulas, re-checks itself and deliberates option by option.
+- The binding failure is therefore running out of budget before committing to an answer. Find WHY specific traces take so long and repair the specific mechanism.
+- Generations 1-3 (direct-answer mode, history below) mapped the answer circuit: docs/MODEL_FINDINGS.md summarises it. Read it if useful.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong inside the thinking, identify the components responsible (specific neurons, heads, directions or circuits) and change them in a way you can justify with evidence. Repairing a specific failure inside the thinking is in scope: for example redundant re-verification of results already established, deliberating again over options already ruled out, or getting stuck in a computation style that cannot finish within budget. Out of scope:
+- what save_edit refuses: the final norm (`model.embedding_norm.weight`), the input embedding / output layer (`model.embed_tokens.weight`), and any edit that only multiplies a whole tensor by a constant;
+- global knobs: making the whole output distribution sharper or flatter;
+- making the model skip its thinking or close it early regardless of the problem, for example a component whose only effect is to raise the probability of "</think>" everywhere, or shortening all traces uniformly.
+Every candidate's description must state the specific behaviour it targets and the evidence.
+
+WHAT YOU HAVE.
+1. Python over the weights (no GPU, no internet). Your folder is `{EDIR}`: `edited/` (your current edit), `work/` (scratch, forward-pass outputs), `code/` (your scripts), `candidates/`, `notes.md`. Run Python with `{EDIR}/py <script>` (working directory = your folder). Write every script you run to `code/NNN_short_name.py` (numbered in order) so the code is kept, and state its hypothesis in its first comment line. Use `-c` only for one-line checks. There is no persistent kernel: save intermediate arrays in `work/` as .npy. In a script, `from wsp.editor import *` gives you:
+   - NAMES and SHAPES (all tensors);
+   - load(name), a float32 torch tensor: your current edit if there is one, else the original (= parent);
+   - load_original(name) and load_base(name) (the unedited LFM3-1.7B);
+   - save_edit(name, tensor) (it reports how many entries change after bfloat16 rounding), drop_edit(name), edited();
+   - submit_candidate(label, description);
+   - tok (the tokenizer);
+   - questions() (the practice questions);
+   - render(qid) (the direct-answer evaluation string of generations 1-3);
+   - render_think(qid) (the exact thinking-mode prompt, ending with "<think>");
+   - trace_text(row) (prompt + exactly what the model generated, for a row of a generate pass or of the trace bank; use it as a "texts" entry of a read pass to teacher-force a trace and record activations along it);
+   - LETTER_IDS (token ids of A..J as the token after "The answer is (").
+   Available: numpy, scipy, scikit-learn, PyTorch (CPU), pandas, sympy, safetensors, tokenizers. Gradients are disabled. The machine has 4 CPU cores and 15 GB of RAM, shared with the forward-pass server (about 4 GB) and the other editors. Keep each script under about 3 GB and a few minutes of compute: load the tensors you need, not the whole model.
+2. Practice questions with answers (none of them is used for selection or held-out evaluation): questions() returns 3,007 MMLU-Pro questions, {id: {id, category, src, question, options, answer, answer_index}}, across all 14 categories.
+3. A SHARED TRACE BANK (free, read-only): {TRACE_BANK} holds the parent's thinking-mode answers to {TRACE_N} practice questions, one JSON object per line: id, category, gold, pred, correct, cut (1 = hit the cap), tokens, think, content, raw. These questions' parent results are also cached by the generation tool, so "both" generate passes on them only cost the edited model's time. Use the bank for diagnosis instead of spending passes.
+4. A forward-pass tool with a budget of {BUDGET} forward passes in total. Write a request as JSON to a file and run `{EDIR}/fwd <file.json>`. A request that fails or is refused does not count. Each request counts as one pass, whatever its size:
+ (a) SCORE: {"type": "score", "model": "original" | "edited" | "both", "questions": ["<practice id>", ...] or "sample": {"n": 256, "seed": 0, "categories": [...] (optional)}, "activations": {"hidden_states": [0..24], "mlp": [0..23], "inputs": [module names], "outputs": [module names]} (optional)}
+    - This runs the evaluation protocol on at most 512 practice questions per model (at most 256 with "both").
+    - You get accuracy (overall and by category), mean log-probability of the correct letter, margin, how much probability the full vocabulary puts on the option letters, and predicted versus true letter counts, the mean rank of the correct option (0 = top) and the mean entropy over the options. "both" also reports the paired change in the correct option's rank (negative = better), which separates ranking gains from mere sharpening or flattening.
+    - "both" runs the parent and your current edit on the same questions and adds the paired difference (edited - original) with its standard error, plus how many questions went wrong->right and right->wrong.
+    - Per-question rows (prediction, correctness, the probabilities of all letters) are in `work/fwd_<k>/score_<k>_<model>.jsonl`.
+    - With "activations", these are saved at the answer position (the last token) for every question, with its grade, in `work/fwd_<k>/score_<k>_acts/<model>/`: the residual stream (0 = embeddings, l = after layer l), the MLP's w2 inputs (7,680 per layer), or the input/output of any named module (e.g. "model.layers.14.self_attn.o_proj" gives the 16 heads x 128 before mixing).
+ (b) READ (teacher-forced): {"type": "read", "model": "original" | "edited", "texts": ["raw text", ...] or "questions": [ids] (rendered evaluation strings) with optional "suffixes": [...], "return": {"token_logprobs": true, "topk": k (<= 50), "hidden_states": [...], "mlp": [...], "inputs": [...], "outputs": [...], "positions": "last" | "mean" | "all", "attn_layers": [attention layer indices], "attn_last": [attention layer indices]}}
+    - This reads up to 1,024 texts, at most 200,000 tokens in total and 4,096 per text.
+    - Results are .npy files with meta.json in `work/fwd_<k>/`.
+    - With "all" positions, activations are concatenated over texts, with offsets.
+    - "attn_layers" returns full attention matrices for the first 4 texts only.
+    - "attn_last" returns, for EVERY text, the attention probabilities from its last token (the answer position) to all positions, for each head. Attention layers are 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 and 22.
+ (c) GENERATE (thinking mode, the evaluation protocol): {"type": "generate", "model": "original" | "edited" | "both", "questions": [...] or "sample": {...}, "n": samples per question (default 1)}
+    - At most 48 answers per model (32 with "both").
+    - You get accuracy, the share cut at the cap, accuracy among finished answers, the mean number of tokens and, with "both", the paired differences (accuracy, cut share, tokens) with standard errors and wrong->right / right->wrong counts.
+    - The full texts are in work/fwd_<k>/gen_<k>_<model>.jsonl (same fields as the trace bank).
+    - COST: generation is slow on this CPU (about 100 s of machine time per answer at full length), so a 32-question "both" pass takes about 1-2 hours of queue time. Use generate passes for causal tests and confirmation, and read passes (fast) for analysis.
+ Timing of score/read passes: about 0.75 s per question per model. Results for the parent are cached, so a "both" pass without activations only costs the edited model's time. One full 256-question "both" pass takes a few minutes, plus waiting while other editors' passes run (one queue for everyone). `fwd` waits up to 9 minutes; if the pass is not done, it prints `fwd wait <id>`, which you run to keep waiting. `{EDIR}/fwd status` shows the queue and your budget.
+
+HOW TO WORK.
+1. Diagnose on the trace bank first. Compare finished and truncated traces of the same kinds of questions: where does the token budget go (setup, arithmetic, re-checking with "Wait"/"Actually", option-by-option elimination)? Find behaviours that are wasteful because they repeat work already done or keep reconsidering a settled point. Use teacher-forced read passes over trace_text(...) with "positions": "all" to find the components active at the start of such episodes (MLP neurons, heads, directions), and token log-probabilities to see what the model was about to write.
+2. Localize causally. Before relying on a component, show that changing it changes the behaviour you predicted: in a read pass, the probability of starting the wasteful episode; in a generate pass, the tokens used and the accuracy. Try several strengths to see a dose-response. Watch for edits that just shorten everything or end the thinking regardless of the problem: those are out of scope and usually cost accuracy on the answers that finished.
+3. Measure with enough power. Generation is expensive, so paired "both" passes on the trace-bank questions are your best tool (the parent side is cached). Accuracy over n answers has a standard error of about 50/sqrt(n) points; paired differences are much less noisy. Choose candidates on DEV questions, then measure each once on HOLDOUT questions you have not used.
+4. Plan your passes. For example: two or three read passes over traces for localisation, then generate passes for dose-response and one HOLDOUT confirmation.
+5. Work efficiently.
+   - Print compact summaries, never whole arrays or whole traces; quote at most about 300 characters of a trace at a time, in ASCII.
+   - Never print raw lists of vocabulary tokens; print token ids or common words instead.
+   - Keep `notes.md` up to date: findings with numbers, edits tried and their measured effect, the current best edit. Before every pass, write the exact current edit (tensors, what was changed, strength) and the question set.
+
+RULES. Not allowed:
+- (a) Gradient descent or any other training: no backward passes, autograd or optimizers. No fitting of weights to a loss on data, whether iterative or in closed form (for example, solving a weight matrix by least squares so that it reproduces target outputs).
+- (b) Running the model other than through the forward-pass tool: do not implement or simulate the network's computation on any input in Python. Reading the residual stream through the tied output layer is the one exception: it is one matrix product.
+- (c) Internet access or search.
+- (d) Looking outside your folder and the API: no reading of other editors' folders, the data files or the GA's state.
+Linear read-outs of RECORDED activations (logit lens, direct logit attribution, and arithmetic on them) count as analysis and may be used to find components and to pre-screen ideas, but every effect you claim must be measured with the forward tool. Allowed: any analysis of the weights and of forward-pass results, any use of the practice questions, and any direct edit of the weights that you compute and that is in scope. That includes directions computed from recorded activations as means, differences or principal components, projections, rank-one edits, and switching or rescaling specific neurons, heads or channels.
+
+HOW YOUR WORK ENDS. Use your forward passes. Then submit your best edit or edits with submit_candidate(label, description), at most {MAX_CANDS}. That is the candidate with the best measured paired gain, on HOLDOUT if you measured it there, even if the gain is not statistically significant; do not submit an empty edit. In each description, say what was changed (tensors, indices, strength), the mechanism, and the measured paired gain with its standard error and the questions it was measured on. Finally, write a short report to `{EDIR}/report.md` and reply with it: what the model gets wrong, what you changed and why, the evidence, and what you would try next with more passes. The report is read by the next generation's editors.
+
+{HISTORY}

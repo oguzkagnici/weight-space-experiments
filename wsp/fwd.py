@@ -15,7 +15,9 @@ Request JSON (one pass each, whatever the size; failed requests do not count):
   "return": {"token_logprobs": true, "topk": k<=50, "hidden_states": [...], "mlp": [...], "inputs": [...],
              "outputs": [...], "positions": "last" | "mean" | "all", "attn_layers": [attention layer idx],
              "attn_last": [attention layer idx]}}   (attn_last: attention FROM the last token, for every text)
-     at most 1,024 texts, 200,000 tokens in total, 4,096 per text; attention probabilities for the first 4 texts."""
+     at most 1,024 texts, 200,000 tokens in total, 4,096 per text; attention probabilities for the first 4 texts.
+ {"type": "generate", "model": "original" | "edited" | "both", "questions": [...] or "sample": {...}, "n": samples}
+     thinking-mode answers (llama.cpp, Q8_0, cap 3,072 tokens): at most 48 per model (32 with "both")."""
 import json, os, random, shutil, sys, time, uuid
 
 from .config import QUEUE, MAX_SCORE_ITEMS, MAX_SCORE_ITEMS_BOTH, MAX_READ_TEXTS, MAX_READ_TOKENS, MAX_TEXT_TOKENS
@@ -23,6 +25,7 @@ from .server import locked_update
 from . import data
 
 WAIT = int(os.environ.get("WSP_WAIT", "540"))
+GEN_MAX, GEN_MAX_BOTH = 48, 32      # thinking-mode generations per model per pass
 
 
 def fail(msg):
@@ -45,15 +48,32 @@ def submit(req):
     practice = data.splits()["practice"]; pset = set(practice)
     Q = data.questions()
     t = req.get("type")
-    if t not in ("score", "read"):
-        fail("type must be 'score' or 'read'")
+    if t not in ("score", "read", "generate"):
+        fail("type must be 'score', 'read' or 'generate'")
     model = req.get("model")
     k = used + len(pend) + 1
     jid = f"{meta['gen_name']}_{meta['editor']}_p{k:02d}_{uuid.uuid4().hex[:6]}"
     job = {"id": jid, "k": k, "type": t, "model": model, "priority": 5, "created": time.time(),
            "editor": meta["editor"], "gen": meta["gen"], "parent_weights": meta.get("parent_weights"),
            "state_file": sfile, "out_dir": os.path.join(edir, "work", f"fwd_{k:02d}"), "request": req}
-    if t == "score":
+    if t == "generate":
+        if model not in ("original", "edited", "both"):
+            fail("model must be original, edited or both")
+        if "questions" in req:
+            qs = list(req["questions"])
+        elif "sample" in req:
+            s_ = req["sample"]; pool = [q for q in practice if not s_.get("categories") or Q[q]["category"] in s_["categories"]]
+            qs = random.Random(s_.get("seed", 0)).sample(pool, min(int(s_["n"]), len(pool)))
+        else:
+            fail("give 'questions' or 'sample'")
+        bad = [q for q in qs if q not in pset]
+        if bad:
+            fail(f"{len(bad)} ids are not practice questions, e.g. {bad[:3]}")
+        nn = int(req.get("n", 1)); lim = GEN_MAX_BOTH if model == "both" else GEN_MAX
+        if not qs or nn < 1 or len(qs) * nn > lim:
+            fail(f"questions x n must be 1..{lim} per model")
+        job["questions"] = qs; job["n"] = nn
+    elif t == "score":
         if model not in ("original", "edited", "both"):
             fail("model must be original, edited or both")
         if "questions" in req:
