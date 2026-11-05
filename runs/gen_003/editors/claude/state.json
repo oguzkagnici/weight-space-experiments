@@ -1,10 +1,10 @@
 {
- "passes_used": 1,
+ "passes_used": 5,
  "pending": [
-  "gen_003_claude_p02_90844a",
-  "gen_003_claude_p03_c9615d",
-  "gen_003_claude_p04_e71525",
-  "gen_003_claude_p05_dd1e2a"
+  "gen_003_claude_p06_62eda4",
+  "gen_003_claude_p07_c12dcd",
+  "gen_003_claude_p08_6c37eb",
+  "gen_003_claude_p09_d013d0"
  ],
  "passes": [
   {
@@ -12,6 +12,30 @@
    "id": "gen_003_claude_p01_0e597e",
    "type": "read",
    "seconds": 164.5
+  },
+  {
+   "k": 2,
+   "id": "gen_003_claude_p02_90844a",
+   "type": "score",
+   "seconds": 175.6
+  },
+  {
+   "k": 3,
+   "id": "gen_003_claude_p03_c9615d",
+   "type": "score",
+   "seconds": 179.9
+  },
+  {
+   "k": 4,
+   "id": "gen_003_claude_p04_e71525",
+   "type": "score",
+   "seconds": 163.9
+  },
+  {
+   "k": 5,
+   "id": "gen_003_claude_p05_dd1e2a",
+   "type": "score",
+   "seconds": 168.4
   }
  ]
 }
