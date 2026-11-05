@@ -198,6 +198,9 @@ class Server:
                     # free llama-server's memory (about 5 GB) before a PyTorch pass; it restarts on the next
                     # generation job (about 10 s). Two models plus long-text activations exceeded the RAM once.
                     self.llama.stop()
+                if job["type"] in ("generate", "eval_gen"):
+                    # the fp32 PyTorch model (6.8 GB) is not needed while llama-server generates; reloaded on demand
+                    self.e.unload()
                 if job["type"] == "score":
                     result = self.run_score(job)
                 elif job["type"] == "read":

@@ -36,14 +36,18 @@ def read_edit_dir(d):
     return out
 
 
+# Compute dtype of the PyTorch engine. Weight VALUES are always the bfloat16 values (edits are rounded to bf16).
+# Until 2026-11-05 ~14:00 the computation ran in bf16 on a host with AMX. After a silent container restart the host
+# has no AMX/avx512_bf16 (bf16 matmul 68 GFLOP/s vs fp32 264 GFLOP/s), so the engine computes in float32 (D36).
+COMPUTE_DTYPE = torch.float32
+DTYPE_TAG = "" if COMPUTE_DTYPE == torch.bfloat16 else "_fp32"     # score caches are per compute dtype
+
+
 class Engine:
     def __init__(self):
         self.tok = AutoTokenizer.from_pretrained(MODEL_DIR, trust_remote_code=True)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            MODEL_DIR, dtype=torch.bfloat16, trust_remote_code=True, attn_implementation="sdpa").eval()
-        self.params = dict(self.model.named_parameters())
-        self.stash = {}            # name -> original bf16 tensor, for tensors currently replaced
-        self.current = None
+        self.model = None
+        self.load()
         # the rendered prompt ends with the token " (" ; the answer is the next token, the bare letter
         ctx = self.tok.encode(data.ASSISTANT_PREFIX, add_special_tokens=False)
         self.letter_ids = []
@@ -52,10 +56,27 @@ class Engine:
             assert full[:-1] == ctx and len(full) == len(ctx) + 1, (l, full, ctx)
             self.letter_ids.append(full[-1])
         assert len(set(self.letter_ids)) == 10
+
+    def load(self):
+        """(Re)load the base model; the stored weights are bf16, upcast exactly to COMPUTE_DTYPE."""
+        if self.model is not None:
+            return
+        self.model = AutoModelForCausalLM.from_pretrained(
+            MODEL_DIR, dtype=COMPUTE_DTYPE, trust_remote_code=True, attn_implementation="sdpa").eval()
+        self.params = dict(self.model.named_parameters())
+        self.stash = {}            # name -> original tensor, for tensors currently replaced
+        self.current = None
         self.layers = self.model.model.layers
+
+    def unload(self):
+        """Free the model's memory (used while llama-server generates)."""
+        import gc
+        self.model = None; self.params = {}; self.stash = {}; self.current = None; self.layers = None
+        gc.collect()
 
     # ------------------------------------------------------------------ weights
     def set_weights(self, dirs):
+        self.load()
         key = weights_key(dirs)
         if key == self.current:
             return key
@@ -71,7 +92,7 @@ class Engine:
                 assert tuple(t.shape) == tuple(p.shape), (name, t.shape, p.shape)
                 if name not in self.stash:
                     self.stash[name] = p.data.clone()
-                p.data.copy_(t.to(torch.bfloat16))
+                p.data.copy_(t.to(torch.bfloat16).to(COMPUTE_DTYPE))
         self.current = key
         return key
 
@@ -105,7 +126,7 @@ class Engine:
         position (last token) -> dict key -> np.ndarray [n, d]."""
         Q = data.questions()
         cache = {}
-        cpath = os.path.join(CACHE, f"score_{cache_key}.jsonl") if cache_key else None
+        cpath = os.path.join(CACHE, f"score_{cache_key}{DTYPE_TAG}.jsonl") if cache_key else None
         if cpath and os.path.exists(cpath) and not acts:
             for line in open(cpath):
                 r = json.loads(line); cache[r["id"]] = r
@@ -120,7 +141,7 @@ class Engine:
             hooks = self._hooks(acts, store) if acts else []
             try:
                 with torch.inference_mode():
-                    logits = self.model(ids).logits[0, -1].float()
+                    logits = self.model(ids, logits_to_keep=1).logits[0, -1].float()
             finally:
                 for h in hooks: h.remove()
             k = len(q["options"])

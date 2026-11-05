@@ -270,3 +270,10 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
   3. `logits_to_keep=1` is used unless per-token log-probs or all-position top-k are requested.
   4. The server stops llama-server before every PyTorch pass; it restarts on the next generation job in about 10 s.
 - Verified: attention rows and full matrices are identical to the old path (max diff 0.0); top-k identical. A 2,325-token trace with every layer requested peaks at 4.9 GB RSS, including the model.
+
+### Hardware change found: the host lost AMX (gen 4, about 14:50 UTC)
+
+- `claude`'s pass 1 (re-run after the OOM fix) took more than an hour. Profiling showed `aten::mm` at about 70 GFLOP/s. `/proc/cpuinfo` now lists `avx512f` but **no `amx_bf16` / `amx_tile` / `avx512_bf16`**: the silent container restart at about 08:17 moved the session to a different host. PyTorch's bf16 matmul has no fast path there.
+- Measured with the server paused: 1,024-token forward in bf16 38 s (27 tok/s); raw matmul bf16 68 vs fp32 264 GFLOP/s; fp32 engine read 70 tok/s.
+- Change (D36): float32 compute on the bf16 weight values; score caches keyed by dtype; the server unloads the PyTorch model (6.8 GB in fp32) during generation jobs and reloads it for the next PyTorch pass. Pass 1 was restarted (not charged) so that all generation-4 analysis passes share one compute dtype.
+- Consequence for planning: score/read passes are now about 6× slower than in generations 1-3 (about 5 s per 400-token question per model). Thinking-mode generation (llama.cpp, about 85 s per answer) is unchanged.
