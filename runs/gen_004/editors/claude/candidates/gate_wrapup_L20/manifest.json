@@ -1,0 +1,26 @@
+{
+ "label": "gate_wrapup_L20",
+ "editor": "claude",
+ "gen": 4,
+ "time": 1793923776.3024049,
+ "tensors": {
+  "model.layers.20.feed_forward.w1.weight": {
+   "changed_bf16": 2046,
+   "numel": 15728640,
+   "rel_change": 0.0638766661286354,
+   "sha_bf16": "1afb307066e558c2"
+  },
+  "model.layers.20.feed_forward.w2.weight": {
+   "changed_bf16": 2045,
+   "numel": 15728640,
+   "rel_change": 0.012696145102381706,
+   "sha_bf16": "01eae962ea4579a6"
+  },
+  "model.layers.20.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.012184028513729572,
+   "sha_bf16": "530f8824c483219e"
+  }
+ }
+}

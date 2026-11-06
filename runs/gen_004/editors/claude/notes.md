@@ -56,3 +56,8 @@
 - Much weaker than DEV (+9.4). HOLDOUT A has few cut-with-statement traces (most cut traces never state an answer: 0 statements), and those are the only place the gate acts. Finished traces mostly got shorter (e.g. 5458 2964 -> 1770, 3198 1158 -> 872) with the same answer.
 - One right->? check: mmlupro_6268 was finished-wrong (D) and is now cut (still wrong), so no loss.
 ## Pass 6 (HOLDOUT B) failed on a machine-wide full disk (GGUF scratch); not charged; requeued unchanged (same snapshot).
+
+## Pass 6 result (HOLDOUT B, 32 fresh practice questions, same edit), code/016
+- acc 0.094 -> 0.188 (+9.4, SE 5.2; +3/-0: 11355, 2151, 8914, all cut -> finished correct). Cut 0.81 -> 0.69. Tokens 2853 -> 2600 (-253, SE 88).
+- Finished traces again got shorter with the same answer (2649 2571 -> 1135, 9763 2659 -> 1687, 7162 2059 -> 918).
+## Holdouts combined (64): +4/-0, +6.3 pp (SE about 3.0). Submitted as candidate gate_wrapup_L20 (code/019).

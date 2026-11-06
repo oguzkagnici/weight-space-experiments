@@ -59,3 +59,10 @@
 ## Pass 6 (generate both, HOLDOUT2 = 32 fresh non-bank practice questions, work/holdout2.json, seed 2026; same edit E3).
 - code/023 on pass 4: post-conclusion commit rate 0.16 -> 0.24 (11/68 -> 11/46); reconsideration episodes after a conclusion 57 -> 35; conclusion points per 1k tokens 0.85 -> 0.60; share of trace after first conclusion 0.38 -> 0.32.
 - Pass 5 (HOLDOUT) FAILED on 'No space left on device' (disk full machine-wide; not charged). Deleted my regenerable work/r1_neuron_contrib_L*.npy and the failed job's snapshot to free space. Pass 6 (HOLDOUT2) is running; HOLDOUT to be resubmitted after it (its output dir would collide: copy fwd_06 first).
+
+## Pass 6 result (generate both, HOLDOUT2 = 32 fresh non-bank questions, edit E3) -- copied to work/fwd_06_holdout2
+- Accuracy 50.0% -> 43.8%, paired -6.25 pp (SE 6.2), 1 w->r / 3 r->w. Cut 43.8% -> 40.6%. Tokens 2245 -> 2149 (-96, SE 79).
+- The 3 r->w (5465, 7862, 9590) are traces that originally finished at 2949/2935/3028 tokens (right at the cap) and now get cut: divergence near the cap.
+- Of 14 originally cut, 4 now finish: 1 correct (5779), 3 wrong.
+- Mechanism replicates: post-conclusion commit rate .23 -> .31 (12/52 -> 16/52); share of trace after first conclusion .32 -> .29.
+## Pass 7 (= budget pass 6; HOLDOUT, the 32 bank holdout questions, same edit E3) resubmitted; out dir work/fwd_06 (collides; holdout2 copied first).
