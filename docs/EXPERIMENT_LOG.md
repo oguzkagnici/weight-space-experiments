@@ -405,3 +405,15 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
   - Even then, removing any neuron's original tiny contribution flips sampled tokens early, so neuron-repurposing edits keep resampling noise under `det1`. This matches `claude`'s observation for n5414.
 - `ed_a` reported that it could not write its own `report.md` (subagents may not write report files). Its full report is in its hand-back message and in `notes.md`.
 - Selection queued for `claude/gate_wrapup_L20_d15` and `ed_a/ed_a_g5_churn_hence_L23` (the champion and carry results already exist).
+
+## 2026-11-06 — Generation 5 decision: the first accepted edit
+| candidate | acc (128 hidden) | diff | SE | z | +/− | cut share | tokens |
+|---|---|---|---|---|---|---|---|
+| champion (base) | 37.50 | | | | | 54.7% | 2,265 |
+| **carry/gate_wrapup_L20** (gen-4 `claude`, target −9) | **46.88** | **+9.38** | 2.6 | **3.61** | **12/0** | −10.9 pp | −152 |
+| claude/gate_wrapup_L20_d15 (target −15) | 43.75 | +6.25 | 3.1 | 2.02 | 12/4 | | |
+| ed_a/ed_a_g5_churn_hence_L23 | 40.62 | +3.12 | 1.9 | 1.64 | 5/1 | | |
+
+- **Winner: `carry/gate_wrapup_L20`.** It is now the champion `gen005_carry_gate_wrapup_L20` (D42), the first edit the loop has accepted in five generations.
+- **Dose-response.** The stronger write (−15) gains less (+6.25) and loses 4 answers that −9 keeps. The original gen-4 tuning was close to the useful maximum.
+- **Queued (D43).** Held-out confirmation in thinking mode (MMLU-Pro 128 and GPQA 198, for base and champion), then the champion's trace bank for generation 6.

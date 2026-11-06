@@ -203,6 +203,7 @@ flowchart LR
     - On fresh practice questions the edit turns cut traces that had committed into correct finished answers: +4 gained, 0 lost over the 64 holdout questions (+6.3 pp, SE about 3.0).
     - Finished traces end 300–1,400 tokens sooner with the same answer.
     - Traces that never state an answer are untouched. These are most of the cut traces, so this is the upper limit of this mechanism.
+  - **Confirmed under the deterministic engine (generation 5 selection, 128 hidden questions, paired):** +9.4 pp (z 3.6), 12 answers gained and none lost; cut share −11 pp. A stronger write (−15) gains less (+6.25, +12/−4), so the useful strength is near −9. This edit became the loop's first champion.
 
 ## A second, sparse commit circuit (generation 4, editor `ed_a`)
 

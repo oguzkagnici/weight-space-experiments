@@ -1,8 +1,10 @@
 {
  "gen": 5,
- "champion": "base",
- "champion_weights": null,
- "lineage": [],
+ "champion": "gen005_carry_gate_wrapup_L20",
+ "champion_weights": "/home/user/weight-space-experiments/runs/champions/gen005_carry_gate_wrapup_L20/weights",
+ "lineage": [
+  "gen005_carry_gate_wrapup_L20"
+ ],
  "history": [
   {
    "gen": 1,
@@ -241,6 +243,51 @@
      "logp_correct_diff": 0.0,
      "weights_changed": 6139,
      "description": "# gate_wrapup_L20: a gated \"stop re-checking\" neuron in layer 20\n\nEdit: repurpose the quiet MLP neuron 5414 of layer 20 (model.layers.20.feed_forward w1 row, w3 row, w2 column; about 2,048 weights each).\n- gate (w1 row) = commit direction - threshold x bias proxy. The commit direction is the mean-difference direction between\n  residual states at points where the model has just stated its answer inside <think> and matched control points, read from recorded activations.\n  The threshold is at the 99.8th percentile of all-token scores (s > 10.28), so it fires on about 0.2% of tokens.\n- up (w3 row) = bias proxy (a direction with a near-constant projection, so the neuron's output is about gate-score minus threshold).\n- down (w2 column) = (wrap-up word direction - reopen word direction) mapped back through the final norm (regularised inverse),\n  scaled so that the estimated logit-difference shift at commit points is -9 (scale 0.400).\n  Wrap-up words exclude </think> itself.\nNo training, no fitting beyond means and percentiles of recorded activations.\n\nMechanism measured (pass 3, read): at commit points that reopened, P(reopen) 0.81 -> 0.68 and P(close) 0.11 -> 0.24 (at target -3).\nControl tokens are unchanged; the neuron fires (> 0.5) on 71% of commit points and 10% of controls.\n\nEvidence (thinking mode, 3072-token cap, fixed seeds, paired original vs edited):\n- DEV (32 practice questions, used for tuning): 37.5 -> 46.9 (+9.4, SE 6.9; +4/-1); cut share 0.53 -> 0.31; tokens -377.\n- HOLDOUT A (32 fresh practice questions, untouched): 31.2 -> 34.4 (+3.1, SE 3.1; +1/-0); tokens -50.\n- HOLDOUT B (32 fresh practice questions, untouched): 9.4 -> 18.8 (+9.4, SE 5.2; +3/-0); cut 0.81 -> 0.69; tokens -253.\n- HOLDOUTS combined (64): +6.3 pp (SE about 3.0; +4/-0).\nWhere it helps: traces that state an answer and then re-check until the cap; it does nothing for traces that never commit.\nRisk: on finished traces it shortens the thinking (same answers so far); one DEV loss (mmlupro_9424).\n"
+    }
+   ]
+  },
+  {
+   "gen": 5,
+   "parent": "base",
+   "winner": "carry/gate_wrapup_L20",
+   "rule": "z >= 2.0",
+   "champion_acc": 37.5,
+   "candidates": [
+    {
+     "name": "carry/gate_wrapup_L20",
+     "acc": 46.88,
+     "acc_diff": 9.38,
+     "acc_diff_se": 2.6,
+     "z": 3.61,
+     "wrong_to_right": 12,
+     "right_to_wrong": 0,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 6139,
+     "description": "# gate_wrapup_L20: a gated \"stop re-checking\" neuron in layer 20\n\nEdit: repurpose the quiet MLP neuron 5414 of layer 20 (model.layers.20.feed_forward w1 row, w3 row, w2 column; about 2,048 weights each).\n- gate (w1 row) = commit direction - threshold x bias proxy. The commit direction is the mean-difference direction between\n  residual states at points where the model has just stated its answer inside <think> and matched control points, read from recorded activations.\n  The threshold is at the 99.8th percentile of all-token scores (s > 10.28), so it fires on about 0.2% of tokens.\n- up (w3 row) = bias proxy (a direction with a near-constant projection, so the neuron's output is about gate-score minus threshold).\n- down (w2 column) = (wrap-up word direction - reopen word direction) mapped back through the final norm (regularised inverse),\n  scaled so that the estimated logit-difference shift at commit points is -9 (scale 0.400).\n  Wrap-up words exclude </think> itself.\nNo training, no fitting beyond means and percentiles of recorded activations.\n\nMechanism measured (pass 3, read): at commit points that reopened, P(reopen) 0.81 -> 0.68 and P(close) 0.11 -> 0.24 (at target -3).\nControl tokens are unchanged; the neuron fires (> 0.5) on 71% of commit points and 10% of controls.\n\nEvidence (thinking mode, 3072-token cap, fixed seeds, paired original vs edited):\n- DEV (32 practice questions, used for tuning): 37.5 -> 46.9 (+9.4, SE 6.9; +4/-1); cut share 0.53 -> 0.31; tokens -377.\n- HOLDOUT A (32 fresh practice questions, untouched): 31.2 -> 34.4 (+3.1, SE 3.1; +1/-0); tokens -50.\n- HOLDOUT B (32 fresh practice questions, untouched): 9.4 -> 18.8 (+9.4, SE 5.2; +3/-0); cut 0.81 -> 0.69; tokens -253.\n- HOLDOUTS combined (64): +6.3 pp (SE about 3.0; +4/-0).\nWhere it helps: traces that state an answer and then re-check until the cap; it does nothing for traces that never commit.\nRisk: on finished traces it shortens the thinking (same answers so far); one DEV loss (mmlupro_9424).\n"
+    },
+    {
+     "name": "claude/gate_wrapup_L20_d15",
+     "acc": 43.75,
+     "acc_diff": 6.25,
+     "acc_diff_se": 3.1,
+     "z": 2.02,
+     "wrong_to_right": 12,
+     "right_to_wrong": 4,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 6140,
+     "description": "# gate_wrapup_L20_d15: the gen-4 \"stop re-checking\" neuron with a 15/9 stronger write\n\nEdit (layer 20 MLP, neuron 5414, about 6,140 weights): identical to the carried candidate gate_wrapup_L20 (gate = the\n\"answer just stated\" commit direction minus a threshold at its 99.8th all-token percentile, s > 10.28; up = bias proxy;\ndown = wrap-up minus reopen word direction mapped back through the final norm), except that the w2 column 5414 is\nscaled by 15/9 (estimated logit-difference shift at commit points -15 instead of -9). w1 and w3 rows unchanged.\n\nPurpose: a dose-response point. Selection measures the carry (-9) and this edit (-15) on the same hidden questions;\nthe carry scored +9.4 pp there (z 3.6, +12/-0).\n\nEvidence (thinking mode, det1 engine, paired against the parent; trace-bank questions, parent side cached):\n- DEV32 (9 cut-with-statement, 15 cut-without, 8 finished; used to compare doses): 8 -> 9 (+3.1, SE 7.1; +3/-2); cut 24 -> 19;\n  the carry on the same DEV32: 8 -> 9 (+3.1, SE 5.5; +2/-1). -15 against the carry directly: +3/-3.\n- HOLDOUT32 (32 other bank questions, fixed-seed draw, measured once): 17 -> 16 (-3.1, SE 3.1; +0/-1); cut 13 -> 14.\n- Combined 64: +0.0 pp. I expect no gain over the carry; the stronger push did not add measurable benefit.\nNote: no trace stays byte-identical (first difference at a median of 300-550 characters), so for this edit pairing behaves\nlike independent samples and small tests have little power.\n"
+    },
+    {
+     "name": "ed_a/ed_a_g5_churn_hence_L23",
+     "acc": 40.62,
+     "acc_diff": 3.12,
+     "acc_diff_se": 1.9,
+     "z": 1.64,
+     "wrong_to_right": 5,
+     "right_to_wrong": 1,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 6143,
+     "description": "Targets HYPOTHESIS CHURN inside the thinking: at a paragraph break after an uncertainty statement (\"Not sure.\", \"Hmm.\"), the parent opens yet another speculative hypothesis or method (\"Alternatively, maybe ...\", \"Maybe ...\", \"Perhaps ...\", \"Another approach ...\") instead of committing. On the 64 DEV trace-bank traces such churn openers follow 7.4% of paragraph breaks in cut traces vs 1.4% in finished ones (126 vs 12; paragraph-initial \"Alternatively\" 28 vs 1); the model's own P(churn opener) at breaks is .051 in cut vs .008 in finished traces. Paragraph-initial Hence/Therefore are pure commit moves (finished 22, cut 2; always followed by 'answer'/'final answer').\nCHANGE (one repurposed neuron, L23 n74, the quietest L23 neuron; 2,048 weights in each of 3 tensors): model.layers.23.feed_forward.w1 row 74 = 16*(d - (12.20/mp)*mu_hat); w3 row 74 = 4.66*mu_hat/(16*mp); w2 column 74 = clip(2*u, +-0.98 * absmax of the other 31 weights of its Q8_0 block in each row). d = unit(unit(g1)+unit(g2)) at the L23 MLP input, g1 = mean at churn breaks - mean at other breaks, g2 = mean at churn breaks - mean over 60k ordinary tokens (recorded on the 64 DEV traces, pass 1); mu_hat = unit mean input (bias proxy, mean projection mp = 6.47); threshold 12.20 = 55th percentile of churn-break scores. u = unit(g_post23 * g_final * (mean E[Hence,Therefore] - mean E[Alternatively,Maybe,Perhaps,Another,Possibly])). The neuron is ~0 except above threshold (fires on 59% of churn breaks, 11% of other breaks in cut traces, 2.4% of breaks in finished traces, 0% of commit breaks and 0.000% of non-break tokens on DEV).\nMECHANISM EVIDENCE (teacher-forced read on 64 DEV traces, v1 with the same gate): at firing churn breaks P(Hence/Therefore) .000 -> .39 and P(churn opener) .28 -> .055, graded by activation (act 2-4: P(H/T) .91); elsewhere mean |dlogp| 0.0004 (7 of 165k positions > 0.1). In generations, paragraph-initial churn openers fall 0.92 -> 0.56 per 1k tokens (DEV) and Hence/Therefore openers rise 0.10 -> 0.87.\nMEASURED (generate both, paired, det1): DEV 32 (traces with a firing; used for choosing) +9.4 (SE 5.2, +3/-0); HOLDOUT 32 trace-bank questions 0.0 (SE 4.5, +1/-1); HOLDOUT 32 fresh random practice questions +9.4 (SE 5.2, +3/-0). Two holdouts combined (64): +4.7 points (SE ~3.4, +4/-1), cut share -1.6 points.\nCAVEATS: replacing any neuron perturbs every logit slightly, so under det1 nearly all edited traces diverge early on ordinary words (no L23 neuron is dead or quantises to zero); paired differences therefore include resampling noise. A w2 column larger than its Q8_0 block peers made this much worse in an earlier version (block scale change); v3 keeps it under the block absmax. Some firings produce \"Hence we need to ...\" (connective, not a commit). The gate acts mainly in knowledge questions (law, health, psychology, philosophy, economics); computation-heavy cut traces rarely trigger it."
     }
    ]
   }

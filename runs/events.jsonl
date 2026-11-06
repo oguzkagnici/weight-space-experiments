@@ -30,3 +30,10 @@
 {"time": "2026-11-06T07:32:43Z", "cmd": "brief", "args": {"editor": null}}
 {"time": "2026-11-06T15:03:05Z", "cmd": "candidates", "args": {}}
 {"time": "2026-11-06T15:03:07Z", "cmd": "select", "args": {"wait": false}}
+{"time": "2026-11-06T17:29:44Z", "cmd": "decide", "args": {"z": 2.0, "force": null, "keep": false}}
+{"time": "2026-11-06T17:29:52Z", "cmd": "report", "args": {"gen": null}}
+{"time": "2026-11-06T17:30:06Z", "cmd": "status", "args": {}}
+{"time": "2026-11-06T17:30:31Z", "cmd": "heldout", "args": {"who": "base", "n": 128, "set": "mmlupro", "protocol": "think"}}
+{"time": "2026-11-06T17:30:34Z", "cmd": "heldout", "args": {"who": "base", "n": 128, "set": "gpqa", "protocol": "think"}}
+{"time": "2026-11-06T17:30:38Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "mmlupro", "protocol": "think"}}
+{"time": "2026-11-06T17:30:41Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "gpqa", "protocol": "think"}}
