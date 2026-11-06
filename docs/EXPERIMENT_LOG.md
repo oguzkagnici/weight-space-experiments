@@ -347,3 +347,9 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - **What this means for gen 4:**
   - The selection test of `gate_wrapup_L20` (+3.1 pp, z 0.82) is valid but had little power, because about 30 percentage points of the per-question noise came from sampling divergence unrelated to the edit.
   - Under `det1` the edited and unedited traces stay identical up to the first token where the edit actually changes the sampled choice. So only the questions the edit really touches contribute variance.
+
+## 2026-11-06 — Trace bank under `det1`; generation 5 started
+- Bank regenerated under `det1`: same 96 ids, 3,468 s (old engine: 8,190 s). Accuracy **38.5%** (SE 5.0); cut 54.2%; 84.1% correct when finished; mean 2,372 tokens (1,544 when finished). This matches the old bank (37.5%, cut 55%, 83.7%).
+  - Truncated traces with an in-think answer statement: **9 of 52** (4 correct), against 17 of 53 in the old bank with the same regex. This is sampling variation between the two engines, so the population the gen-4 gate targets is small and variable.
+  - Cut share by subject: law 10/12, health 8/11, physics 7/13, engineering 4/5, economics 5/10. No truncations in biology, computer science or history (n = 3, 3, 2).
+- Generation 5 created (D41). `carry/gate_wrapup_L20` and the champion are queued for selection on the 128 hidden questions at priority 9.
