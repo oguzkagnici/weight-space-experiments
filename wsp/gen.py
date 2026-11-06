@@ -11,7 +11,12 @@ import numpy as np
 from .config import ROOT, LETTERS
 from . import data
 
-LLAMA = "/home/user/llama.cpp/build/bin"
+# Generation engine (D40). "det1": llama.cpp built with -DGGML_LLAMAFILE=OFF -DGGML_CPU_REPACK=OFF, separate KV per slot,
+# no flash attention, no prompt-prefix reuse -> byte-identical outputs regardless of batch neighbours, and 1.6-2x faster on
+# this host than the default build. The engine tag is part of every generation cache file name, so results of different
+# engines are never mixed or paired. Generations 1-4 used the default build (tag ""), which is NOT deterministic with 16 slots.
+ENGINE_TAG = "det1"
+LLAMA = "/home/user/llama.cpp/build-det/bin"
 GGUF_CACHE = "/home/user/gguf_cache"
 BASE_Q8 = "/home/user/models/LFM3-1.7B-GGUF/LFM3-1.7B-Q8_0.gguf"
 PORT = 8091
@@ -20,8 +25,8 @@ THINK_CAP = 3072
 THINK_INSTR = 'Think step by step, then finish with "The answer is (X)" where X is the letter of the correct option.'
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "top_k": 20}
 MAX_GGUF_CACHE = 4            # keep at most this many edited Q8_0 files
-EXTRA_ARGS = []               # extra llama-server arguments
-CACHE_PROMPT = True           # llama-server prompt-prefix reuse across requests
+EXTRA_ARGS = ["-no-kvu", "-fa", "off"]   # extra llama-server arguments
+CACHE_PROMPT = False          # llama-server prompt-prefix reuse across requests
 
 
 def user_message(q):

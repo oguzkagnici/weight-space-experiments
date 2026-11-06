@@ -125,7 +125,7 @@ class Server:
         self.beat(f"building gguf {key}" if dirs else "base gguf")
         path = gen.build_gguf(dirs, key)
         self.beat(f"generating {len(items)} answers with {key or 'base'}")
-        return gen.generate(self.llama, path, items, cache_path=os.path.join(CACHE, f"gen_{key}_cap{gen.THINK_CAP}.jsonl")), key
+        return gen.generate(self.llama, path, items, cache_path=os.path.join(CACHE, f"gen_{key}_cap{gen.THINK_CAP}" + (f"_{gen.ENGINE_TAG}" if gen.ENGINE_TAG else "") + ".jsonl")), key
 
     def run_generate(self, job):
         from . import gen

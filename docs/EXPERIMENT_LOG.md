@@ -339,3 +339,11 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
   - It does make generation **2.3× faster** on this host (no AMX). The repacked and sgemm Q8_0 paths are slow here.
   - Being tested next: separate KV per slot (`-no-kvu`) with prompt-cache reuse off (`cache_prompt=false`), with and without flash attention.
 - `wsp/gen.py` gained `EXTRA_ARGS` (extra llama-server arguments) and `CACHE_PROMPT`. Both default to the previous behaviour.
+- **Resolved: a deterministic and faster engine (D40).**
+  - The `build-det` build with `-no-kvu -fa off` and `cache_prompt=false` reproduced 16 of 16 traces at cap 600 (78 tok/s).
+  - It also reproduced **16 of 16 full-length (3,072-token) traces with different batch neighbours** (`determinism_mixed_full.json`; accuracy 7 of 16 both times), at 38–46 tok/s.
+  - It is now the default engine (`ENGINE_TAG det1`; the server was restarted).
+  - The trace bank is being regenerated under it.
+- **What this means for gen 4:**
+  - The selection test of `gate_wrapup_L20` (+3.1 pp, z 0.82) is valid but had little power, because about 30 percentage points of the per-question noise came from sampling divergence unrelated to the edit.
+  - Under `det1` the edited and unedited traces stay identical up to the first token where the edit actually changes the sampled choice. So only the questions the edit really touches contribute variance.

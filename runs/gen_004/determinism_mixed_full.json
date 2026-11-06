@@ -1,0 +1,137 @@
+{
+ "config": {
+  "bin": "/home/user/llama.cpp/build-det/bin",
+  "extra": [
+   "-no-kvu",
+   "-fa",
+   "off"
+  ],
+  "cache_prompt": false
+ },
+ "cap": 3072,
+ "seconds": [
+  980.5439937114716,
+  1592.6122872829437
+ ],
+ "tok_per_s": [
+  37.69948134614486,
+  45.92957154989256
+ ],
+ "identical": 16,
+ "pairs": [
+  {
+   "id": "mmlupro_8198",
+   "identical": true,
+   "first_div": 5979,
+   "len": 5979,
+   "tokens": 2506
+  },
+  {
+   "id": "mmlupro_4637",
+   "identical": true,
+   "first_div": 3775,
+   "len": 3775,
+   "tokens": 1255
+  },
+  {
+   "id": "mmlupro_5510",
+   "identical": true,
+   "first_div": 15529,
+   "len": 15529,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_2476",
+   "identical": true,
+   "first_div": 5262,
+   "len": 5262,
+   "tokens": 1034
+  },
+  {
+   "id": "mmlupro_10465",
+   "identical": true,
+   "first_div": 7665,
+   "len": 7665,
+   "tokens": 1863
+  },
+  {
+   "id": "mmlupro_9892",
+   "identical": true,
+   "first_div": 3611,
+   "len": 3611,
+   "tokens": 1138
+  },
+  {
+   "id": "mmlupro_2017",
+   "identical": true,
+   "first_div": 15969,
+   "len": 15969,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_9493",
+   "identical": true,
+   "first_div": 7799,
+   "len": 7799,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_5719",
+   "identical": true,
+   "first_div": 11094,
+   "len": 11094,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_11805",
+   "identical": true,
+   "first_div": 10141,
+   "len": 10141,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_1643",
+   "identical": true,
+   "first_div": 10233,
+   "len": 10233,
+   "tokens": 2102
+  },
+  {
+   "id": "mmlupro_7456",
+   "identical": true,
+   "first_div": 12158,
+   "len": 12158,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_6941",
+   "identical": true,
+   "first_div": 13373,
+   "len": 13373,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_4418",
+   "identical": true,
+   "first_div": 3073,
+   "len": 3073,
+   "tokens": 1201
+  },
+  {
+   "id": "mmlupro_6352",
+   "identical": true,
+   "first_div": 13928,
+   "len": 13928,
+   "tokens": 3072
+  },
+  {
+   "id": "mmlupro_453",
+   "identical": true,
+   "first_div": 4035,
+   "len": 4035,
+   "tokens": 1291
+  }
+ ],
+ "acc_alone": 7,
+ "acc_mixed": 7
+}
