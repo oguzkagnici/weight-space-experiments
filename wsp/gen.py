@@ -25,7 +25,7 @@ THINK_CAP = 3072
 THINK_INSTR = 'Think step by step, then finish with "The answer is (X)" where X is the letter of the correct option.'
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "top_k": 20}
 MAX_GGUF_CACHE = 4            # keep at most this many edited Q8_0 files
-EXTRA_ARGS = ["-no-kvu", "-fa", "off"]   # extra llama-server arguments
+EXTRA_ARGS = ["-no-kvu", "-fa", "off", "-cram", "0"]   # extra llama-server arguments; -cram 0 (D44): no host prompt cache (OOM)
 CACHE_PROMPT = False          # llama-server prompt-prefix reuse across requests
 
 

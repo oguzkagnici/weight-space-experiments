@@ -439,3 +439,9 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - The net cut share falls only 3.9 pp because other traces moved in both directions without changing the grade (all wrong either way).
   - So the edit rescues correct-but-unfinished reasoning, as in selection; the higher "accuracy if finished" (76.8% → 85.2%) is a consequence, not a separate effect.
 - The champion GPQA run crashed with `RemoteDisconnected` (the same OOM kill as the base run); see the next entry.
+
+## 2026-11-06 — Out-of-memory cause found and fixed (D44)
+- The champion's GPQA run was also killed (`RemoteDisconnected`), at 62 of 198 answers; the base run had reached 50.
+- **Cause:** llama.cpp's host-memory prompt cache (`--cache-ram`, 8 GB by default). It saves the state of every finished slot for possible reuse, although our requests never reuse prompts (`cache_prompt=false`). GPQA's long prompts and full-length traces fill it fastest.
+- **Fix:** `-cram 0`. Determinism check on 32 trace-bank questions with 16 slots: **32 of 32 byte-identical** to the `det1` bank (1,474 s). Results computed before and after the fix can therefore be mixed and paired; the engine tag stays `det1`.
+- The cached answers are kept and the two GPQA jobs are requeued (champion first, then base, then the champion trace bank).
