@@ -296,3 +296,9 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - The session container restarted; files survived, but processes (eval server, llama-server, watchdog, the ed_a sub-agent) did not.
 - Restarted with `start_server.sh` (which requeued ed_a's running final pass gen_004_ed_a_p06_0ebbf0, uncharged) and the detached watchdog. ed_a was resumed from its transcript.
 - claude's work was complete before the restart (candidate gate_wrapup_L20 submitted, report written).
+
+### 2026-11-06 — gen 4: editors finished
+- **claude:** candidate `gate_wrapup_L20` (L20 n5414 gated wrap-up neuron, 6,139 weights). DEV +9.4 (SE 6.9). HOLDOUT A +3.1 (SE 3.1). HOLDOUT B +9.4 (SE 5.2). The 64 holdout questions combined: +6.3 pp (SE about 3.0), +4/−0. Report: `runs/gen_004/editors/claude/report.md`.
+- **ed_a:** found a sparse commit circuit: L18 n5407 writes Therefore/Hence/Thus, and L19 n50 and L22 n3686 suppress it. Its edit E3 (boost n5407's up-projection along the conclusion direction and zero both suppressors) changed behaviour (commit rate after a conclusion 0.23 → 0.29–0.31, fewer re-checks) but not accuracy. DEV +12.5 (SE 7.4); HOLDOUT +6.25 (SE 4.3); HOLDOUT2 −6.25 (SE 6.2); combined holdouts 0.0 (SE 3.9). No candidate was submitted (D37). Report: `runs/gen_004/editors/ed_a/report.md`.
+- Selection queued: champion (base) and `claude/gate_wrapup_L20` on the 96 hidden selection questions (thinking protocol D30).
+- Model findings for both editors, with a circuit diagram, were added to `docs/MODEL_FINDINGS.md`.

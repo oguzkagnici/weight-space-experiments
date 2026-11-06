@@ -66,3 +66,9 @@
 - Of 14 originally cut, 4 now finish: 1 correct (5779), 3 wrong.
 - Mechanism replicates: post-conclusion commit rate .23 -> .31 (12/52 -> 16/52); share of trace after first conclusion .32 -> .29.
 ## Pass 7 (= budget pass 6; HOLDOUT, the 32 bank holdout questions, same edit E3) resubmitted; out dir work/fwd_06 (collides; holdout2 copied first).
+
+## Final pass result (generate both, HOLDOUT = 32 bank holdout questions, edit E3), copied to work/fwd_06_holdout
+- Accuracy 43.8% -> 50.0%, paired +6.25 pp (SE 4.3), 2 w->r / 0 r->w. Cut 56% -> 47% (-9.4, SE 5.2). Tokens -90 (SE 106). Finished subset: 14/14 correct both.
+- Post-conclusion commit rate .23 -> .29 (14/61 -> 16/56); share of trace after first conclusion .35 -> .30.
+- Combined HOLDOUT + HOLDOUT2 (64 q): 0.0 pp (SE 3.9), 3 w->r / 3 r->w.
+## Decision: no candidate submitted. The mechanism replicates in all three generate sets, but the combined holdout accuracy gain is 0.0 (SE 3.9); the coordinator asked to submit only if the combined holdout evidence supports it.

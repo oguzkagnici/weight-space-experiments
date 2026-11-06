@@ -199,4 +199,38 @@ flowchart LR
   - At ordinary paragraph ends, nothing changes.
   - Along finished traces, the per-token log-prob change is under 0.001 on average, and the only change above 0.5 is at a commit point.
   - Layers 21–23 dilute the edit to about ⅓ of its direct (read-out) effect.
-  - Generation-level effects (accuracy, truncation) are being measured; see `runs/gen_004/`.
+  - Generation-level effects, measured on paired generations with the same seeds:
+    - On fresh practice questions the edit turns cut traces that had committed into correct finished answers: +4 gained, 0 lost over the 64 holdout questions (+6.3 pp, SE about 3.0).
+    - Finished traces end 300–1,400 tokens sooner with the same answer.
+    - Traces that never state an answer are untouched. These are most of the cut traces, so this is the upper limit of this mechanism.
+
+## A second, sparse commit circuit (generation 4, editor `ed_a`)
+
+`ed_a` looked at a different decision point: the paragraph break after a **conclusion paragraph** ("Thus D is best."), before the formal "the answer is (X)". Here it found a *sparse* circuit, unlike the diffuse picture above:
+
+```mermaid
+flowchart LR
+    CP["conclusion paragraph<br/>'Thus D is best.'"] --> BR["paragraph break"]
+    DIR["'conclusion just stated' direction<br/>at MLP-18 input (AUC 0.89)"] -.-> N["L18 n5407 — commit writer<br/>(gate open at every break;<br/>up-projection sets strength)<br/>writes Therefore / Hence / Thus"]
+    BR --> N
+    N --> OUT["'Therefore / Hence, the answer is (D)'<br/>→ commit"]
+    N -- "read by" --> S1["L19 n50<br/>suppressor"]
+    N -- "read by" --> S2["L22 n3686<br/>suppressor"]
+    S1 -- "writes against<br/>therefore/hence<br/>(cancels ~70% of a boost)" --> OUT
+    S2 -- "takes back +0.59 logit<br/>when L19 n50 is removed" --> OUT
+    BR --> RC["'But let's double-check ...'<br/>(84 of 103 conclusions)"]
+```
+
+- **L18 neuron 5407 is a commit writer.** Its output ranks Therefore, Hence and Thus at 9th, 12th and 14th of 128k tokens.
+  - Its activation is −2.3 at commit points versus about −0.5 to −1.0 at re-check points and ordinary breaks.
+  - It correlates −0.77 with the odds of committing.
+- **Two downstream neurons suppress it.** L19 n50 and L22 n3686 read n5407's output and write against therefore/hence.
+  - They form a layered self-correction: boosting n5407 alone is cancelled by about 70%.
+  - Removing L19 n50 lets L22 n3686 take part of the boost back.
+  - This is a concrete example of the "later layers dilute an edit" effect seen in phase 1 and above.
+- **Behaviour change without accuracy change.**
+  - The edit was: n5407's up-projection plus 0.6 × the conclusion direction, with both suppressors' outputs zeroed.
+  - Commit probability at conclusion breaks went from 0.44 to 0.70, and post-conclusion re-checks fell by about 40%.
+  - But accuracy on 64 fresh questions was +0.0 pp (SE 3.9). The newly finished traces were only 50–60% correct, and sampled traces diverge: three answers that originally finished just under the cap now hit it.
+- **The cut traces that never conclude make up about 70% of the cut traces in `ed_a`'s DEV set.** They deliberate option by option, mostly in health, law and physics. Neither circuit touches them; they are the open problem for the next generation.
+
