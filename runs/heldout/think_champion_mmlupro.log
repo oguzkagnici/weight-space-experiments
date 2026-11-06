@@ -1,0 +1,2 @@
+gen005_carry_gate_wrapup_L20: held-out thinking-mode {"n": 128, "acc": 40.62, "se": 4.34, "cut_share": 52.3, "acc_if_finished": 85.2, "no_answer_finished": 0, "mean_tokens": 2313.3, "mean_tokens_finished": 1481.6}
+paired vs base: {'n': 128, 'acc_diff': np.float64(7.03), 'acc_diff_se': 2.5, 'wrong_to_right': 10, 'right_to_wrong': 1, 'cut_share_diff': np.float64(-3.91), 'cut_share_diff_se': 3.2, 'tokens_diff': -113.2, 'tokens_diff_se': 45.951}

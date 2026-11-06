@@ -424,3 +424,18 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
   - The kernel log shows the memory cgroup's OOM killer stopped `llama-server` at 10.4 GB resident (15 GB limit, shared with the PyTorch server and the session).
   - The job was requeued unchanged. Already generated answers are kept in the generation cache.
   - If it recurs, both GPQA runs will use a smaller batch under a separate engine tag, so they remain paired with each other.
+
+## 2026-11-06 — Held-out MMLU-Pro confirms the champion (D43)
+Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order), paired with the base run above:
+
+| model | acc | SE | cut share | acc if finished | mean tokens | tokens if finished |
+|---|---|---|---|---|---|---|
+| base | 33.59 | 4.2 | 56.2% | 76.8% | 2,427 | |
+| **gen005_carry_gate_wrapup_L20** | **40.62** | 4.3 | 52.3% | 85.2% | 2,313 | 1,482 |
+
+- **Paired: +7.03 pp (SE 2.5, z 2.8), 10 wrong → right, 1 right → wrong.** Cut share −3.9 pp (SE 3.2); −113 tokens (SE 46).
+- The gain on fresh questions is close to the selection estimate (+9.4), so the selection win was not luck of the draw.
+- **Where the gain comes from.** 9 of the 10 gained questions were cut at the cap in the base run and finish correctly under the champion (1,750–2,930 tokens). The 10th changed its answer in a finished trace (C → E). The one loss is the reverse: finished and correct in base, cut under the champion.
+  - The net cut share falls only 3.9 pp because other traces moved in both directions without changing the grade (all wrong either way).
+  - So the edit rescues correct-but-unfinished reasoning, as in selection; the higher "accuracy if finished" (76.8% → 85.2%) is a consequence, not a separate effect.
+- The champion GPQA run crashed with `RemoteDisconnected` (the same OOM kill as the base run); see the next entry.

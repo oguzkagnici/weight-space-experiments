@@ -204,6 +204,7 @@ flowchart LR
     - Finished traces end 300–1,400 tokens sooner with the same answer.
     - Traces that never state an answer are untouched. These are most of the cut traces, so this is the upper limit of this mechanism.
   - **Confirmed under the deterministic engine (generation 5 selection, 128 hidden questions, paired):** +9.4 pp (z 3.6), 12 answers gained and none lost; cut share −11 pp. A stronger write (−15) gains less (+6.25, +12/−4), so the useful strength is near −9. This edit became the loop's first champion.
+  - **Held out (128 untouched MMLU-Pro questions, thinking mode):** +7.0 pp (SE 2.5, z 2.8), +10/−1. 9 of the 10 gains are traces the unedited model cuts at the cap and the edited model finishes correctly, so the neuron works by letting already-correct reasoning conclude.
 
 ## A second, sparse commit circuit (generation 4, editor `ed_a`)
 

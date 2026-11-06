@@ -297,9 +297,15 @@ def history_text(st, upto_gen):
                          f"{c['weights_changed']} weights. {c['description'][:700]}")
         rep_root = os.path.join(gen_dir(h["gen"]), "editors")
         for ed in sorted(os.listdir(rep_root)):
-            rp = os.path.join(rep_root, ed, "report.md")
+            rp = os.path.join(rep_root, ed, "report.md"); npth = os.path.join(rep_root, ed, "notes.md")
             if os.path.exists(rp):
                 parts.append(f"\nReport of editor {ed} (generation {h['gen']}):\n{open(rp).read()[:3500]}")
+            elif ed != "carry" and os.path.exists(npth):
+                # sub-agents sometimes cannot create report.md: use a '## REPORT' section of notes.md, else its end
+                nt = open(npth).read(); i = nt.rfind("## REPORT")
+                body = nt[i:][:3500] if i >= 0 else nt[-3500:]
+                parts.append(f"\nReport of editor {ed} (generation {h['gen']}; no report.md, so "
+                             f"{'the REPORT section' if i >= 0 else 'the end'} of its notes.md):\n{body}")
     return "\n".join(parts)
 
 
