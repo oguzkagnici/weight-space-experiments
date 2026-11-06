@@ -59,3 +59,4 @@
 - DEV32 (code/013): all 9 cut-with-statement traces, 15 cut-without, 8 finished.
 - Pass 4: carry exact on DEV32. Pass 5: a stronger write (target −15 instead of −9; w2 column × 15/9) on DEV32. Pass 6: a third dose or a lower threshold, depending on the result.
 - Submit the best variant, so selection can test whether more push adds to the +9.4.
+- Pass 4 (gen_005_claude_p04_6b1468): carry exact on DEV32. Pass 5 (gen_005_claude_p05_ffdb63): target −15 (w2 column 5414 × 15/9) on DEV32. Both are queued (passes snapshot the edit at submission).
