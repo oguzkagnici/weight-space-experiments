@@ -75,3 +75,7 @@
 - The parent side reproduces the bank byte for byte (32/32), which confirms that the cache and engine are consistent.
 ## Pass 6: HOLDOUT32 (code/016) for the −15 dose
 32 bank questions not in DEV32, drawn with a fixed seed. This dose is my candidate: selection will measure −9 (carry) against −15 side by side on 128 hidden questions, which gives a properly powered dose-response.
+
+## Pass 6 result and submission
+- HOLDOUT32, dose −15: 17 → 16 (−3.1, SE 3.1; +0/−1); cut 13 → 14. Combined with DEV32: +0.0 pp over 64 questions.
+- Submitted `gate_wrapup_L20_d15` (code/018) as the dose-response point. Report written.

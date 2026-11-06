@@ -369,3 +369,16 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
   - Under the old nondeterministic engine the same edit had measured +3.1 (z 0.82). Removing the sampling noise turned an inconclusive result into a clear one.
   - No trace is byte-identical, because the repurposed neuron is slightly active everywhere. Even so, every flipped answer is a win.
 - **Next (`claude`, passes 4–6).** Dose-response of this commit neuron on a fixed DEV32 drawn from the bank: carry exact versus a stronger write (target −15).
+
+## 2026-11-06 — Generation 5, editor `claude`, passes 4–6 and submission
+- **Dose-response of the commit neuron on bank questions** (paired; the parent side reproduces the bank byte for byte):
+
+  | set | edit | result |
+  |---|---|---|
+  | DEV32 | carry, target −9 | +3.1 pp (SE 5.5), +2/−1 |
+  | DEV32 | target −15 | +3.1 pp (SE 7.1), +3/−2 |
+  | DEV32 | −15 against carry | +3/−3 |
+  | HOLDOUT32 | target −15 | −3.1 pp (SE 3.1), +0/−1 |
+
+- **No edited trace stays identical.** The first difference comes at a median of 300–550 characters, so for this edit pairing gives little noise reduction.
+- **Submitted** `claude/gate_wrapup_L20_d15` as the dose-response point. Selection measures it alongside the carry (−9).

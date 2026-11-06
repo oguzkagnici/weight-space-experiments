@@ -93,3 +93,19 @@ cut DEV traces with a firing (code/021). Traces without a firing are expected un
   bias-proxy projection); harmless for the next digit; prompt positions are irrelevant (L23 output only feeds logits).
 Pass 4 plan: generate both, same DEV set (work/dev_gen_set.json) to compare with pass 3: divergences should now
 happen at gated breaks.
+
+## Pass 4 (generate both, v3, same DEV set of 32) -> work/fwd_04
+- acc 15.6 -> 25.0 (+9.4, SE 5.2; +3/-0); cut 75.0 -> 62.5%; tokens -129 (SE 67).
+  W->R: 2147 (psych), 1740 (law), 7615 (econ), all cut -> finished correct. Newly finished wrong: 1375 (law, H), 5822 (other, B).
+  6829 (finished wrong) -> cut wrong. No finished-correct trace lost (5 of 5 kept their answer).
+- Still all 32 traces diverge, mostly at the SAME early mid-sentence points as with v2 (code/023). The common factor
+  is the removal of the original L23 n74 (quietest L23 neuron, max contribution .04): under det1 + top-p/top-k,
+  a tiny logit change at any token can flip the sampled token. code/028/029: no L23 neuron has a Q8_0 w2 column that
+  quantises to zero, and none is quieter than n74, so a repurposed neuron always causes these resampling divergences.
+  => paired differences contain resampling noise (like the old engine) in addition to the mechanism.
+- Mechanism is visible in the edited generations (code/030): paragraph-initial churn openers 0.92 -> 0.56 per 1k
+  tokens (-39%), paragraph-initial Hence/Therefore 0.10 -> 0.87 per 1k.
+- v3 chosen for HOLDOUT (no further tuning on DEV).
+
+Pass 5 plan: generate both, v3 (unchanged), HOLDOUT = the 32 held-out trace-bank questions (work/split.json
+holdout: 17 cut, 15 finished; never used in any analysis).
