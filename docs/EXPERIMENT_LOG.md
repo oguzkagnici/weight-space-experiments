@@ -302,3 +302,22 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - **ed_a:** found a sparse commit circuit: L18 n5407 writes Therefore/Hence/Thus, and L19 n50 and L22 n3686 suppress it. Its edit E3 (boost n5407's up-projection along the conclusion direction and zero both suppressors) changed behaviour (commit rate after a conclusion 0.23 → 0.29–0.31, fewer re-checks) but not accuracy. DEV +12.5 (SE 7.4); HOLDOUT +6.25 (SE 4.3); HOLDOUT2 −6.25 (SE 6.2); combined holdouts 0.0 (SE 3.9). No candidate was submitted (D37). Report: `runs/gen_004/editors/ed_a/report.md`.
 - Selection queued: champion (base) and `claude/gate_wrapup_L20` on the 96 hidden selection questions (thinking protocol D30).
 - Model findings for both editors, with a circuit diagram, were added to `docs/MODEL_FINDINGS.md`.
+
+### 2026-11-06 — gen 4: selection and decision
+- Parent (base) on the 96 hidden selection questions, thinking protocol: **42.71%** (SE 5.05); 51% cut at the cap; 87.2% correct when finished; mean 2,385 tokens.
+- `claude/gate_wrapup_L20`: **45.83%**. Paired difference **+3.12 pp (SE 3.8, z 0.82)**, 8 gained and 5 lost. Cut share 51.0% → 43.8%; mean tokens 2,385 → 2,236.
+- **Decision: no candidate passed (z < 2). The base model stays champion (elitism).**
+- Breakdown by trace status (champion → candidate):
+
+  | Champion | Candidate | Count | Correctness |
+  |---|---|---|---|
+  | cut | finished | 13 | 8 became correct |
+  | finished | cut | 6 | 5 had been correct |
+  | finished | finished | 41 | every answer kept its correctness; mean tokens 1,564 → 1,381 |
+  | cut | cut | 36 | — |
+
+- The losses are not caused by the edit forcing re-checks. Two of the six finished → cut traces never state an answer at all, so the gate cannot have fired there.
+- **Paired traces diverge early.** All 96 pairs differ, and the first differing character has a median position of 344 (quartiles 189 and 649); only 1 of 96 diverges right after an answer statement. So pairing barely reduces variance in thinking mode: after the first differing token, the two traces are close to independent samples.
+- Ruled out as a cause: quantisation. Our `llama-quantize` of the official BF16 GGUF is byte-identical to the official Q8_0 in all 287 tensors.
+- Being tested: run-to-run nondeterminism of llama.cpp with 16 parallel slots, by rerunning the base model on 16 trace-bank questions with the cache off.
+- Found and fixed while investigating: the doubled `<think>` in read-pass contexts (D39).

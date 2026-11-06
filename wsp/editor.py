@@ -149,8 +149,15 @@ def render_think(qid):
 
 
 def trace_text(row):
-    """Prompt + exactly what the model generated, for a row of a generate pass (gen_<k>_<model>.jsonl)."""
-    return render_think(row["id"]) + row["raw"]
+    """Prompt + exactly what the model generated, for a row of a generate pass (gen_<k>_<model>.jsonl).
+
+    llama-server returns the prompt's trailing "<think>" again at the start of the content (its LFM2 parser only
+    consumes "<|im_start|>assistant\n" as the generation prompt), so row["raw"] starts with a "<think>" the model
+    did not generate. It is removed here so the text matches the real token context (fixed 2026-11-06, D39)."""
+    p, raw = render_think(row["id"]), row["raw"]
+    if p.endswith("<think>") and raw.startswith("<think>"):
+        raw = raw[len("<think>"):]
+    return p + raw
 
 
 LETTER_IDS = [tok.encode(_data.ASSISTANT_PREFIX + l, add_special_tokens=False)[-1] for l in LETTERS] if tok else None
