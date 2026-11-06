@@ -37,3 +37,4 @@
 {"time": "2026-11-06T17:30:34Z", "cmd": "heldout", "args": {"who": "base", "n": 128, "set": "gpqa", "protocol": "think"}}
 {"time": "2026-11-06T17:30:38Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "mmlupro", "protocol": "think"}}
 {"time": "2026-11-06T17:30:41Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "gpqa", "protocol": "think"}}
+{"time": "2026-11-06T19:32:00Z", "cmd": "heldout", "args": {"who": "base", "n": 1000, "set": "gpqa", "protocol": "think"}}

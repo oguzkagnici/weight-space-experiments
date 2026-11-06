@@ -417,3 +417,10 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - **Winner: `carry/gate_wrapup_L20`.** It is now the champion `gen005_carry_gate_wrapup_L20` (D42), the first edit the loop has accepted in five generations.
 - **Dose-response.** The stronger write (−15) gains less (+6.25) and loses 4 answers that −9 keeps. The original gen-4 tuning was close to the useful maximum.
 - **Queued (D43).** Held-out confirmation in thinking mode (MMLU-Pro 128 and GPQA 198, for base and champion), then the champion's trace bank for generation 6.
+
+## 2026-11-06 — Held-out confirmation runs (D43): first results and an out-of-memory incident
+- **Base, held-out MMLU-Pro, 128 questions, thinking mode, `det1`:** accuracy **33.59%** (SE 4.2); cut 56.2%; 76.8% correct when finished; 2,427 tokens on average.
+- **Incident.** The base GPQA run failed with `RemoteDisconnected`.
+  - The kernel log shows the memory cgroup's OOM killer stopped `llama-server` at 10.4 GB resident (15 GB limit, shared with the PyTorch server and the session).
+  - The job was requeued unchanged. Already generated answers are kept in the generation cache.
+  - If it recurs, both GPQA runs will use a smaller batch under a separate engine tag, so they remain paired with each other.
