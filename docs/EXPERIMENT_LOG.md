@@ -291,3 +291,8 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - Freed about 9 GB by deleting the regenerable scratch tensors of finished generations 1–3 (`work/*.safetensors`, large `work/*.npy`, editors' staging `edited/` dirs). Candidates' frozen tensors are kept.
 - `wsp/gen.py build_gguf` now evicts old cache entries *before* building (one build needs about 5.3 GB of scratch) and removes its scratch files in a `finally`, so a failed build no longer leaves 3–4 GB behind. The running server picks this up at its next restart.
 - claude pass 6 was requeued unchanged. ed_a had already deleted its pass-5 snapshot and resubmits the pass itself.
+
+### 2026-11-06 — gen 4: container restart
+- The session container restarted; files survived, but processes (eval server, llama-server, watchdog, the ed_a sub-agent) did not.
+- Restarted with `start_server.sh` (which requeued ed_a's running final pass gen_004_ed_a_p06_0ebbf0, uncharged) and the detached watchdog. ed_a was resumed from its transcript.
+- claude's work was complete before the restart (candidate gate_wrapup_L20 submitted, report written).
