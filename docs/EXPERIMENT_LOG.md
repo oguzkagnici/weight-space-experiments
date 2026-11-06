@@ -445,3 +445,10 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - **Cause:** llama.cpp's host-memory prompt cache (`--cache-ram`, 8 GB by default). It saves the state of every finished slot for possible reuse, although our requests never reuse prompts (`cache_prompt=false`). GPQA's long prompts and full-length traces fill it fastest.
 - **Fix:** `-cram 0`. Determinism check on 32 trace-bank questions with 16 slots: **32 of 32 byte-identical** to the `det1` bank (1,474 s). Results computed before and after the fix can therefore be mixed and paired; the engine tag stays `det1`.
 - The cached answers are kept and the two GPQA jobs are requeued (champion first, then base, then the champion trace bank).
+
+## 2026-11-06 ~22:30 — Container restart onto a different host
+- The container restarted at about 22:30 and stopped every process. At that point the champion's GPQA run had 111 of 198 answers cached; base GPQA has 50.
+- **The new host has AMX and AVX-512 (bf16, VNNI) again**; the previous one (since 2026-11-05) had neither (D36). The `det1` llama.cpp binary was compiled with `GGML_NATIVE` on the old host, so it uses the same instructions here.
+- **Check:** 32 of 32 trace-bank traces byte-identical to the `det1` bank under the new host (1,599 s; `runs/gen_005/engine_checks/cram0_determinism_newhost_amx.txt`). Generation results from both hosts can therefore be mixed and paired.
+- The PyTorch side (score and read passes, float32 since D36) may now use different matmul kernels, so recorded activations can differ in the last bits from those computed on the previous host. That matters only for comparing activations across hosts, not for generation results.
+- Queue, watchdog and memory log restarted; the interrupted champion GPQA job resumes from its cache.
