@@ -60,3 +60,18 @@
 - Pass 4: carry exact on DEV32. Pass 5: a stronger write (target −15 instead of −9; w2 column × 15/9) on DEV32. Pass 6: a third dose or a lower threshold, depending on the result.
 - Submit the best variant, so selection can test whether more push adds to the +9.4.
 - Pass 4 (gen_005_claude_p04_6b1468): carry exact on DEV32. Pass 5 (gen_005_claude_p05_ffdb63): target −15 (w2 column 5414 × 15/9) on DEV32. Both are queued (passes snapshot the edit at submission).
+
+## Passes 4–5 result: dose-response on DEV32 (code/015)
+| edit | parent → edited correct | diff (SE) | +/− | cut | tokens |
+|---|---|---|---|---|---|
+| carry (target −9) | 8 → 9 | +3.1 (5.5) | +2/−1 | 24 → 20 | −85 |
+| dose (target −15) | 8 → 9 | +3.1 (7.1) | +3/−2 | 24 → 19 | −151 |
+- Comparing −15 with the carry directly: +3/−3. A stronger push adds nothing measurable at n = 32.
+- By group:
+  - cut with a statement: 0 → 1 for both; cut 9 → 5 for both;
+  - cut without a statement: 0 → 1 (carry) and 0 → 2 (−15);
+  - finished: 8 → 7 and 8 → 6 (one finished trace each became cut).
+- **No trace stays identical.** The first differing character is at a median of about 300–550 characters, well before any commit point. The repurposed neuron, and the removal of its original role, perturb every trace a little. Under deterministic decoding that is enough to send each trace down a different path. So for this edit the "paired" comparison behaves like independent samples, and only large samples resolve it. That is consistent with the hidden selection set (n = 128, +12/−0) being far clearer than any 32-question test.
+- The parent side reproduces the bank byte for byte (32/32), which confirms that the cache and engine are consistent.
+## Pass 6: HOLDOUT32 (code/016) for the −15 dose
+32 bank questions not in DEV32, drawn with a fixed seed. This dose is my candidate: selection will measure −9 (carry) against −15 side by side on 128 hidden questions, which gives a properly powered dose-response.

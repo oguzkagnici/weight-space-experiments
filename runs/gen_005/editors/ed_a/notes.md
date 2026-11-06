@@ -69,3 +69,27 @@ kappa 6.0, theta 12.20 (55th pct). In-sample: fires on 59% of churn breaks (medi
 cut traces, 2.3% in finished, 0% commit breaks (fin); 8/29 finished and 28/35 cut DEV traces have >= 1 firing.
 Pass 3 plan: generate both on work/dev_gen_set.json = 8 finished DEV traces with a firing (5 correct) + 24 of the 28
 cut DEV traces with a firing (code/021). Traces without a firing are expected unchanged.
+
+## Pass 3 (generate both, v2, DEV set of 32: 8 finished-with-firing + 24 cut-with-firing) -> work/fwd_03
+- acc 15.6 -> 21.9 (+6.25, SE 6.2; +3/-1); cut 75 -> 65.6%; tokens -197 (SE 99).
+- BUT code/023: ALL 32 traces diverged, nearly all at mid-sentence word choices early in the trace (char 81..3200),
+  not at gated breaks with Hence/Therefore. These are butterfly divergences: the gains/losses are resampling noise,
+  not the mechanism (8198 R->W diverged at 6% of the trace on "occurs at vertex of parabola").
+- Cause (code/024): llama.cpp quantises w2 to Q8_0 in blocks of 32 along each row. The new column 74 (kappa 6) exceeded
+  the absmax of its block peers (cols 64..95) in 1,450 of 2,048 rows (median ratio 1.8, max 14x), so the block scale
+  grew and 31 other neurons' weights in every such block were quantised more coarsely -> small logit changes at every
+  token -> early sampled-token flips. PyTorch (read pass) does not show this.
+- Lesson for later editors: under det1, keep every new weight inside the Q8_0 block absmax of its neighbours (w2
+  columns are the dangerous case; w1/w3 rows own their blocks).
+
+## EDIT v3 (current, for pass 4)  code/026_build_v3.py 55 6.0 save
+- Neuron L23 n74. Gate w1[74] = 16*(d - (theta/mp) mu_hat) (alpha 16: SiLU tail negligible), theta 12.20 (55th pct).
+- w3[74] = S * mu_hat/(16 mp), S = 4.66 (activation gain).
+- w2[:,74] = clip(2*u, +-0.98*peer block absmax per row) (614 rows clipped; ||c|| 1.39, c.u 1.29, lens nearly unchanged:
+  Hence +28, Therefore +20, Thus +11, Alternatively -7, Maybe -14, Perhaps -14, Another -11.5).
+- S chosen so act*c has the same u-component as v2 (kappa 6). Firing stats as v2 (59% churn breaks, 2.4% finished
+  other breaks, 0% commit breaks fin, 0.000% non-break tokens).
+- code/027: at generated positions, 20 of 154k have act < -0.047 (min -0.97, numeric tokens like "2." with negative
+  bias-proxy projection); harmless for the next digit; prompt positions are irrelevant (L23 output only feeds logits).
+Pass 4 plan: generate both, same DEV set (work/dev_gen_set.json) to compare with pass 3: divergences should now
+happen at gated breaks.
