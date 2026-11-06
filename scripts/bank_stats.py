@@ -20,7 +20,7 @@ def stats(rows):
     for name, pat in [("maybe", r"\bmaybe\b"), ("perhaps", r"\bperhaps\b"), ("Alternatively", r"\bAlternatively\b"),
                       ("Actually", r"\bActually\b"), ("Wait", r"\bWait\b")]:
         out[f"{name}_per1k_cut_vs_fin"] = (dens(cut, pat), dens(fin, pat))
-    stated = lambda r: bool(re.search(r"answer is", think_of(r).split("</think>")[0]))
+    stated = lambda r: bool(re.search(r"answer is \(?\*?\*?[A-J]\b", think_of(r).split("</think>")[0]))
     out["fin_stated_in_think"] = sum(stated(r) for r in fin)
     out["cut_stated_in_think"] = sum(stated(r) for r in cut)
     out["cut_stated_correct"] = sum(stated(r) and r["gold"] in re.findall(r"answer is \(?\*?\*?([A-J])", think_of(r))[-1:]
