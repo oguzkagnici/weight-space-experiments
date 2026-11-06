@@ -1,0 +1,130 @@
+[
+ {
+  "id": "mmlupro_9251",
+  "identical": false,
+  "first_div_char": 249,
+  "len": 6827,
+  "correct_bank": 1,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_4839",
+  "identical": false,
+  "first_div_char": 27,
+  "len": 5245,
+  "correct_bank": 1,
+  "correct_rerun": 1
+ },
+ {
+  "id": "mmlupro_1754",
+  "identical": false,
+  "first_div_char": 1032,
+  "len": 14764,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_8262",
+  "identical": false,
+  "first_div_char": 447,
+  "len": 5206,
+  "correct_bank": 1,
+  "correct_rerun": 1
+ },
+ {
+  "id": "mmlupro_10194",
+  "identical": false,
+  "first_div_char": 313,
+  "len": 13447,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_10964",
+  "identical": false,
+  "first_div_char": 81,
+  "len": 13104,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_1177",
+  "identical": false,
+  "first_div_char": 76,
+  "len": 14862,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_1171",
+  "identical": false,
+  "first_div_char": 18,
+  "len": 15095,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_10187",
+  "identical": false,
+  "first_div_char": 37,
+  "len": 12538,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_345",
+  "identical": false,
+  "first_div_char": 304,
+  "len": 9800,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_9849",
+  "identical": false,
+  "first_div_char": 264,
+  "len": 3681,
+  "correct_bank": 1,
+  "correct_rerun": 1
+ },
+ {
+  "id": "mmlupro_10203",
+  "identical": false,
+  "first_div_char": 470,
+  "len": 12395,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_7187",
+  "identical": false,
+  "first_div_char": 18,
+  "len": 14616,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_8192",
+  "identical": false,
+  "first_div_char": 94,
+  "len": 3455,
+  "correct_bank": 1,
+  "correct_rerun": 1
+ },
+ {
+  "id": "mmlupro_2654",
+  "identical": false,
+  "first_div_char": 448,
+  "len": 14094,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ },
+ {
+  "id": "mmlupro_11720",
+  "identical": false,
+  "first_div_char": 90,
+  "len": 9248,
+  "correct_bank": 0,
+  "correct_rerun": 0
+ }
+]

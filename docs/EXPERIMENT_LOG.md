@@ -319,5 +319,11 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 - The losses are not caused by the edit forcing re-checks. Two of the six finished → cut traces never state an answer at all, so the gate cannot have fired there.
 - **Paired traces diverge early.** All 96 pairs differ, and the first differing character has a median position of 344 (quartiles 189 and 649); only 1 of 96 diverges right after an answer statement. So pairing barely reduces variance in thinking mode: after the first differing token, the two traces are close to independent samples.
 - Ruled out as a cause: quantisation. Our `llama-quantize` of the official BF16 GGUF is byte-identical to the official Q8_0 in all 287 tensors.
-- Being tested: run-to-run nondeterminism of llama.cpp with 16 parallel slots, by rerunning the base model on 16 trace-bank questions with the cache off.
+- **Confirmed cause: llama.cpp batched generation is nondeterministic.** The unedited base model was rerun with the same Q8_0 file and the same seeds on 16 trace-bank questions, with the cache off and 16 slots (`runs/gen_004/determinism_base16.json`).
+  - **0 of 16** traces were reproduced. The first difference fell at characters [18, 18, 27, 37, 76, 81, 90, 94, 249, 264, 304, 313, 447, 448, 470, 1032], the same range as the candidate-versus-champion divergences. One of the 16 answers flipped correctness.
+  - The likely mechanism is that the rounding of the CPU kernels depends on how many sequences share a batch.
+  - Consequences:
+    - In thinking mode, the gen-4 'paired' comparisons were in effect comparisons of independent samples, and the per-question variance is close to that of independent draws. The z statistic is still valid, because the SE was computed from the observed paired differences, but it has little power.
+    - The edit did not cause the early divergence.
+- Being tested: whether single-slot generation (`-np 1`) is deterministic, and its speed. If it is, unchanged traces stay identical and pairing removes most of the noise.
 - Found and fixed while investigating: the doubled `<think>` in read-pass contexts (D39).
