@@ -39,3 +39,23 @@
 - In an attention head with a strong sink on the first token, the sink weight is e^Δ/(e^Δ+N). That decays smoothly with absolute position N and averages out content noise.
 - Read prefixes of 10 traces cut at paragraph breaks near 600, 1,200, 1,800, 2,400 and 2,900 generated tokens.
 - Record attn_last (all full-attention layers) and the per-head o_proj inputs at the last token (layers 14, 18, 22). Then look for heads whose first-token weight or output tracks N with low spread across traces.
+
+## Pass 3 result: the model has a length counter in attention, but does not write it to the residual (code/010–011)
+- **Sink heads.** Several full-attention heads put a large share of their attention on the first token. The share falls smoothly with absolute length N, as expected from sink dilution, e^D/(e^D+N).
+  - Mean first-token weight: L18.H1 0.26, L18.H2 0.22, L18.H3 0.15; L18.H0, H5, H6 and H7 0.05–0.08; L2.H2 0.08.
+  - The slope of log(1/w0 − 1) on log N is 0.6–0.85 for L18 H0/H3/H5/H6/H7 and L2.H2 (corr 0.7–0.76). A slope of 1 would be a pure sink.
+- **Summed sink log-odds** over those 6 heads separates early (≤1,300 generated tokens) from late (≥2,300) positions with held-out d' 2.6; the oracle log N gives 4.6. So the attention pattern "knows" the length.
+- **But it is not written out.**
+  - L18 head outputs: d' 1.5. The best single head is L22.H4 at d' 1.9.
+  - Residual h18, h20 and h22: d' 0.35–0.46. The content the heads average over swamps the sink term.
+- This confirms pass 2: there is no readable late-length signal downstream. A counter would have to be built by re-reading a sink head's value through a new o_proj direction.
+## Scope decision: no length-triggered wrap-up
+- The brief (method, point 2) puts out of scope "edits that just shorten everything or end the thinking regardless of the problem".
+- A gate on "late in the trace" is such an edit even if it gains (pass 1 suggests forced answers late are right 26–44%). I drop it.
+## The carried gen-4 candidate wins selection clearly
+- gate_wrapup_L20 on the 128 hidden selection questions (det1, paired): parent 48, edited 60, **+9.4 points, z 3.6, +12/−0**; cut 70 → 56.
+- No trace is byte-identical. The repurposed neuron is slightly active everywhere, so every trace drifts, but all 12 flips are wins.
+## Plan for passes 4–6: dose-response of the commit neuron
+- DEV32 (code/013): all 9 cut-with-statement traces, 15 cut-without, 8 finished.
+- Pass 4: carry exact on DEV32. Pass 5: a stronger write (target −15 instead of −9; w2 column × 15/9) on DEV32. Pass 6: a third dose or a lower threshold, depending on the result.
+- Submit the best variant, so selection can test whether more push adds to the +9.4.

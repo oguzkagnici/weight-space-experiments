@@ -353,3 +353,19 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
   - Truncated traces with an in-think answer statement: **9 of 52** (4 correct), against 17 of 53 in the old bank with the same regex. This is sampling variation between the two engines, so the population the gen-4 gate targets is small and variable.
   - Cut share by subject: law 10/12, health 8/11, physics 7/13, engineering 4/5, economics 5/10. No truncations in biology, computer science or history (n = 3, 3, 2).
 - Generation 5 created (D41). `carry/gate_wrapup_L20` and the champion are queued for selection on the 128 hidden questions at priority 9.
+
+## 2026-11-06 — Generation 5, editor `claude`, passes 1–3; carried candidate's selection result
+- **Pass 1 (read, forced-answer probe on 52 cut traces).**
+  - Never-concluding traces give a correct argmax 19–26% of the time (chance 10%), with a mean confidence of 0.8. Only confidence ≥ 0.95 is informative (41% correct).
+  - The belief drifts between 30% and 65% of the trace. These traces have not converged; they are not hiding a correct answer.
+- **Pass 2 (read, residual at all positions).**
+  - There is no clean length signal in the residual. The "late" direction reads wrapping-up content and saturates by about 1,500 tokens.
+- **Pass 3 (read, attention from the last token).**
+  - Sink-dilution heads (L18 H0/H3/H5/H6/H7, L2.H2) track absolute length (summed d' 2.6), but the head outputs and the residual barely carry it (d' ≤ 1.9 and ≈ 0.4).
+  - Written up in MODEL_FINDINGS.
+- **Scope decision.** A length-triggered wrap-up is dropped as out of scope ("ends the thinking regardless of the problem"), even though it would likely gain.
+- **Selection of the carried gen-4 candidate `gate_wrapup_L20`** on 128 hidden questions, paired, `det1`:
+  - Parent 48 correct, edited 60: **+9.4 pp, z 3.6, +12/−0**. Cut 70 → 56.
+  - Under the old nondeterministic engine the same edit had measured +3.1 (z 0.82). Removing the sampling noise turned an inconclusive result into a clear one.
+  - No trace is byte-identical, because the repurposed neuron is slightly active everywhere. Even so, every flipped answer is a win.
+- **Next (`claude`, passes 4–6).** Dose-response of this commit neuron on a fixed DEV32 drawn from the bank: carry exact versus a stronger write (target −15).

@@ -52,3 +52,20 @@ Tensors model.layers.23.feed_forward.{w1,w3,w2}, neuron 74 only (row 74 of w1 an
   non-break tokens 0.000%; finished traces with >=1 fire 8/29, cut 28/35.
 Pass 2 plan: read, edited, same 64 DEV traces, all positions, topk 20 + token_logprobs: compare with pass 1 at breaks
 (effect size per activation, P(Hence/Therefore), P(churn)) and at all other tokens (should be unchanged).
+
+## Pass 2 (read, edited v1, same 64 DEV traces) -> work/fwd_02; code/019
+- Firing churn breaks in cut traces (n 71, act 1.51): P(Hence/Therefore) .000 -> .389, P(churn openers) .281 -> .055.
+  Finished-trace churn breaks firing (n 8): P(H/T) .005 -> .555. Other breaks firing: cut n 167 (.001 -> .239),
+  finished n 17 (.002 -> .181).
+- Dose-response by activation: act .1-.5: P(H/T) .015; .5-1: .056; 1-2: .294; 2-4: .913 (P(churn) -> 0).
+- Non-break positions: mean |dlogp| 0.0004, only 7 of 165,263 positions with |dlogp| > 0.1. (L23 output only affects
+  the next-token distribution at its own position.)
+- Side effect: SiLU negative tail slightly lowers commits where the gate is just below threshold: commit breaks
+  P(Thus) .580 -> .568 (fin), .551 -> .491 (cut); non-firing churn breaks P(churn) .41 -> .48.
+
+## EDIT v2 (current, for pass 3)  code/020_build_edit_sharp.py 6.0 55 save 4
+Same as v1 but gate sharpened: w1[74] = 4*(d - (theta/mp) mu_hat), w3[74] = mu_hat/(4 mp) (negative tail /4).
+kappa 6.0, theta 12.20 (55th pct). In-sample: fires on 59% of churn breaks (median act 1.61), 11% of other breaks in
+cut traces, 2.3% in finished, 0% commit breaks (fin); 8/29 finished and 28/35 cut DEV traces have >= 1 firing.
+Pass 3 plan: generate both on work/dev_gen_set.json = 8 finished DEV traces with a firing (5 correct) + 24 of the 28
+cut DEV traces with a firing (code/021). Traces without a firing are expected unchanged.

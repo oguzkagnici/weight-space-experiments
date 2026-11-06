@@ -234,3 +234,35 @@ flowchart LR
   - But accuracy on 64 fresh questions was +0.0 pp (SE 3.9). The newly finished traces were only 50–60% correct, and sampled traces diverge: three answers that originally finished just under the cap now hit it.
 - **The cut traces that never conclude make up about 70% of the cut traces in `ed_a`'s DEV set.** They deliberate option by option, mostly in health, law and physics. Neither circuit touches them; they are the open problem for the next generation.
 
+
+## The never-concluding traces, and how the model tracks length (generation 5, editor `claude`)
+
+### What the model believes mid-trace when it never concludes
+- Method: each of 52 cut traces in the `det1` bank was interrupted at the paragraph break before 30% and 65% of its length, followed by "So the answer is (", and the letter distribution was read.
+- **The forced belief is mostly wrong and over-confident.**
+  - Traces that never state an answer: the argmax is correct 19% of the time at 30% and 26% at 65% (chance is 10%), with a mean confidence of 0.8.
+  - Traces that do state one: 22% at 30% and 44% at 65%.
+- **Calibration.** Confidence between 0.4 and 0.95 is near chance (10–19% correct). Only confidence ≥ 0.95 means something (41% correct, n 39).
+- **The belief drifts.** The forced answer is the same at 30% and 65% in only 25 of 52 traces.
+- **Reading.** These traces are mostly *not* "knows the answer but will not commit". They are cases where the reasoning has not converged. A confidence-gated commit cannot rescue them, so the target has to be the reasoning itself.
+
+### Length is visible to attention, not to the residual stream
+
+```mermaid
+flowchart LR
+    BOS["first token<br/>(attention sink)"] --> H["full-attention heads<br/>L18 H0/H3/H5/H6/H7, L2.H2<br/>sink weight ≈ e^D/(e^D+N)"]
+    CTX["all earlier tokens<br/>(content)"] --> H
+    H -- "summed sink log-odds:<br/>early vs late d' 2.6" --> P(("length is in the<br/>attention pattern"))
+    H -- "head output: d' ≤ 1.9<br/>(content average swamps the sink term)" --> R["residual h18–h22:<br/>early vs late d' ≈ 0.4"]
+    R -.-> X["no downstream reader of<br/>'how long have I been thinking'"]
+```
+
+- **A difference-of-means "late versus mid" direction at paragraph breaks** (14 traces, layers 14 and 20) does rise with position.
+  - Held-out, it fires only near the end of *finished* traces, never in cut traces. So it reads "wrapping up" content, not length.
+  - Refit on cut traces alone, it saturates by about 1,500 tokens.
+- **Sink dilution.** Several full-attention heads put 5–26% of their attention on the first token. That share falls smoothly with absolute length, with a log-odds slope of 0.6–0.85 against log N.
+  - Summed over six heads, it separates ≤1,300 from ≥2,300 generated tokens with held-out d' 2.6 (oracle log N: 4.6).
+  - But the heads' outputs mix that term with the average of the content values. In the residual stream the separation drops to d' ≈ 0.4.
+- **Consequence.** Within this analysis, the network has no usable internal "budget is running out" signal, so it cannot plan for the cap. That is consistent with traces running into the cap mid-sentence.
+  - An edit could build such a counter (re-read a sink head's value through a new o_proj direction).
+  - A length-triggered stop, however, is out of scope for this experiment ("ends the thinking regardless of the problem"), so it was not pursued.
