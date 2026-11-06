@@ -1,0 +1,115 @@
+{
+ "extra_args": [
+  "-no-kvu",
+  "-fa",
+  "off"
+ ],
+ "cache_prompt": false,
+ "llama_bin": "/home/user/llama.cpp/build-det/bin",
+ "parallel": 16,
+ "cap": 600,
+ "seconds": [
+  122.45402550697327,
+  125.7084550857544
+ ],
+ "tok_per_s": 78.39676940186273,
+ "identical": 16,
+ "pairs": [
+  {
+   "id": "mmlupro_1196",
+   "identical": true,
+   "first_div": 2817,
+   "len": 2817
+  },
+  {
+   "id": "mmlupro_1740",
+   "identical": true,
+   "first_div": 2834,
+   "len": 2834
+  },
+  {
+   "id": "mmlupro_1375",
+   "identical": true,
+   "first_div": 2555,
+   "len": 2555
+  },
+  {
+   "id": "mmlupro_6562",
+   "identical": true,
+   "first_div": 2508,
+   "len": 2508
+  },
+  {
+   "id": "mmlupro_9353",
+   "identical": true,
+   "first_div": 1790,
+   "len": 1790
+  },
+  {
+   "id": "mmlupro_9274",
+   "identical": true,
+   "first_div": 1890,
+   "len": 1890
+  },
+  {
+   "id": "mmlupro_3773",
+   "identical": true,
+   "first_div": 1232,
+   "len": 1232
+  },
+  {
+   "id": "mmlupro_6577",
+   "identical": true,
+   "first_div": 2583,
+   "len": 2583
+  },
+  {
+   "id": "mmlupro_4152",
+   "identical": true,
+   "first_div": 1957,
+   "len": 1957
+  },
+  {
+   "id": "mmlupro_3144",
+   "identical": true,
+   "first_div": 2854,
+   "len": 2854
+  },
+  {
+   "id": "mmlupro_2055",
+   "identical": true,
+   "first_div": 2960,
+   "len": 2960
+  },
+  {
+   "id": "mmlupro_7019",
+   "identical": true,
+   "first_div": 3048,
+   "len": 3048
+  },
+  {
+   "id": "mmlupro_4811",
+   "identical": true,
+   "first_div": 2919,
+   "len": 2919
+  },
+  {
+   "id": "mmlupro_7261",
+   "identical": true,
+   "first_div": 2435,
+   "len": 2435
+  },
+  {
+   "id": "mmlupro_2731",
+   "identical": true,
+   "first_div": 2667,
+   "len": 2667
+  },
+  {
+   "id": "mmlupro_1275",
+   "identical": true,
+   "first_div": 3093,
+   "len": 3093
+  }
+ ]
+}

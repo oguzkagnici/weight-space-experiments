@@ -1,0 +1,113 @@
+{
+ "extra_args": [
+  "-no-kvu"
+ ],
+ "cache_prompt": false,
+ "llama_bin": "/home/user/llama.cpp/build-det/bin",
+ "parallel": 16,
+ "cap": 600,
+ "seconds": [
+  103.11694025993347,
+  102.18768334388733
+ ],
+ "tok_per_s": 93.09818518471035,
+ "identical": 4,
+ "pairs": [
+  {
+   "id": "mmlupro_1196",
+   "identical": false,
+   "first_div": 26,
+   "len": 2819
+  },
+  {
+   "id": "mmlupro_1740",
+   "identical": false,
+   "first_div": 777,
+   "len": 2918
+  },
+  {
+   "id": "mmlupro_1375",
+   "identical": false,
+   "first_div": 323,
+   "len": 2597
+  },
+  {
+   "id": "mmlupro_6562",
+   "identical": true,
+   "first_div": 2560,
+   "len": 2560
+  },
+  {
+   "id": "mmlupro_9353",
+   "identical": true,
+   "first_div": 1862,
+   "len": 1862
+  },
+  {
+   "id": "mmlupro_9274",
+   "identical": true,
+   "first_div": 1703,
+   "len": 1703
+  },
+  {
+   "id": "mmlupro_3773",
+   "identical": true,
+   "first_div": 1211,
+   "len": 1211
+  },
+  {
+   "id": "mmlupro_6577",
+   "identical": false,
+   "first_div": 18,
+   "len": 2768
+  },
+  {
+   "id": "mmlupro_4152",
+   "identical": false,
+   "first_div": 95,
+   "len": 1717
+  },
+  {
+   "id": "mmlupro_3144",
+   "identical": false,
+   "first_div": 261,
+   "len": 3071
+  },
+  {
+   "id": "mmlupro_2055",
+   "identical": false,
+   "first_div": 51,
+   "len": 3005
+  },
+  {
+   "id": "mmlupro_7019",
+   "identical": false,
+   "first_div": 18,
+   "len": 2978
+  },
+  {
+   "id": "mmlupro_4811",
+   "identical": false,
+   "first_div": 20,
+   "len": 2959
+  },
+  {
+   "id": "mmlupro_7261",
+   "identical": false,
+   "first_div": 228,
+   "len": 2647
+  },
+  {
+   "id": "mmlupro_2731",
+   "identical": false,
+   "first_div": 32,
+   "len": 2819
+  },
+  {
+   "id": "mmlupro_1275",
+   "identical": false,
+   "first_div": 247,
+   "len": 3113
+  }
+ ]
+}
