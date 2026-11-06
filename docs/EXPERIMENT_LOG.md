@@ -382,3 +382,26 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
 
 - **No edited trace stays identical.** The first difference comes at a median of 300–550 characters, so for this edit pairing gives little noise reduction.
 - **Submitted** `claude/gate_wrapup_L20_d15` as the dose-response point. Selection measures it alongside the carry (−9).
+
+## 2026-11-06 — Generation 5, editor `ed_a`: finished (summary of its hand-back)
+- **Target: hypothesis churn.** After an uncertainty statement ("Not sure.", "Hmm."), the parent opens another speculative paragraph ("Alternatively, maybe ...", "Perhaps ...", "Another approach ...") instead of committing.
+  - P(churn opener) at breaks is 0.051 in cut traces and 0.008 in finished ones; the gap is already present in the first quarter of the trace.
+  - Ruled out as causes: re-copying options and repeated option sweeps (same rate per token in both kinds of trace).
+- **Candidate `ed_a_g5_churn_hence_L23`.** It repurposes L23 n74 (the quietest L23 neuron; 6,143 weights).
+  - Gate: a churn-break direction (cross-validated AUC 0.91), threshold at the 55th percentile of churn-break scores.
+  - Output: Hence/Therefore minus the churn openers, clipped to the Q8_0 block absmax.
+  - Read pass: at firing churn breaks, P(Hence/Therefore) 0 → 0.39 and P(churn) 0.28 → 0.055. Elsewhere the mean |Δlogp| is 0.0004.
+- **Paired generate results:**
+
+  | set | result |
+  |---|---|
+  | DEV32 | +9.4 (SE 5.2, +3/−0) |
+  | HOLDOUT bank 32 | 0.0 (SE 4.5, +1/−1) |
+  | HOLDOUT fresh 32 | +9.4 (SE 5.2, +3/−0) |
+  | holdouts combined (64) | **+4.7 (SE ≈ 3.4, +4/−1)** |
+
+- **Engineering finding: the Q8_0 block artefact.** A new w2 column larger than its Q8_0 block neighbours raises the block scale. llama.cpp then quantises the other 31 neurons in the block more coarsely, and every trace diverges (`ed_a`'s pass 3).
+  - Fixed by clipping to 0.98 × the block absmax.
+  - Even then, removing any neuron's original tiny contribution flips sampled tokens early, so neuron-repurposing edits keep resampling noise under `det1`. This matches `claude`'s observation for n5414.
+- `ed_a` reported that it could not write its own `report.md` (subagents may not write report files). Its full report is in its hand-back message and in `notes.md`.
+- Selection queued for `claude/gate_wrapup_L20_d15` and `ed_a/ed_a_g5_churn_hence_L23` (the champion and carry results already exist).

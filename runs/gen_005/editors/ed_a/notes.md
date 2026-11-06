@@ -109,3 +109,31 @@ happen at gated breaks.
 
 Pass 5 plan: generate both, v3 (unchanged), HOLDOUT = the 32 held-out trace-bank questions (work/split.json
 holdout: 17 cut, 15 finished; never used in any analysis).
+Pass 6 plan (submitted while pass 5 runs, edit unchanged v3): generate both on a fresh random sample of 32 practice
+questions (sample n 32, seed 505) as a second holdout.
+
+## Pass 5 (generate both, v3, HOLDOUT 32 bank questions) -> work/fwd_05
+- acc 40.6 -> 40.6 (0.0, SE 4.5; +1/-1); cut 53.1 -> 56.2%; tokens +114 (SE 63). 29 of 32 traces diverge, 3 identical.
+  W->R 7691 (math, cut -> finished B via "Hence answer c = 2"); R->W 10393 (comp sci, finished correct -> cut after a
+  divergence at 49% on an ordinary word). 10770 finished wrong -> cut.
+- HOLDOUT traces churn much less than DEV (orig 0.31 vs 0.92 churn openers per 1k): its cut traces are mostly
+  math/chemistry/engineering/business computations, where the gate rarely applies.
+- New failure mode visible: the gate fires but the state is not ready to commit -> "Hence we need to reason
+  logically..." / "Hence we need to infer..." (2055, 4192): Hence used as a connective, not a commit.
+
+## Pass 6 (generate both, v3, fresh random 32 practice questions, sample seed 505) -> work/fwd_06
+- acc 43.75 -> 53.12 (+9.4, SE 5.2; +3/-0); cut 50 -> 43.8%; tokens -69 (SE 75). 29 of 32 diverge.
+  W->R: 4330 (chem; "Not sure.//Hence I'll go with answer G" = mechanism-driven commit, correct), 11365 (eng),
+  933 (law). 5518 finished wrong -> cut wrong. Churn openers 0.37 -> 0.22 /1k; Hence/Therefore 0.32 -> 0.49 /1k.
+
+## Summary of v3
+DEV (32, selected traces with a firing) +9.4 (SE 5.2, +3/-0); HOLDOUT bank 32: 0.0 (SE 4.5, +1/-1);
+HOLDOUT fresh 32: +9.4 (SE 5.2, +3/-0). Two holdouts combined (64): +4.7 pp (SE ~3.4, +4/-1).
+Caveat: nearly every edited trace diverges early (repurposing any neuron perturbs all logits slightly), so these
+paired differences include resampling noise; mechanism-driven rescues are clearly identifiable in 7691 and 4330.
+Candidate: v3 submitted as ed_a_g5_churn_hence_L23.
+
+## End
+Candidate ed_a_g5_churn_hence_L23 submitted (code/031). Big scratch deleted (pass-1 L23/L20 inputs, snapshots 02-05;
+snapshot 06 = submitted edit kept). report.md: the tool environment refused to write it (subagent restriction on
+report files); the report text is in the final reply to the orchestrator.

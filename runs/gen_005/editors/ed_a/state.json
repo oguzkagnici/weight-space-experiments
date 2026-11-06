@@ -1,8 +1,6 @@
 {
- "passes_used": 4,
- "pending": [
-  "gen_005_ed_a_p05_5a6d99"
- ],
+ "passes_used": 6,
+ "pending": [],
  "passes": [
   {
    "k": 1,
@@ -27,6 +25,18 @@
    "id": "gen_005_ed_a_p04_51f6f6",
    "type": "generate",
    "seconds": 1666.9
+  },
+  {
+   "k": 5,
+   "id": "gen_005_ed_a_p05_5a6d99",
+   "type": "generate",
+   "seconds": 1282.6
+  },
+  {
+   "k": 6,
+   "id": "gen_005_ed_a_p06_dd0194",
+   "type": "generate",
+   "seconds": 3010.2
   }
  ]
 }
