@@ -25,3 +25,30 @@ Pass 1 (read, original): 64 DEV traces (trace_text), positions all, token_logpro
 model.layers.20.feed_forward.w1 and model.layers.23.feed_forward.w1. ~168k tokens.
 Goal: next-token distribution at every paragraph break; a "churn restart" direction at MLP inputs; check it is
 silent on finished traces; find a quiet neuron to repurpose.
+
+## Pass 1 (read, original, 64 DEV traces, all positions) -> work/fwd_01 (L20 inputs compacted to break rows + sample)
+- code/009: 2,572 paragraph breaks. Next paragraph is a churn opener (Alternatively/Maybe/Perhaps/But perhaps/Another/
+  Better approach/Possibly...) at 126 of 1,706 breaks in cut traces (7.4%) vs 12 of 866 in finished (1.4%).
+- code/010: the model's own P(churn opener: Alternatively/Maybe/Perhaps/Another/Possibly) at breaks: cut .051 vs
+  finished .008 (already .036 vs .004 in the first quarter of the trace). At churn breaks .34; at commit breaks ~0.
+  Mean-difference direction (churn vs other breaks) at the MLP input: CV AUC .92 (L20), .91 (L23).
+- code/011: at churn breaks the alternatives are Let .13, B(etter) .11, But .08, Given .04, I .035, Thus only .013.
+  Paragraph-initial "Hence"/"Therefore" are pure commit moves (finished 14+8, cut 1+1; always followed by
+  "answer"/"final answer"), "Thus" is mixed (in cut traces "Thus we need" 20/126).
+- code/012: gate from means (churn-break mean minus other-break mean + churn-break mean minus token mean), held-out
+  by trace: fires on ~40% of churn breaks, 0.00% of non-break tokens, ~1-2% of finished-trace other breaks.
+- code/013: lens of (commit-break minus churn-break) state at L20/L23: Thus/Hence/Therefore z +12..+14, churn
+  openers z -7..-9: the commit-vs-churn choice is one readable direction.
+- code/014: L23 n74 is quiet (mean|a| .08, max .58, |a|*||g_post*w2col|| <= .03): repurposed.
+
+## EDIT v1 (current, for pass 2)  code/017_build_edit.py 6.0 55 save
+Tensors model.layers.23.feed_forward.{w1,w3,w2}, neuron 74 only (row 74 of w1 and w3, column 74 of w2).
+- w1[74] = d - (theta/mp) * mu_hat, d = unit(unit(g1)+unit(g2)), g1 = mean x23 at churn breaks - mean at other breaks,
+  g2 = churn-break mean - mean over 60k non-break tokens (x23 = recorded input of L23 w1, DEV traces);
+  mu_hat = unit mean token input, mp = mean projection 6.47; theta = 12.20 = 55th pct of churn-break scores.
+- w3[74] = mu_hat/mp (~1 everywhere) => act ~ silu(s - theta).
+- w2[:,74] = 6.0 * unit(g_post23 * g_final * (mean E[Hence,Therefore] - mean E[Alternatively,Maybe,Perhaps,Another,Possibly])).
+- In-sample firing (act>0.1): churn breaks 57% (median act 1.38), other breaks cut 11%, finished 2.3%, commit 0%,
+  non-break tokens 0.000%; finished traces with >=1 fire 8/29, cut 28/35.
+Pass 2 plan: read, edited, same 64 DEV traces, all positions, topk 20 + token_logprobs: compare with pass 1 at breaks
+(effect size per activation, P(Hence/Therefore), P(churn)) and at all other tokens (should be unchanged).

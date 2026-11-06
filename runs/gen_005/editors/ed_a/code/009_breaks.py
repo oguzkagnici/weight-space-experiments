@@ -2,7 +2,7 @@
 import json, re, numpy as np
 from wsp.editor import *
 K=1
-D=f'work/fwd_{K}'
+D='work/fwd_01'
 meta=json.load(open(f'{D}/meta.json'))
 ids_list=json.load(open('work/req1_ids.json'))
 rows={json.loads(l)['id']:json.loads(l) for l in open('/home/user/weight-space-experiments/runs/shared/trace_bank_base_cap3072_det1.jsonl')}

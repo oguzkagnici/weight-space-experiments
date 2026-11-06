@@ -30,3 +30,12 @@
 ## Pass 2 plan: is there a linearly readable length signal? (code/005)
 - Read the residual (layers 14 and 20) at all positions on 7 cut traces and the 7 longest finished traces (43.6k tokens).
 - Compute the difference of means between late (>2,200) and mid (500–1,500) positions, cross-validated over traces; check the score at "\n\n" tokens.
+
+## Pass 2 result: no clean length signal in the residual (code/006–008)
+- The late-minus-mid direction, pooled over all 14 traces, rises monotonically with position (L20: −4.7 at 0–500 tokens up to +4.6 at 2,500+; held-out AUC 0.75 at paragraph breaks). But a threshold set on early breaks fires only in **finished** traces near their end, never in cut traces. It reads "wrapping up" content, not length.
+- Refit on cut traces only (leave-one-cut-trace-out), the score saturates by about 1,500 tokens (L20 by bin: −6.8, −1.2, −0.4, +3.1, +1.3, +3.9). Finished traces score just as high from 1,000 tokens on, so it cannot separate 1,500 from 2,500 tokens.
+- **Conclusion.** Under a difference-of-means read, the residual carries early-versus-later (the first ~1,000 tokens) but no usable late-length signal. A gate on "late in the trace" has to come from a component that integrates over the context.
+## Pass 3 plan: look for a counter head (code/009)
+- In an attention head with a strong sink on the first token, the sink weight is e^Δ/(e^Δ+N). That decays smoothly with absolute position N and averages out content noise.
+- Read prefixes of 10 traces cut at paragraph breaks near 600, 1,200, 1,800, 2,400 and 2,900 generated tokens.
+- Record attn_last (all full-attention layers) and the per-head o_proj inputs at the last token (layers 14, 18, 22). Then look for heads whose first-token weight or output tracks N with low spread across traces.
