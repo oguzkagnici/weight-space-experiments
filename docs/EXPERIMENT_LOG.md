@@ -327,3 +327,15 @@ Protocol D30 (cap 3,072, temperature 0.6, fixed seeds, Q8_0). 8,190 s of queue t
     - The edit did not cause the early divergence.
 - Being tested: whether single-slot generation (`-np 1`) is deterministic, and its speed. If it is, unchanged traces stay identical and pairing removes most of the noise.
 - Found and fixed while investigating: the doubled `<think>` in read-pass contexts (D39).
+- **Single slot (`-np 1`) is deterministic:** 4 of 4 base traces reproduced byte for byte, at 10.9 tok/s (`runs/gen_004/determinism_np1.json`). Unusable at that speed.
+- **Batched determinism test** (16 slots, 16 trace-bank questions run twice with the second submission order shuffled, cap 600 tokens):
+
+  | build | identical | tok/s |
+  |---|---|---|
+  | default build (llamafile sgemm + CPU repack on) | 6 / 16 | 39.4 |
+  | `build-det` (`-DGGML_LLAMAFILE=OFF -DGGML_CPU_REPACK=OFF`) | 7 / 16 | **91.2** |
+
+  - Turning off sgemm and repack does not make generation deterministic.
+  - It does make generation **2.3× faster** on this host (no AMX). The repacked and sgemm Q8_0 paths are slow here.
+  - Being tested next: separate KV per slot (`-no-kvu`) with prompt-cache reuse off (`cache_prompt=false`), with and without flash attention.
+- `wsp/gen.py` gained `EXTRA_ARGS` (extra llama-server arguments) and `CACHE_PROMPT`. Both default to the previous behaviour.

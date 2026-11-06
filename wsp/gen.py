@@ -20,6 +20,8 @@ THINK_CAP = 3072
 THINK_INSTR = 'Think step by step, then finish with "The answer is (X)" where X is the letter of the correct option.'
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "top_k": 20}
 MAX_GGUF_CACHE = 4            # keep at most this many edited Q8_0 files
+EXTRA_ARGS = []               # extra llama-server arguments
+CACHE_PROMPT = True           # llama-server prompt-prefix reuse across requests
 
 
 def user_message(q):
@@ -89,7 +91,7 @@ class LlamaServer:
         ctx = PARALLEL * (THINK_CAP + 1024)
         log = open(os.path.join(ROOT, "queue", "llama_server.log"), "a")
         self.proc = subprocess.Popen([f"{LLAMA}/llama-server", "-m", gguf_path, "-t", "4", "-np", str(PARALLEL),
-                                      "-c", str(ctx), "--port", str(PORT), "--jinja", "--reasoning-format", "none"],
+                                      "-c", str(ctx), "--port", str(PORT), "--jinja", "--reasoning-format", "none"] + list(EXTRA_ARGS),
                                      stdout=log, stderr=log, stdin=subprocess.DEVNULL)
         self.model = gguf_path
         for _ in range(300):
@@ -115,7 +117,7 @@ class LlamaServer:
     def ask(self, qid, sample=0, cap=THINK_CAP):
         q = data.questions()[qid]
         body = {"messages": [{"role": "user", "content": user_message(q)}], "max_tokens": cap,
-                "seed": seed_of(qid, sample), **SAMPLING}
+                "seed": seed_of(qid, sample), "cache_prompt": CACHE_PROMPT, **SAMPLING}
         req = urllib.request.Request(f"http://127.0.0.1:{PORT}/v1/chat/completions", json.dumps(body).encode(),
                                      {"Content-Type": "application/json"})
         r = json.load(urllib.request.urlopen(req, timeout=48 * 3600))
