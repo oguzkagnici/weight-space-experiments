@@ -1,0 +1,47 @@
+{
+ "parallel": 1,
+ "seconds": [
+  845.7828078269958,
+  865.3854763507843
+ ],
+ "tokens_run1": 9197,
+ "tok_per_s": 10.873950043545031,
+ "pairs": [
+  {
+   "id": "mmlupro_9251",
+   "identical": true,
+   "first_div": 9911,
+   "tokens": [
+    3072,
+    3072
+   ]
+  },
+  {
+   "id": "mmlupro_4839",
+   "identical": true,
+   "first_div": 5949,
+   "tokens": [
+    1467,
+    1467
+   ]
+  },
+  {
+   "id": "mmlupro_1754",
+   "identical": true,
+   "first_div": 14452,
+   "tokens": [
+    3072,
+    3072
+   ]
+  },
+  {
+   "id": "mmlupro_8262",
+   "identical": true,
+   "first_div": 6815,
+   "tokens": [
+    1586,
+    1586
+   ]
+  }
+ ]
+}
