@@ -470,3 +470,7 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Both editors' 4th passes (generate, gen 6) failed at `llama-quantize` with 230 MB of disk left; failed passes are not charged and both were resubmitted.
 - Freed 7.6 GB: two old gen-5 Q8_0 builds and 0.9 GB of activation arrays from finished generations; the GGUF cache now keeps at most 3 edited builds.
 - The base GPQA job (priority 6) had started in the gap; the server was restarted so that editor passes run first again.
+
+## 2026-11-07 ~05:20 — Second container restart
+- Same host type (AMX). All processes stopped, including the `ed_a` sub-agent and `claude`'s pass 6 (generate, running).
+- Queue, watchdog and memory log restarted; the interrupted pass was requeued (not charged twice). `ed_a` was resumed from its saved transcript with a note about the restart.
