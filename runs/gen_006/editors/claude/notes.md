@@ -48,3 +48,13 @@ Focus: never-concluding knowledge questions (law, health). Parent = gen005_carry
 - Silence: mean |dlogp| 0.004 per token before the first positive and in unrelated traces; 0.13-0.19% of tokens change by > 0.1.
 ## Pass 4 plan (generate both, edited v1 unchanged): DEV32 = the 32 bank questions of passes 2-3 (22 narrowing + 5 finished + 5 cut, work/dev32.json)
 - Expect: some of the 18 cut narrowing traces finish (forced-probe says ~8 would be right if they committed at the first narrowing); no change to the 5 finished.
+- (orchestrator note) While fixing the disk-full incident I saw the last two lines of ed_a's notes (its pass-4 plan); not used for my edit.
+
+## Pass 4 result (generate both, v1, DEV32) -> work/fwd_04
+- acc 7 -> 10 of 32: **+9.4 pp (SE 5.2), +3/-0**; cut 23 -> 19 (-12.5 pp, SE 7.4); tokens -149 (SE 77).
+  - Gains (all narrowing traces, cut -> finished correct): 2654 (H), 7691 (B), 8262 (E; one of the parent's regressions).
+  - cut -> finished wrong: 5325 (E), 6941 (E). finished wrong -> cut: 1643. The 10 unrelated traces: no grade change.
+- All 32 traces diverge early (first difference 18-3105 chars, typically 100-1000): the removed original n6823 output flips sampled tokens (gen-5 lesson), so part of the paired difference is resampling noise.
+- Mechanism in the generations (code/013): after two-finalist paragraphs, commit opener next: parent 3/39 -> edited 5/20; answer within 600 chars 2/39 -> 3/20; edited traces narrow less often (11 vs 22 traces).
+## Pass 5 plan (generate both, v1 unchanged): HOLDOUT32 = 32 fresh practice questions outside the bank (code/012, seed claude-gen6-holdout)
+## Pass 6 plan (generate both, v1 unchanged): HOLDOUT32-B (code/014, seed claude-gen6-holdout-b), queued while pass 5 waits
