@@ -500,3 +500,13 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Guards added (D52); invalid outputs quarantined; the three runs requeued. The base GPQA run (priority 10) had become next and started on a verified fresh server; selection follows it.
 - Audit of all generation caches: no other wrong-model result.
 - Lesson: a health check proves that *a* server answers, not that it is *ours* with the right weights.
+
+### 2026-11-07 12:05 UTC: GPQA transfer of the gen-5 parent (held out, thinking, det1)
+| model | correct / 198 | cut | mean tokens | acc. when finished |
+|---|---|---|---|---|
+| base | 25 (12.6%) | 168 | 2,900 | 0.83 (25/30) |
+| gen005_carry_gate_wrapup_L20 | 33 (16.7%) | 158 | 2,854 | 0.83 (33/40) |
+- Paired: **+4.04 pp (SE 2.13, z 1.90), +13/−5**. Same direction as on MMLU-Pro held out (+7.0, z 2.8), but short of z 2. The gain comes from finishing more traces; accuracy when finished is unchanged.
+- No cut-and-correct rows in either file (D49 has no effect).
+- Caveat: GPQA traces almost never finish within the 3,072-token cap (85% cut for base), so this mostly measures whether a trace concludes. Both models score below the 25% chance level because cut answers count as wrong.
+- Base run served by a verified fresh server (D52 guards active).
