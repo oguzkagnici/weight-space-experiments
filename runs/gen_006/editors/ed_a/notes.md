@@ -68,3 +68,25 @@ Measure: P('"The') at </think>, P(eos) after '".', thinking per-token TV vs pass
 Expect: +4 (1740, 9274, 8198, 6014), finished traces same answers, ~240 fewer tokens each.
 - pass 4 first attempt FAILED in server quantize (disk space, not charged); freed 1.3 GB of my scratch (fwd_02 activations; kept O2/opener content rows in work/p2_L23_content_rows.npy), resubmitted.
 ## Pass 5 plan (generate both, edit v2a unchanged): HOLDOUT A = fresh random 32 practice questions (sample seed 606). Queued while pass 4 waits.
+
+## Pass 4 results (generate both, v2a, DEV 32 bank) -> work/fwd_04 (code/026)
+- acc 71.9 -> 62.5 (-9.4, SE 9.4; +3/-6); cut 15.6 -> 9.4%; tokens -284; 7 finished answers WITHOUT an answer line.
+- Mechanism half-worked: every answer starts with '"The' (p0 push OK); '"The answer is (X)"' + end in 9/32 (gains 8198 C, 6014 D:
+  both cut-in-answer traces of the parent now finish correct). But after '"The' the model often writes its own explanation in quotes
+  ('"The child will have ... codominance."', '"The interest created by ...') and ends -> no answer -> 6 losses (9424, 2817, 6478,
+  2602, 2334 + 10935 cut). In generation P(' answer' | '</think>"The') is clearly < 1 (teacher-forced read showed lp -0.1..-7.9).
+- Thinking still diverges early in 27/32 (first diff median ~0.2 of the trace) despite HF-estimated TV .35/trace: under Q8 the
+  removed neurons' contributions (and Q8 activation-block re-scaling) flip samples much more often than the HF estimate.
+- LESSON: queued pass 5 (v2a on HOLDOUT A seed 606) before seeing pass 4 -> pass 5 measures a known-broken edit.
+
+## Edit v3 (code/028, cfg work/edit_cfg3.json) = v2a + third quiet L23 neuron n7602
+- gate: PC-cleaned mean-diff of the answer-initial '"The' token (10 samples, never occurs inside thinking where the quote is ' "The')
+  vs thinking mean, z*=17, alpha 4 (worst thinking token g ~ -2, 1 of 30k tokens > -5; targets g >= 12 in-sample);
+  up = proxy (u 4); w2 col = E[' answer'] - E['"', ' interest', ' child', ...] through the norm gains, Q8-block clipped.
+## Pass 6 plan (generate both, v3): HOLDOUT A = same fresh 32 (seed 606) as pass 5 (parent side cached); submitted before seeing pass 5.
+
+## Pass 5 results (generate both, v2a, HOLDOUT A = sample seed 606) -> work/fwd_05
+- acc 46.9 -> 46.9 (0.0, SE 4.5; +1/-1); cut 53.1 -> 46.9%; tokens -44. No finished answer without an answer line here.
+- Thinking diverges before </think> in 28/32 (often in the first 5-20%), so the paired result is mostly resampling noise.
+- Answers start with '"The' everywhere; ' answer' follows only sometimes ('"The answer is (D)"' in 3/17 finished); otherwise a
+  quoted explanation that ends with the usual answer line (finished answers still have an answer).

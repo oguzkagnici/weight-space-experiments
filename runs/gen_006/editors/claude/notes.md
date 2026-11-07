@@ -58,3 +58,11 @@ Focus: never-concluding knowledge questions (law, health). Parent = gen005_carry
 - Mechanism in the generations (code/013): after two-finalist paragraphs, commit opener next: parent 3/39 -> edited 5/20; answer within 600 chars 2/39 -> 3/20; edited traces narrow less often (11 vs 22 traces).
 ## Pass 5 plan (generate both, v1 unchanged): HOLDOUT32 = 32 fresh practice questions outside the bank (code/012, seed claude-gen6-holdout)
 ## Pass 6 plan (generate both, v1 unchanged): HOLDOUT32-B (code/014, seed claude-gen6-holdout-b), queued while pass 5 waits
+
+## Pass 5 result (generate both, v1, HOLDOUT32 fresh) -> work/fwd_05
+- acc 13 -> 15: **+6.25 pp, +2/-0**; cut 17 -> 13; tokens 2,196 -> 2,058.
+- All 4 changed questions are traces where the PARENT narrowed to two finalists and ran to the cap:
+  - 11199 (philosophy, "between B and C" x3) -> finished C, correct; 4754 (history, "B or C") -> finished B, correct;
+  - 609 (business, "B or D") -> finished G, wrong; 8256 (math, "either A or J") -> finished A, wrong (gold J).
+- Mechanism (code/013): after two-finalist paragraphs, commit opener next: parent 0/14 -> edited 3/10; answer within 600 chars 0/14 -> 3/10.
+- (container restart at ~05:20; pass 6 requeued by the orchestrator, not charged twice)
