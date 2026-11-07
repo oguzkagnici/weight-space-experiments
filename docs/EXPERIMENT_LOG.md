@@ -554,3 +554,9 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - no w2 column quantises to zero;
   - the only exactly silent carrier found is forbidden. That carrier is the tied embedding row of a never-used token: top-k 20 makes logits outside the top 20 irrelevant, and the token never appears in the context.
 - Pass 4 completes the paired test on the remaining 48 bank questions.
+
+### 2026-11-07 — gen 7, editor `claude`: pass 4 and outcome (no candidate)
+- Edit v1, paired against the bank on all 96 questions: 37 → 38, +1.0 pp (SE 2.8), +4/−3; cut 53 → 50; byte-identical 1/96. REST48 gives +6.2 pp, but all three of its gains are in non-target traces (resampling).
+- The mechanism is confirmed: a commit word follows a two-finalist paragraph in 10/29 cases, against 3/39 for the parent. The accuracy effect is within noise.
+- Noise floor measured: correctness flips on 7/96 questions and cut status on 13/96 under resampling, which gives SE ≈ 2.4 pp at 128.
+- Decision (editor): no candidate submitted (expected z ≈ 0.3). Passes 5–6 left unused. Report: runs/gen_007/editors/claude/report.md.
