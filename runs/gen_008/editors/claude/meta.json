@@ -1,0 +1,9 @@
+{
+ "editor": "claude",
+ "gen": 8,
+ "gen_name": "gen_008",
+ "parent": "gen005_carry_gate_wrapup_L20",
+ "parent_weights": "/home/user/weight-space-experiments/runs/champions/gen005_carry_gate_wrapup_L20/weights",
+ "budget": 6,
+ "max_candidates": 1
+}

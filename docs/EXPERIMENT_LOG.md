@@ -581,3 +581,10 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - D52 validity check: 1/128 traces byte-identical; 74/76 finished answers in the edit's short form.
 - Event analysis: the champion closed the thinking and was then cut inside the answer in 5 traces. The edit rescued 1 of them. The other 8 gains and 5 losses are resampling.
 - Champion survives (elitism). Cosmetic: `ga report` labels generate passes "read None texts".
+
+### 2026-11-07 — Generation 8 created (D55)
+- Parent: `gen005_carry_gate_wrapup_L20`. Editors: `claude` and a fresh `ed_a` (background sub-agent), 6 passes and ≤ 1 candidate each; 128 hidden questions.
+- Brief: `prompts/editor_task_think_g8.md`. It sets a size target (≈ +6 pp) and asks editors to stack mechanisms.
+- Carry: `stack_shortans_L23_finalist_L22`, the union of generation 7's L23 short answer (ed_a) and L22 two-finalist gate (claude).
+- `ga select --priority 9`: champion and carry queued.
+- Bank cut rate by category (for the briefs): law 9/12, health 9/11, physics 6/13, math 5/7, economics 5/10, psychology 5/9, engineering 4/5. Cut traces contain fewer numbers than finished ones (4.9 vs 6.5 per 1k characters), so long computation is not the main cause of cuts.

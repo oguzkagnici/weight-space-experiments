@@ -1,0 +1,48 @@
+{
+ "label": "stack_shortans_L23_finalist_L22",
+ "editor": "carry",
+ "gen": 8,
+ "time": 1794093684.5304399,
+ "sources": {
+  "ed_a": "runs/gen_007/editors/ed_a/candidates/ed_a_g7_short_answer_dupfold_L23/edited",
+  "claude": "runs/gen_007/editors/claude/edited"
+ },
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 6142,
+   "numel": 15728640,
+   "rel_change": 0.704189658164978,
+   "sha_bf16": "0fdf882569c86a76"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 8180,
+   "numel": 15728640,
+   "rel_change": 0.03147356957197189,
+   "sha_bf16": "278b32e9dbfc2b21"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 6133,
+   "numel": 15728640,
+   "rel_change": 0.033445023000240326,
+   "sha_bf16": "97fed5729acb529f"
+  },
+  "model.layers.22.feed_forward.w1.weight": {
+   "changed_bf16": 2046,
+   "numel": 15728640,
+   "rel_change": 0.10305610299110413,
+   "sha_bf16": "cc764327e95ddbc1"
+  },
+  "model.layers.22.feed_forward.w2.weight": {
+   "changed_bf16": 2047,
+   "numel": 15728640,
+   "rel_change": 0.018890369683504105,
+   "sha_bf16": "32675f2e7589ae86"
+  },
+  "model.layers.22.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.019423607736825943,
+   "sha_bf16": "2e363167f7d11901"
+  }
+ }
+}
