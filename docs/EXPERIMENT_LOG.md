@@ -560,3 +560,15 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The mechanism is confirmed: a commit word follows a two-finalist paragraph in 10/29 cases, against 3/39 for the parent. The accuracy effect is within noise.
 - Noise floor measured: correctness flips on 7/96 questions and cut status on 13/96 under resampling, which gives SE ≈ 2.4 pp at 128.
 - Decision (editor): no candidate submitted (expected z ≈ 0.3). Passes 5–6 left unused. Report: runs/gen_007/editors/claude/report.md.
+
+### 2026-11-07 — gen 7: ed_a hand-back; selection queued
+- ed_a submitted one candidate, `ed_a_g7_short_answer_dupfold_L23`, in layer 23.
+  - It frees slots in a cluster of four near-duplicate L23 neurons (w1/w3/w2 cos ≥ .9998, activation corr .9999) by merging their w2 columns into one twin.
+  - It hosts three gated units in the freed slots: `</think>` → `"The`, `"The` → ` answer`, and `)".` → `<|im_end|>`. The visible answer becomes `"The answer is (X)"`.
+  - Results: DEV32 +15.6 pp (+6/−1; 4 gains from the edit itself), HOLDOUT A 0.0 (+1/−1), HOLDOUT B −6.25 (+1/−3).
+  - Byte-identical traces were only 2–6 of 32; median first divergence at 13–19% of the trace.
+  - ed_a expects 0 ± 3 pp in selection.
+- ed_a independently reached the same conclusion as `claude`: under Q8_0 with sampling, exact silence is unattainable. A per-token change of ~1e-4 already flips an early near-tie token.
+- New finding (ed_a): L23 contains near-duplicate neurons ({1228, 3401, 3793, 6986}, {331, 5105, 881}, {5821, 2400}). Merging them frees slots with 4× less output change than removing the quietest neurons.
+- Process note: ed_a's attempt to create `report.md` was refused by the tool's permissions. It appended its report to `notes.md` (`## REPORT`) instead; `ga brief` falls back to notes.md. The orchestrator did not write the file on its behalf.
+- `ga select --priority 9`: 1 candidate on the 128 hidden questions (the champion run is already done).

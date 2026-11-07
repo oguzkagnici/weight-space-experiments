@@ -108,3 +108,72 @@
   So the 4-6x lower simulated perturbation did not translate into fewer divergences.
 
 ## Pass 5/6 plan: HOLDOUT generate both, v5 unchanged, fresh samples n=32 seed 777 (pass 5) and seed 778 (pass 6).
+
+## Pass 5 results (generate both, v5, HOLDOUT A = fresh sample n32 seed 777; work/fwd_05)
+- acc 14 -> 14 (0.0), +1/-1; cut 15 -> 16; tokens +35 (SE 88). Thinking identical 4/32; first diff median 16%.
+- No closed-but-cut parent trace in this sample (all 15 parent cuts are inside the thinking), so the mechanism had
+  nothing to rescue. Gain 7952 (cut -> finished B) and loss 6309 (finished D -> cut) are both resampling swaps.
+- 17 of 18 edited finished answers are exactly '"The answer is (X)"'; 8624 ended its thinking with '\boxed{F}'
+  instead of a quoted answer line -> the </think> unit did not fire, normal long answer (correct, F).
+
+## Pass 6 results (generate both, v5, HOLDOUT B = fresh sample n32 seed 778; work/fwd_06)
+- acc 13 -> 11 (-6.25), +1/-3; cut 15 -> 16; tokens +76 (SE 115). Thinking identical 6/32; first diff median 19%.
+- Again no closed-but-cut parent trace (0 of 64 holdout questions vs 5 of 96 bank). All 4 swaps are resampling:
+  11284 (cut -> finished D, correct), 5091 (A -> I after divergence at 5%), 5633 and 7615 (finished -> cut).
+- All 15 edited finished answers are exactly '"The answer is (X)"'.
+- HOLDOUT A+B (64): 27 -> 25, -3.1 pts (SE ~3.8), +2/-4. DEV (32, enriched): +15.6 (+6/-1; 4 mechanism gains).
+
+## End
+Candidate ed_a_g7_short_answer_dupfold_L23 submitted (code/032, = v5). Large activation files deleted. report.md could not
+be written (the tool refused report files for subagents), so the report follows.
+
+## REPORT
+### ed_a, generation 7: silence under Q8_0 is not achievable; short visible answer in freed DUPLICATE L23 neurons
+WHAT I SET OUT TO DO. Build an edit that is bitwise silent off-target. In det1 (REPACK/LLAMAFILE off ->
+ggml_vec_dot_q8_0_q8_0), the activation vector entering w2 is itself quantised to Q8_0 in blocks of 32 neurons, so
+a neuron contributes exactly 0 on a token only if |h_j| < block amax/254.
+
+FINDINGS ABOUT SILENCE
+- No neuron is free. No w2 column quantises to all zeros (code/003). In L20-L23, every neuron's activation is
+  Q8-nonzero on 33-95% of tokens (median 92-95%; pass 1, code/007), including the parent's gated n5414 (60%).
+- L23 contains duplicate neurons: {1228,3401,3793,6986} (cos w1 .9998, w3 +-.9999, w2 +-.9998, activation corr .9999),
+  {331,5105,881} (.9995), {5821,2400} (.997). A slot can be freed by an algebraic merge into its twin
+  (w2_k += s*w2_j). In a Q8_0 simulation on recorded activations (code/018-029), freeing 3 slots of the 4-cluster
+  changes the L23 output by 2.6e-4, against 1.0e-3 for removing gen6's 3 quietest neurons. Clipping the merged column
+  to keep the block scales is worse (3.3e-3). The freed unit is its activation block's max 40-70% of the time.
+- A gate can have exactly zero leak: a shrinkage-LDA direction at the L23 MLP input, with the threshold applied
+  through a whitened bias proxy (CV .03), is -20 at the max of 125k recorded thinking tokens. It never fired on ~100k
+  unseen tokens.
+- BUT THIS DID NOT BUY SILENCE. Only 2/32, 4/32 and 6/32 thinking traces stayed byte-identical; the first difference
+  came at a median of 13-19% of the trace, as in gen6. The divergences are at near-tie tokens. A per-token
+  perturbation of about 1e-4 (2.7e-4 mean |dlogp| in the fp32 read engine) already flips an early sampled token.
+
+WHAT I CHANGED (ed_a_g7_short_answer_dupfold_L23; L23 only)
+- Folds: w2[:,1228] += w2[:,3401] - w2[:,3793] - w2[:,6986].
+- Three units, each with an LDA gate (+-20 at the in-sample boundary), up row = 4 x bias proxy, and a w2 column
+  scaled into each row's Q8 block absmax (block scales preserved exactly):
+  * n3401: at </think>, writes '"The';
+  * n3793: at '"The' after it, writes ' answer';
+  * n6986: at the ')".' ending that line, writes <|im_end|>.
+- The answer becomes '"The answer is (X)"'; the model copies the letter from the thinking's last line.
+
+EVIDENCE
+- Passes 1-2 (read, parent): parent P('"The'|</think>) e^-14; P(' answer'|'"The') e^-1.2; P(end|')".') e^-0.03.
+- Pass 3 (read, edited): all three targets at P = 1.000; no firing on unseen traces.
+- Pass 4 (generate both, DEV 32 bank questions incl. the 5 closed-but-cut traces): 11 -> 16 (+15.6, +6/-1).
+  The 4 mechanism gains are 1740, 6014, 8198 and 9274; tokens -273.
+- Pass 5 (generate both, HOLDOUT A, 32 fresh, seed 777): 0.0 (+1/-1).
+- Pass 6 (generate both, HOLDOUT B, 32 fresh, seed 778): -6.25 (+1/-3).
+- Holdout total (64): -3.1 (SE ~3.8; +2/-4). Every holdout swap is resampling: neither sample contained a trace the
+  parent closed and then cut in the answer. 32 of 33 edited finished answers are exactly '"The answer is (X)"' with
+  the parent's letter; one thinking ended in \boxed{F}, the unit did not fire, and the answer was long but correct.
+
+ASSESSMENT: the mechanism works where its event occurs (4/4 targets rescued), but the event is rare (5/96 bank,
+0/64 fresh) and the edit is not silent. Expect about 0 +- 3 in selection.
+
+NEXT
+1. Treat silence as unattainable under Q8 with sampling. Only mechanisms worth >= +8 pts can pass on 128 questions;
+   alternatively, ask for selection averaged over several seeds.
+2. The only bit-exact route left needs an edit whose quantised weights and activations are unchanged off-target
+   (perhaps a duplicate pair inside one block whose twin is always the larger; I found none).
+3. The real lever remains the ~35/53 cut traces that never conclude.

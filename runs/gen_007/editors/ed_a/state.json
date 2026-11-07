@@ -1,9 +1,6 @@
 {
- "passes_used": 4,
- "pending": [
-  "gen_007_ed_a_p05_98055f",
-  "gen_007_ed_a_p06_d09a1a"
- ],
+ "passes_used": 6,
+ "pending": [],
  "passes": [
   {
    "k": 1,
@@ -28,6 +25,18 @@
    "id": "gen_007_ed_a_p04_9c8f2e",
    "type": "generate",
    "seconds": 1780.0
+  },
+  {
+   "k": 5,
+   "id": "gen_007_ed_a_p05_98055f",
+   "type": "generate",
+   "seconds": 3029.6
+  },
+  {
+   "k": 6,
+   "id": "gen_007_ed_a_p06_d09a1a",
+   "type": "generate",
+   "seconds": 2884.5
   }
  ]
 }
