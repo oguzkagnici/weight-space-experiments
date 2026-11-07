@@ -90,3 +90,4 @@ Expect: +4 (1740, 9274, 8198, 6014), finished traces same answers, ~240 fewer to
 - Thinking diverges before </think> in 28/32 (often in the first 5-20%), so the paired result is mostly resampling noise.
 - Answers start with '"The' everywhere; ' answer' follows only sometimes ('"The answer is (D)"' in 3/17 finished); otherwise a
   quoted explanation that ends with the usual answer line (finished answers still have an answer).
+- 05:20 container restart; pass 6 requeued (not charged).

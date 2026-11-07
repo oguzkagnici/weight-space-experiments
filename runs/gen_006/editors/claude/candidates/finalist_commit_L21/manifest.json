@@ -1,0 +1,26 @@
+{
+ "label": "finalist_commit_L21",
+ "editor": "claude",
+ "gen": 6,
+ "time": 1794032008.4017558,
+ "tensors": {
+  "model.layers.21.feed_forward.w1.weight": {
+   "changed_bf16": 2045,
+   "numel": 15728640,
+   "rel_change": 0.11736826598644257,
+   "sha_bf16": "3fd3101c6486c1eb"
+  },
+  "model.layers.21.feed_forward.w2.weight": {
+   "changed_bf16": 2045,
+   "numel": 15728640,
+   "rel_change": 0.01994049921631813,
+   "sha_bf16": "396bfd0f5363579e"
+  },
+  "model.layers.21.feed_forward.w3.weight": {
+   "changed_bf16": 2046,
+   "numel": 15728640,
+   "rel_change": 0.011864596977829933,
+   "sha_bf16": "3908c96fb9bb8892"
+  }
+ }
+}

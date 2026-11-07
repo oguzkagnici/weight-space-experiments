@@ -66,3 +66,8 @@ Focus: never-concluding knowledge questions (law, health). Parent = gen005_carry
   - 609 (business, "B or D") -> finished G, wrong; 8256 (math, "either A or J") -> finished A, wrong (gold J).
 - Mechanism (code/013): after two-finalist paragraphs, commit opener next: parent 0/14 -> edited 3/10; answer within 600 chars 0/14 -> 3/10.
 - (container restart at ~05:20; pass 6 requeued by the orchestrator, not charged twice)
+
+## Pass 6 result (generate both, v1, HOLDOUT32-B fresh) -> work/fwd_06
+- 0.0 pp (SE 4.5), +1/-1; cut 9 -> 9; tokens -34. Only 4 parent traces narrow here; the gain (8843, math) and the loss (6651, health: finished correct -> cut; first difference at char 633) are not gate events (resampling).
+- Holdouts combined (64 fresh): +3.1 pp (SE ~3.1), +3/-1.
+## SUBMITTED: finalist_commit_L21 = edit v1 (code/015). Report in report.md.
