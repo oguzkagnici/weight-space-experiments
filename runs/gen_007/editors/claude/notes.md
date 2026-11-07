@@ -33,3 +33,18 @@
 - The trace bank reproduces the parent byte-identically (gen 6 pass-4 originals: 32/32), so edited-only generate passes on
   bank questions are paired for free (48 questions instead of 32).
 - Pass 3: generate edited on DEV32 + 16 more bank questions ("extra16", regression check).
+
+## Pass 3 result (generate, edited v1, 48 bank questions; code/011) -> work/paired_p3.json
+- DEV32: 8 -> 6 (-6.2 pp, SE 6.2, +1/-3), cut 21 -> 21. EXTRA16: 10 -> 10 (+0/-0). All 48: -4.2 pp (+1/-3).
+- Byte-identical traces: 0 of 48. First divergence median at 5.4% of the trace (~100-300 tokens after the prompt).
+- Mechanism holds: after a two-finalist paragraph the edited model opens with a commit word 5/18 vs parent 3/39 (gen 6: 11/37 vs 5/59).
+  4 narrowing cut traces now finish (1 correct); 4 traces that finished are now cut (3 were correct): resampling.
+- Diagnosis (code/012): the new neuron is silent before divergence (|h_new|*||col|| = 0.000 before the first diverging
+  token in 31 of 32 traces; median 1e-17). The divergence comes from REMOVING n1786's original output (mean
+  |h|*||col|| ~0.02 per token). So even the 2nd-quietest neuron resamples every trace; the s-score calibration from gen 6
+  (s 0.0013 -> ~25% predicted) does not transfer (observed 5%).
+- Conclusion on the brief: exact silence is impossible under the rules. No neuron is Q8-silent (pass 1), no w2 column
+  quantises to zero, and the only exactly-silent carrier I found, a tied embedding row of a never-used token (its logit
+  stays outside top-k 20 except where it fires), is forbidden (embed_tokens out of scope). A length-triggered stop is out
+  of scope (earlier decision). So every candidate resamples, and only a large mechanism can pass selection.
+- Pass 4: edited v1 on the other 48 bank questions -> 96 paired questions in total (the most informative use of a pass).

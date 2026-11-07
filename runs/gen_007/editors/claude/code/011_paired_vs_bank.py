@@ -34,11 +34,13 @@ for r in E:
         fd = len(tok(tb[:i], add_special_tokens=False)["input_ids"]) / max(1, b["tokens"])
     nb, cb = mech(tb); ne, ce = mech(te)
     for key, v in (("pairs_parent", nb), ("commit_parent", cb), ("pairs_edit", ne), ("commit_edit", ce)): tot[key] += v
-    set_ = "dev" if r["id"] in dv["dev"] else "extra16"
+    set_ = "dev" if r["id"] in dv["dev"] else ("extra16" if r["id"] in dv.get("extra16", []) else "rest48")
     rows.append(dict(id=r["id"], set=set_, grp=grp.get(r["id"], "other"), pc=b["correct"], ec=r["correct"], pcut=b["cut"], ecut=r["cut"],
                      same=same, fd=round(fd, 3), pred=(b["pred"], r["pred"]), gold=r["gold"]))
-for name, sel in (("DEV32", [x for x in rows if x["set"] == "dev"]), ("EXTRA16", [x for x in rows if x["set"] == "extra16"]), ("ALL48", rows)):
-    n = len(sel); d = [x["ec"] - x["pc"] for x in sel]; m = sum(d) / n
+for name, sel in (("DEV32", [x for x in rows if x["set"] == "dev"]), ("EXTRA16", [x for x in rows if x["set"] == "extra16"]), ("REST48", [x for x in rows if x["set"] == "rest48"]), ("ALL", rows)):
+    n = len(sel)
+    if n < 2: continue
+    d = [x["ec"] - x["pc"] for x in sel]; m = sum(d) / n
     se = math.sqrt(sum((v - m) ** 2 for v in d) / (n - 1) / n) if n > 1 else 0
     fds = sorted(x["fd"] for x in sel if not x["same"])
     print(f"{name}: parent {sum(x['pc'] for x in sel)} -> edited {sum(x['ec'] for x in sel)} of {n} | diff {100*m:+.1f} pp (SE {100*se:.1f}, z {m/se if se else 0:.2f}) "

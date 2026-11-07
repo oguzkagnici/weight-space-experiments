@@ -78,3 +78,20 @@
 
 ## Pass 3 (read, edited), work/req3.json (code/025): 52 pass-2 texts + out-of-sample bank cut traces, ~195k tokens,
    token_logprobs + top5 all positions.
+## Pass 3 results (work/fwd_03, code/026)
+- Targets on 46 synthetic texts: P('"The' | </think>) = 1.000 (min 1.000), P(' answer' | '"The') = 1.000, P(<|im_end|> | ')".') = 1.000.
+- Thinking/prompt tokens of 52 pass-2 texts (92,580 tokens, fp32 engine): mean |dlogp| 2.7e-4, p99 2.7e-3, max 0.0099
+  (the fold residual; not 0). Gen6's L23 edit had ~5e-4.
+- 30 out-of-sample cut traces (~100k thinking tokens): no gate firing (no target token predicted with P>0.98 where
+  the text differs; none of '"The'/<|im_end|> top-1 with high P).
+
+## Pass 4 plan: generate both, DEV = 32 bank questions (code/027: 5 closed-cut targets 1740 9274 8198 6829 6014 +
+   14 finished + 13 cut, random), edit v4 unchanged. Measure gains and byte-identical thinking.
+- code/028 (float residual per fold, sim units): 3401->1228 5.6e-5, 3793->6986 7.6e-5, 881->331 3.1e-4 (dominates; total 2.75e-4).
+- code/029 (Q8 sim): A+B 2.0e-4, A+B+C 3.6e-4, all three hosts from the 4-cluster folded into 1228: 2.6e-4.
+- v5 (code/030, now in edited/; v4 is preserved in work/fwd_04_snapshot): identical units, hosts 3401, 3793, 6986, all
+  folded into 1228 (w2_1228 += w2_3401 - w2_3793 - w2_6986; signs from the duplicate structure). 881/331 untouched.
+  Gate/leak checks identical to v4 (pe host 6986: leak max ratio .0003, 0 nonzero-Q8 tokens).
+- Pass 4 (v4) FAILED in llama-quantize (disk full: 4.1 GB free, build needs ~5.3 GB); does not count. Deleted my big
+  activation files (fwd_01 mlp20-22, L20/L22 inputs; fwd_02 mlp23 after saving host-block amax) -> 7.3 GB free.
+- Pass 4 resubmitted with v5 (current edited/), same DEV 32 (work/req4.json).

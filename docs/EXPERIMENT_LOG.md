@@ -541,3 +541,16 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The trace bank reproduces the parent byte-identically: gen-6 pass-4 originals matched 32/32. An edited-only generate on bank questions is therefore paired for free (48 questions per pass instead of 32).
 - Pass 3: edited generate on DEV32 plus 16 further bank questions.
 - Disk: deleted the per-pass weight snapshots of generations 1–6, 2.7 GB in total. They were gitignored; submitted candidates keep their weights. Hashes are recorded in runs/snapshot_hashes_gen1-6.txt.
+
+### 2026-11-07 — gen 7, editor `claude`: pass 3 (edit v1 generate) and divergence diagnosis
+- Edit v1 (L22 n1786 two-finalist gate) on 48 bank questions, compared paired against the bank (identical to the parent):
+  - DEV32: −6.2 pp (+1/−3);
+  - EXTRA16: 0;
+  - byte-identical traces: 0 of 48; median first divergence at 5% of the trace.
+- The mechanism still shows: a commit opener follows a two-finalist paragraph in 5/18 cases, against 3/39 for the parent.
+- Diagnosis: the new gate is silent before divergence in 31 of 32 traces (0.000 up to the first diverging token). Divergence comes from removing the original neuron's small output (~0.02 per token).
+- The brief's goal, exact silence, is impossible under the rules:
+  - no neuron is Q8-silent;
+  - no w2 column quantises to zero;
+  - the only exactly silent carrier found is forbidden. That carrier is the tied embedding row of a never-used token: top-k 20 makes logits outside the top 20 irrelevant, and the token never appears in the context.
+- Pass 4 completes the paired test on the remaining 48 bank questions.
