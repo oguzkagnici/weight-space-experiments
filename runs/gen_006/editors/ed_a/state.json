@@ -1,6 +1,26 @@
 {
- "passes_used": 0,
+ "passes_used": 3,
  "pending": [
-  "gen_006_ed_a_p01_d0f0db"
+  "gen_006_ed_a_p04_911c67"
+ ],
+ "passes": [
+  {
+   "k": 1,
+   "id": "gen_006_ed_a_p01_d0f0db",
+   "type": "read",
+   "seconds": 639.0
+  },
+  {
+   "k": 2,
+   "id": "gen_006_ed_a_p02_b4a150",
+   "type": "read",
+   "seconds": 1318.5
+  },
+  {
+   "k": 3,
+   "id": "gen_006_ed_a_p03_2482b9",
+   "type": "read",
+   "seconds": 510.9
+  }
  ]
 }
