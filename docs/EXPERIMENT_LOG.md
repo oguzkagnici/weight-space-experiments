@@ -527,3 +527,8 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - Its 26 swaps: all 13 losses are parent-finished traces that the edited model now runs to the cap; 11 of 13 gains are parent-cut traces it now finishes. Only 3 of the 12 parent traces that were cut and narrowed to two finalists became correct, and those also diverged early (2-12%), so even they cannot be credited to the gate.
   - With SE 2.6-4.0 on 128 questions, effects of +2 to +4 pp (the size the editors' mechanisms predict) cannot reach z 2. The gen-5 champion passed because its effect was larger (+9.4, z 3.6).
 - Generation-6 report: `runs/gen_006/REPORT.md`.
+
+## 2026-11-07 ~16:00: generation 7 created (D53)
+- Parent unchanged (`gen005_carry_gate_wrapup_L20`). Editors `claude` and a fresh `ed_a`; 6 passes, ≤ 1 candidate each.
+- The new brief section on generation 6 states the power arithmetic: on 128 paired questions, +4/−0 passes (z 2.0), but early divergence produces 10-26 random swaps. Editors are asked for edits that are exactly silent off-target, verified by counting byte-identical traces.
+- Parent selection queued at priority 9.
