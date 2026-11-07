@@ -66,3 +66,4 @@ Measure: P('"The') at </think>, P(eos) after '".', thinking per-token TV vs pass
   0.06-0.83 per trace (mean .35) => ~72% of traces expected byte-identical up to </think> (HF estimate).
 ## Pass 4 plan (generate both, edit v2a unchanged): DEV = the 5 closed-but-cut bank traces + 27 random finished bank traces (seed 6).
 Expect: +4 (1740, 9274, 8198, 6014), finished traces same answers, ~240 fewer tokens each.
+- pass 4 first attempt FAILED in server quantize (disk space, not charged); freed 1.3 GB of my scratch (fwd_02 activations; kept O2/opener content rows in work/p2_L23_content_rows.npy), resubmitted.

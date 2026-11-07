@@ -465,3 +465,8 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - Carried candidate `carry/churn_hence_L23` (gen-5 `ed_a` edit, stacked).
   - Parent and carry selection queued at priority 9.
   - `ga select` gained `--priority`. `ga brief` falls back to an editor's `notes.md` when `report.md` is missing.
+
+## 2026-11-07 ~03:00 — Disk-full incident (D47)
+- Both editors' 4th passes (generate, gen 6) failed at `llama-quantize` with 230 MB of disk left; failed passes are not charged and both were resubmitted.
+- Freed 7.6 GB: two old gen-5 Q8_0 builds and 0.9 GB of activation arrays from finished generations; the GGUF cache now keeps at most 3 edited builds.
+- The base GPQA job (priority 6) had started in the gap; the server was restarted so that editor passes run first again.
