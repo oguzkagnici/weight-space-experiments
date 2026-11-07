@@ -514,3 +514,16 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 ### 2026-11-07 14:05 UTC: gen 6 selection re-run, carry done
 - carry/churn_hence_L23: 68/128 vs parent 69/128, **−0.78 pp (SE 2.60, z −0.30), +5/−6**, cut 50 vs 48. Only 12 of 128 traces identical to the parent's, which confirms the edited weights were served (D52 guards).
 - claude/finalist_commit_L21 running on the verified GGUF; ed_a/ed_a_g6_short_answer_L23 pending.
+
+### 2026-11-07 15:45 UTC: generation 6 decision (D51): the champion survives
+| candidate | acc | diff vs parent (53.91) | SE | z | +/− | cut (parent 48) | mean tokens (parent 2,109) | think identical to parent | median first divergence |
+|---|---|---|---|---|---|---|---|---|---|
+| ed_a/ed_a_g6_short_answer_L23 | 54.69 | +0.78 | 3.2 | +0.24 | +9/−8 | 47 | 1,929 | 11/128 | 14% of the trace |
+| claude/finalist_commit_L21 | 53.91 | 0.00 | 4.0 | 0.00 | +13/−13 | 52 | 2,091 | 3/128 | 7% |
+| carry/churn_hence_L23 | 53.12 | −0.78 | 2.6 | −0.30 | +5/−6 | 50 | 2,085 | 16/128 | 22% |
+- All three outputs checked against D52: distinct traces, verified GGUFs, no cut-and-correct rows.
+- **Why the editors' fresh-holdout gains (+3 to +6 pp) vanished: resampling noise.**
+  - Every edit repurposes a neuron, which removes that neuron's original output. That slightly changes all logits, and with temperature 0.6 a changed sampled token soon follows. `claude`'s traces diverge from the parent's at a median of 7% of the trace (84 of 128 before 10%), far before its gate can fire (two-finalist paragraphs come at ~58%).
+  - Its 26 swaps: all 13 losses are parent-finished traces that the edited model now runs to the cap; 11 of 13 gains are parent-cut traces it now finishes. Only 3 of the 12 parent traces that were cut and narrowed to two finalists became correct, and those also diverged early (2-12%), so even they cannot be credited to the gate.
+  - With SE 2.6-4.0 on 128 questions, effects of +2 to +4 pp (the size the editors' mechanisms predict) cannot reach z 2. The gen-5 champion passed because its effect was larger (+9.4, z 3.6).
+- Generation-6 report: `runs/gen_006/REPORT.md`.

@@ -269,3 +269,24 @@ flowchart LR
 - **Consequence.** Within this analysis, the network has no usable internal "budget is running out" signal, so it cannot plan for the cap. That is consistent with traces running into the cap mid-sentence.
   - An edit could build such a counter (re-read a sink head's value through a new o_proj direction).
   - A length-triggered stop, however, is out of scope for this experiment ("ends the thinking regardless of the problem"), so it was not pursued.
+
+## Generation 6: two-finalist oscillation, answer re-derivation, and why small edits do not survive selection
+
+### Oscillating between two finalists (editor `claude`)
+- 18 of the parent's 53 cut bank traces narrow the choice to two options ("either F or G", "between C and H"), on average 58% into the trace. They then spend ~1,300 tokens re-sweeping without deciding. Finished traces rarely narrow (4 of 43).
+- A forced answer right after the first two-finalist paragraph is correct in 8 of 18 such cut traces (7 of 11 when gold is one of the two; P(the pair) 0.99). At the cap it is 10 of 18. So the model has usually already found the right finalist; it does not commit.
+- **The state is linearly readable** at the L21 MLP input. At paragraph-break tokens (any token containing "\n\n", 296 token types), a mean-difference direction separates breaks ending a two-finalist paragraph from all other breaks with leave-one-trace-out AUC 0.86.
+- A gated neuron on that direction, writing commit openers (So/Thus/Therefore/Hence) minus deliberation openers, collapses the next-paragraph deliberation opener where it fires ("Option" 0.80 → 0.04, "Let" 0.61 → 0.13). In generations, commit openers after two-finalist paragraphs rose from 5/59 to 11/37.
+- On selection (128 hidden) it made no net difference (+13/−13); see the noise finding below.
+
+### The visible answer re-derives the whole solution (editor `ed_a`)
+- After `</think>` the parent writes a ~250-token step-by-step re-derivation before "The answer is (X)". In 42 of 43 finished traces this answer equals the thinking's last answer.
+- When the thinking ends late, this redundant text is what the cap cuts (5 of 53 cut bank traces; 4 had the right answer settled).
+- Three L23 neurons, each firing at one position (`</think>` → `"The`, answer-initial `"The` → ` answer`, after `"The answer is (X)".` → end), make the answer exactly `"The answer is (X)"`. The letter is copied from the thinking with P = 1.00.
+- On selection it saved 180 tokens per question but gained only +0.8 pp (+9/−8). Few selection traces are cut inside the answer.
+
+### Resampling noise dominates paired selection of small edits
+- Repurposing any neuron removes its original output, which nudges every logit a little. Under temperature-0.6 sampling a different token is soon drawn and the trace takes another path, even though the edit's gate never fired.
+- Median first divergence from the parent's trace: 7% of the trace (`claude`, L21), 14% (`ed_a`, L23 ×3), 22% (carried L23 edit). Only 3-16 of 128 thinking traces stayed identical.
+- The swaps follow the finish/cut boundary: a resampled finished trace sometimes runs to the cap (loss), and a resampled cut trace sometimes finishes (gain). This yields 11-26 swaps per edit and SE 2.6-4.0 pp on 128 questions, regardless of what the edit targets.
+- Consequence: a mechanism whose true effect is +2 to +4 pp (a cue that occurs in 5-15% of questions) cannot pass z ≥ 2 on 128 questions. Editors' 32-question holdouts also overstate effects: +3 to +6 there vs ±0.8 on selection.
