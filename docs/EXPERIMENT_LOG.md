@@ -487,3 +487,8 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - Scope judgment: admitted (D50).
   - Its report also found a **grading inconsistency**: a trace cut after writing "answer is (X)" would have counted as correct. No existing row was affected; fixed (D49).
 - Selection queued at priority 9: parent, `carry/churn_hence_L23`, `claude/finalist_commit_L21`, `ed_a/ed_a_g6_short_answer_L23`. Base GPQA after them (D48).
+
+### 2026-11-07 08:35 UTC: gen 6 selection, parent done
+- Parent (gen005_carry_gate_wrapup_L20) on the 128 selection questions (think, det1): 69/128 = 53.9%, cut 48/128. No cut-and-correct rows, so the D49 grading fix does not change this number.
+- carry/churn_hence_L23 running; claude/finalist_commit_L21 and ed_a/ed_a_g6_short_answer_L23 pending, then base GPQA (priority 10).
+- The wait task hit its 2 h background limit and was re-armed; nothing failed.
