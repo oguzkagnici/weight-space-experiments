@@ -510,3 +510,7 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - No cut-and-correct rows in either file (D49 has no effect).
 - Caveat: GPQA traces almost never finish within the 3,072-token cap (85% cut for base), so this mostly measures whether a trace concludes. Both models score below the 25% chance level because cut answers count as wrong.
 - Base run served by a verified fresh server (D52 guards active).
+
+### 2026-11-07 14:05 UTC: gen 6 selection re-run, carry done
+- carry/churn_hence_L23: 68/128 vs parent 69/128, **−0.78 pp (SE 2.60, z −0.30), +5/−6**, cut 50 vs 48. Only 12 of 128 traces identical to the parent's, which confirms the edited weights were served (D52 guards).
+- claude/finalist_commit_L21 running on the verified GGUF; ed_a/ed_a_g6_short_answer_L23 pending.
