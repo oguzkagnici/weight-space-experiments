@@ -532,3 +532,12 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Parent unchanged (`gen005_carry_gate_wrapup_L20`). Editors `claude` and a fresh `ed_a`; 6 passes, ≤ 1 candidate each.
 - The new brief section on generation 6 states the power arithmetic: on 128 paired questions, +4/−0 passes (z 2.0), but early divergence produces 10-26 random swaps. Editors are asked for edits that are exactly silent off-target, verified by counting byte-identical traces.
 - Parent selection queued at priority 9.
+
+### 2026-11-07 — gen 7, editor `claude`: pass 2 analysis and edit v1; disk housekeeping
+- Pass 2 (read, parent, MLP inputs at L22/L23 on 32 bank traces): the two-finalist break direction separates at L22 (LOTO AUC 0.864) and L23 (0.859), as at L21 in gen 6 (0.86).
+- New finding: the bias-proxy gate fires on the first prompt tokens of every text. These are low-norm, constant attention-sink tokens: 'user' at L22; BOS, `<|im_start|>` and `\n` at L23. Such a gate perturbs every question through the KV cache. The fix projects the gate row off the 4-dim subspace of those tokens and subtracts a small sink penalty.
+- Edit v1, L22 n1786 (the second-lowest removal impact, 0.0013): threshold 7.5, k 6, w2 column norm 1.47.
+  - It fires on 79% of two-finalist breaks, 13.7% of other breaks and 0.27% of all tokens.
+- The trace bank reproduces the parent byte-identically: gen-6 pass-4 originals matched 32/32. An edited-only generate on bank questions is therefore paired for free (48 questions per pass instead of 32).
+- Pass 3: edited generate on DEV32 plus 16 further bank questions.
+- Disk: deleted the per-pass weight snapshots of generations 1–6, 2.7 GB in total. They were gitignored; submitted candidates keep their weights. Hashes are recorded in runs/snapshot_hashes_gen1-6.txt.

@@ -20,3 +20,16 @@
 - Deleted mlp12-21 arrays (disk); kept mlp22/23.
 
 ## Pass 2 plan (read, original): MLP inputs ("inputs": feed_forward) at L22 and L23, positions all, on DEV traces = 18 cut-narrowing + 4 finished-narrowing + 10 others (bank). Rebuild the two-finalist gate at the lowest-impact carrier (L23 n2509 or L22 n1786).
+
+## Pass 2 analysis (code/007-010)
+- Two-finalist direction (positives = break after a two-finalist statement, 38 in 22 traces; negatives = other 1,504 breaks):
+  LOTO AUC 0.864 at L22, 0.859 at L23 (gen 6 L21: 0.86).
+- Bias-proxy gate fired on the first prompt tokens of EVERY text (L22: 'user'; L23: BOS, <|im_start|>, '\n'): low-norm,
+  constant sink tokens. That would perturb every question via the KV cache. Fix (code/009): project the gate row off the
+  4-dim subspace of the first 4 tokens and subtract 0.5 x the sink direction -> first-4 g = -3.4, no prompt firing.
+- L22 thr 7.5 pen 0.5: fires on 79% of positives, 13.7% of other breaks, 125 of 47,060 tokens (0.27%); median all-token g -7.1.
+  L23 separates worse (0.53-0.63 of positives at comparable off-target), so L22 n1786 is the carrier.
+- Edit v1 (code/010 7.5 0.5 6 2): L22 n1786, w1 row norm 9.5, w3 = mu_hat/mp, w2 col norm 1.47 (orig 0.168), cos 0.94.
+- The trace bank reproduces the parent byte-identically (gen 6 pass-4 originals: 32/32), so edited-only generate passes on
+  bank questions are paired for free (48 questions instead of 32).
+- Pass 3: generate edited on DEV32 + 16 more bank questions ("extra16", regression check).

@@ -13,17 +13,13 @@ rows = {json.loads(l)["id"]: json.loads(l) for l in open("/home/user/weight-spac
 dev = json.load(open("work/dev_ids.json"))["dev"]
 off = np.load("work/fwd_02/offsets.npy")
 breaks = []          # (global row, trace index, label, frac)
+BREAK = {i for i in range(len(tok)) if "\n\n" in tok.decode([i])}
 for ti, qid in enumerate(dev):
     text = trace_text(rows[qid]); p = render_think(qid)
-    enc = tok.encode(text, add_special_tokens=False)
-    n_rows = int(off[ti + 1] - off[ti]); shift = n_rows - len(enc.ids if hasattr(enc, "ids") else enc)
-    ids = enc.ids if hasattr(enc, "ids") else enc
-    # character offsets of each token
-    spans = enc.offsets if hasattr(enc, "offsets") else None
-    if spans is None:
-        spans = []; pos = 0
-        for k in range(len(ids)):
-            s = tok.decode(ids[:k + 1]); spans.append((pos, len(s))); pos = len(s)
+    enc = tok(text, return_offsets_mapping=True, add_special_tokens=False)
+    n_rows = int(off[ti + 1] - off[ti])
+    if len(enc["input_ids"]) != n_rows:
+        print("token count mismatch", qid, len(enc["input_ids"]), n_rows); continue
     think_end = text.find("</think>", len(p)); think_end = len(text) if think_end < 0 else think_end
     think = text[len(p):think_end]
     pos_ends = set()
@@ -31,18 +27,15 @@ for ti, qid in enumerate(dev):
         if len({x for x in m.groups() if x}) == 2:
             e = think.find("\n\n", m.end())
             if e >= 0: pos_ends.add(len(p) + e)
-    for k, (a, b) in enumerate(spans):
-        if a < len(p) or a >= think_end: continue
-        piece = text[a:b]
-        if "\n\n" in piece:
-            j = text.find("\n\n", a)
-            lab = int(j in pos_ends)
-            breaks.append((int(off[ti]) + k + shift, ti, lab, (a - len(p)) / max(1, think_end - len(p))))
+    for k, (tid, (a, b)) in enumerate(zip(enc["input_ids"], enc["offset_mapping"])):
+        if tid not in BREAK or a < len(p) or a >= think_end: continue
+        lab = int(any(a <= pc < b for pc in pos_ends))
+        breaks.append((int(off[ti]) + k, ti, lab, (a - len(p)) / max(1, think_end - len(p))))
+shift = 0
 B = np.array(breaks)
 print(f"shift {shift}; breaks {len(B)}, positives {int(B[:, 2].sum())} in {len(set(B[B[:, 2] == 1][:, 1]))} traces")
 json.dump([dict(row=int(r), ti=int(t), lab=int(l), frac=float(f)) for r, t, l, f in breaks], open("work/breaks.json", "w"))
 for L in (22, 23):
-    Xa = np.load(f"work/fwd_02/model.layers.{L}.feed_forward.in.npy") if False else None
     import glob
     f = [x for x in glob.glob("work/fwd_02/*.npy") if f"layers.{L}.feed_forward" in x][0]
     Xa = np.load(f, mmap_mode="r")
