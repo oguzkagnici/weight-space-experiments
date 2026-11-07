@@ -95,3 +95,16 @@
 - Pass 4 (v4) FAILED in llama-quantize (disk full: 4.1 GB free, build needs ~5.3 GB); does not count. Deleted my big
   activation files (fwd_01 mlp20-22, L20/L22 inputs; fwd_02 mlp23 after saving host-block amax) -> 7.3 GB free.
 - Pass 4 resubmitted with v5 (current edited/), same DEV 32 (work/req4.json).
+
+## Pass 4 results (generate both, v5, DEV 32 bank questions; work/fwd_04, code/031)
+- acc 11 -> 16 of 32 (+15.6 pts), +6/-1; cut 18 -> 13; tokens -273 (SE 99).
+- Gains: the 4 closed-but-cut targets 1740 (D), 6014 (D), 8198 (C), 9274 (B) now finish with '"The answer is (X)"';
+  6804 and 7373 (cut -> finished correct after an early divergence). Loss: 2147 (finished J -> cut, diverged at 31%).
+  6829 (closed-cut, wrong) diverged at char 136 and was cut again.
+- Every finished edited answer is exactly '"The answer is (X)"' (6014: the line twice); letters equal the parent's
+  in all 14 finished-both traces.
+- SILENCE NOT ACHIEVED: only 2/32 thinking traces byte-identical; first difference at median 13% of the trace (as gen6).
+  The ~1e-4-level per-token perturbation of the folds/requantisation still flips an early sampled token.
+  So the 4-6x lower simulated perturbation did not translate into fewer divergences.
+
+## Pass 5/6 plan: HOLDOUT generate both, v5 unchanged, fresh samples n=32 seed 777 (pass 5) and seed 778 (pass 6).

@@ -48,3 +48,8 @@
   stays outside top-k 20 except where it fires), is forbidden (embed_tokens out of scope). A length-triggered stop is out
   of scope (earlier decision). So every candidate resamples, and only a large mechanism can pass selection.
 - Pass 4: edited v1 on the other 48 bank questions -> 96 paired questions in total (the most informative use of a pass).
+
+## Pass 4 result (edited v1, other 48 bank questions) -> all 96 paired
+- REST48 +6.2 pp (+3/-0; all three gains in non-target traces: resampling). ALL 96: 37 -> 38, +1.0 pp (SE 2.8), +4/-3,
+  cut 53 -> 50, byte-identical 1/96. Mechanism: commit after two-finalist paragraph 10/29 vs 3/39.
+- Decision: no candidate (expected z ~0.3 at 128). Passes 5-6 unused. report.md written.

@@ -4,10 +4,10 @@
 # Usage: ./py code/011_paired_vs_bank.py <pass k> [ids-json-key ...]
 import sys, json, re, math, collections
 from wsp.editor import tok
-k = int(sys.argv[1])
+ks = [int(a) for a in sys.argv[1:]]; k = ks[-1]
 BANK = "/home/user/weight-space-experiments/runs/shared/trace_bank_gen005champ_cap3072_det1.jsonl"
 bank = {json.loads(l)["id"]: json.loads(l) for l in open(BANK)}
-E = [json.loads(l) for l in open(f"work/fwd_{k:02d}/gen_{k}_edited.jsonl")]
+E = [json.loads(l) for kk in ks for l in open(f"work/fwd_{kk:02d}/gen_{kk}_edited.jsonl")]
 g = json.load(open("work/groups.json")); dv = json.load(open("work/dev_ids.json"))
 grp = {q: n for n in ("narrow", "fin_narrow") for q in g[n]}
 L = r"\(?([A-J])\)?"
