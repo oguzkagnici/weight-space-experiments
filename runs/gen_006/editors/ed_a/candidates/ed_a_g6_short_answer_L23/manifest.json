@@ -1,0 +1,26 @@
+{
+ "label": "ed_a_g6_short_answer_L23",
+ "editor": "ed_a",
+ "gen": 6,
+ "time": 1794033161.319317,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 6143,
+   "numel": 15728640,
+   "rel_change": 0.4443426728248596,
+   "sha_bf16": "dbace2b223f7d4e6"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 6143,
+   "numel": 15728640,
+   "rel_change": 0.03802390396595001,
+   "sha_bf16": "a73054355801c0df"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 6141,
+   "numel": 15728640,
+   "rel_change": 0.0317784920334816,
+   "sha_bf16": "98780d663381e779"
+  }
+ }
+}

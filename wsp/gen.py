@@ -134,6 +134,8 @@ class LlamaServer:
             think, content = raw, ""
         pred, ok = grade(content, q["answer"])
         cut = c["finish_reason"] == "length"
+        if cut:
+            ok = 0   # protocol (D30, D49): an answer cut at the cap is wrong, even if "answer is (X)" was already written
         return {"id": qid, "sample": sample, "category": q["category"], "gold": q["answer"], "pred": pred,
                 "correct": ok, "cut": int(cut), "finished_think": int("</think>" in raw),
                 "tokens": r["usage"]["completion_tokens"], "think": think, "content": content, "raw": raw}

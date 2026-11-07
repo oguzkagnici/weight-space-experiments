@@ -474,3 +474,16 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 ## 2026-11-07 ~05:20 — Second container restart
 - Same host type (AMX). All processes stopped, including the `ed_a` sub-agent and `claude`'s pass 6 (generate, running).
 - Queue, watchdog and memory log restarted; the interrupted pass was requeued (not charged twice). `ed_a` was resumed from its saved transcript with a note about the restart.
+
+## 2026-11-07 — Generation 6 editors finished
+- **`claude` → `finalist_commit_L21`** (one repurposed neuron, L21 n6823). Target: cut traces that narrow to two finalists ("either F or G") and then oscillate until the cap (18 of the parent's 53 cut bank traces; finished traces rarely narrow, 4 of 43).
+  - Forced answer at the first two-finalist paragraph end: 8 of 18 correct (7 of 11 when gold is one of the two; probability on the pair 0.99). Forced at the cap: 10 of 18.
+  - Gate: mean-difference direction at the L21 MLP input between breaks ending two-finalist paragraphs and other breaks (leave-one-trace-out AUC 0.86). Output: commit openers minus deliberation openers.
+  - Read: where the gate fires, deliberation openers collapse ("Option" 0.80 → 0.04); elsewhere mean |Δlogp| 0.004 per token.
+  - Generate (paired): DEV32 +9.4 (+3/−0); HOLDOUT32 +6.25 (+2/−0); HOLDOUT32-B 0.0 (+1/−1). Holdouts combined (64 fresh): **+3.1 (SE ≈ 3.1, +3/−1)**. All 5 DEV/HOLDOUT32 gains are narrowing traces that now finish with the right finalist; the HOLDOUT32-B changes come from early divergence.
+- **`ed_a` → `ed_a_g6_short_answer_L23`** (three repurposed L23 neurons: n4526, n7602, n810). Target: after `</think>` the parent re-derives the solution in the visible answer (~250 tokens) before "The answer is (X)". In 42 of 43 finished bank traces it is the answer already settled in the thinking. 5 of 53 cut bank traces were cut while writing that answer, 4 of them with the right answer already settled.
+  - The edit makes the visible answer exactly `"The answer is (X)"` followed by the end of message, with the letter copied from the thinking.
+  - Generate: DEV32, an earlier two-neuron version: −9.4 (+3/−6; the answer opener sometimes led to a quoted explanation without an answer). Fresh 32, the final three-neuron version: **+6.25 (SE 4.3, +2/−0)**, cut 53% → 41%, −265 tokens; all 19 finished answers have exactly that form.
+  - Scope judgment: admitted (D50).
+  - Its report also found a **grading inconsistency**: a trace cut after writing "answer is (X)" would have counted as correct. No existing row was affected; fixed (D49).
+- Selection queued at priority 9: parent, `carry/churn_hence_L23`, `claude/finalist_commit_L21`, `ed_a/ed_a_g6_short_answer_L23`. Base GPQA after them (D48).

@@ -91,3 +91,9 @@ Expect: +4 (1740, 9274, 8198, 6014), finished traces same answers, ~240 fewer to
 - Answers start with '"The' everywhere; ' answer' follows only sometimes ('"The answer is (D)"' in 3/17 finished); otherwise a
   quoted explanation that ends with the usual answer line (finished answers still have an answer).
 - 05:20 container restart; pass 6 requeued (not charged).
+
+## Pass 6 results (generate both, v3, HOLDOUT A seed 606) -> work/fwd_06
+- acc 46.9 -> 53.1 (+6.25, SE 4.3; +2/-0); cut 53.1 -> 40.6%; tokens -265 (SE 103); all 19 finished answers are '"The answer is (X)"'.
+- 29/32 traces still diverge inside the thinking (noise). Gains 7802 (math), 884 (law, finishes at 2951 tokens).
+## End
+Submitted candidate ed_a_g6_short_answer_L23 (= v3, code/029). Report in report.md. Scratch activations and snapshots deleted.
