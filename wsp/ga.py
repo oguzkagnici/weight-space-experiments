@@ -137,13 +137,13 @@ def cmd_select(a):
     jid = f"{gen['name']}_sel_champion"
     out = os.path.join(gd, "selection", "champion.jsonl")
     if not os.path.exists(out):
-        enqueue_eval(jid, parent, sel, out, protocol=gen.get("protocol", "direct")); jobs["champion"] = jid
+        enqueue_eval(jid, parent, sel, out, priority=a.priority, protocol=gen.get("protocol", "direct")); jobs["champion"] = jid
     for c in candidates(g):
         safe = c["name"].replace("/", "__")
         out = os.path.join(gd, "selection", f"{safe}.jsonl")
         if os.path.exists(out): continue
         jid = f"{gen['name']}_sel_{safe}"
-        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out, protocol=gen.get("protocol", "direct"))
+        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out, priority=a.priority, protocol=gen.get("protocol", "direct"))
         jobs[c["name"]] = jid
     print(f"enqueued {len(jobs)} selection evaluations on {len(sel)} hidden questions: {list(jobs)}")
     if a.wait and jobs:
@@ -429,6 +429,7 @@ def main():
     p.add_argument("--trace-bank", default=None, help="jsonl of base-model thinking traces shared with editors (phase 2)")
     sp.add_parser("candidates")
     p = sp.add_parser("select"); p.add_argument("--wait", action="store_true")
+    p.add_argument("--priority", type=int, default=0)  # e.g. 9: run after editor passes
     p = sp.add_parser("decide"); p.add_argument("--z", type=float, default=2.0); p.add_argument("--force")
     p.add_argument("--keep", action="store_true")
     p = sp.add_parser("heldout"); p.add_argument("who", nargs="?", default="champion"); p.add_argument("--n", type=int, default=1000)

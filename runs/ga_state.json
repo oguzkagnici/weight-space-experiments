@@ -1,5 +1,5 @@
 {
- "gen": 5,
+ "gen": 6,
  "champion": "gen005_carry_gate_wrapup_L20",
  "champion_weights": "/home/user/weight-space-experiments/runs/champions/gen005_carry_gate_wrapup_L20/weights",
  "lineage": [

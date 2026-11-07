@@ -1,0 +1,27 @@
+{
+ "label": "churn_hence_L23",
+ "editor": "ed_a",
+ "gen": 5,
+ "time": 1793977294.0960548,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2047,
+   "numel": 15728640,
+   "rel_change": 0.3841368854045868,
+   "sha_bf16": "6cd299c3b73c120c"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.019177252426743507,
+   "sha_bf16": "e15ca1919732c0c4"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.013523119501769543,
+   "sha_bf16": "7e356d4402443bd2"
+  }
+ },
+ "carried_from": "ed_a/ed_a_g5_churn_hence_L23 (gen 5)"
+}

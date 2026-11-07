@@ -452,3 +452,16 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - **Check:** 32 of 32 trace-bank traces byte-identical to the `det1` bank under the new host (1,599 s; `runs/gen_005/engine_checks/cram0_determinism_newhost_amx.txt`). Generation results from both hosts can therefore be mixed and paired.
 - The PyTorch side (score and read passes, float32 since D36) may now use different matmul kernels, so recorded activations can differ in the last bits from those computed on the previous host. That matters only for comparing activations across hosts, not for generation results.
 - Queue, watchdog and memory log restarted; the interrupted champion GPQA job resumes from its cache.
+
+## 2026-11-07 — The champion's trace bank, and generation 6 (D46)
+- **GPQA, champion:** all 198 answers generated (thinking mode, `det1`); the paired comparison with base follows when the base run (priority 6) finishes.
+- **Champion trace bank** (same 96 practice questions, `det1`): accuracy 38.5% (the same as base), cut 53 of 96 (base 52), 37 of 43 finished correct (86%), 1,470 tokens per finished answer (base 1,544).
+  - **Paired with the base bank: +5/−5**, 7 cut → finished and 8 finished → cut; no trace byte-identical (the repurposed neuron diverges every trace early).
+  - So on these 96 questions the champion shows no gain, against +9.4 (selection, +12/−0) and +7.0 (held out, +10/−1) on fresh questions. Pooled over the 352 questions measured under `det1`: **+27/−6**.
+  - The 4 regressions where base finished correctly and the champion is cut (8262, 7373, 5325, 8198): in three, the champion states the right answer mid-trace (43–66%) and keeps deliberating.
+  - 18 of the champion's 53 cut traces state an answer inside the thinking (10 correct); base had 7. About half state it in the last 10% (too late); the rest state it at 19–66%, mostly hedged ("Thus likely answer is (E) …") or firm and then re-verified ("The answer is (G). But we must double-check …").
+- **Generation 6 created (D46):** parent `gen005_carry_gate_wrapup_L20`.
+  - Editors `claude` (never-concluding knowledge questions: law and health) and a fresh `ed_a` (answer statements that do not close).
+  - Carried candidate `carry/churn_hence_L23` (gen-5 `ed_a` edit, stacked).
+  - Parent and carry selection queued at priority 9.
+  - `ga select` gained `--priority`. `ga brief` falls back to an editor's `notes.md` when `report.md` is missing.
