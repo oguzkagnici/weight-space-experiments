@@ -492,3 +492,11 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Parent (gen005_carry_gate_wrapup_L20) on the 128 selection questions (think, det1): 69/128 = 53.9%, cut 48/128. No cut-and-correct rows, so the D49 grading fix does not change this number.
 - carry/churn_hence_L23 running; claude/finalist_commit_L21 and ed_a/ed_a_g6_short_answer_L23 pending, then base GPQA (priority 10).
 - The wait task hit its 2 h background limit and was re-armed; nothing failed.
+
+### 2026-11-07 10:40 UTC: gen 6 selection runs invalid, fixed and requeued (D52)
+- The carry and `claude` selection outputs were byte-identical to the parent's (69/128, cut 48, every trace identical).
+- Cause: the worker's graceful restart (`os.execv`, for the D49 grading fix) left its llama-server child, serving the parent's GGUF, on the port. New servers for the edited models failed to bind; the old one answered.
+- `ed_a`'s run was in progress on the same orphan; stopped by killing it.
+- Guards added (D52); invalid outputs quarantined; the three runs requeued. The base GPQA run (priority 10) had become next and started on a verified fresh server; selection follows it.
+- Audit of all generation caches: no other wrong-model result.
+- Lesson: a health check proves that *a* server answers, not that it is *ours* with the right weights.

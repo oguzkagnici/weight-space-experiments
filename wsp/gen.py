@@ -85,6 +85,44 @@ def build_gguf(weight_dirs, key):
 
 
 # ---------------------------------------------------------------- llama-server management
+def kill_strays():
+    """SIGKILL every llama-server on our port that this process does not track (D52), and wait until they are gone."""
+    import signal
+    pids = []
+    for d in os.listdir("/proc"):
+        if not d.isdigit():
+            continue
+        try:
+            args = open(f"/proc/{d}/cmdline", "rb").read().split(b"\0")
+        except OSError:
+            continue
+        if args and args[0].endswith(b"llama-server") and b"--port" in args and str(PORT).encode() in args:
+            pids.append(int(d))
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except OSError:
+            pass
+    for _ in range(100):
+        alive = []
+        for pid in pids:
+            try:
+                st = open(f"/proc/{pid}/stat").read().split(")")[-1].split()[0]
+            except OSError:
+                continue
+            if st != "Z":
+                alive.append(pid)
+            else:
+                try:
+                    os.waitpid(pid, os.WNOHANG)   # reap our own zombie children
+                except ChildProcessError:
+                    pass
+        if not alive:
+            return pids
+        time.sleep(0.1)
+    raise RuntimeError(f"could not kill stray llama-server(s) {pids}")
+
+
 class LlamaServer:
     def __init__(self):
         self.proc = None; self.model = None
@@ -93,6 +131,7 @@ class LlamaServer:
         if self.proc and self.proc.poll() is None and self.model == gguf_path:
             return
         self.stop()
+        kill_strays()   # D52: a llama-server left over from a worker re-exec kept the port and answered for every model
         ctx = PARALLEL * (THINK_CAP + 1024)
         log = open(os.path.join(ROOT, "queue", "llama_server.log"), "a")
         self.proc = subprocess.Popen([f"{LLAMA}/llama-server", "-m", gguf_path, "-t", "4", "-np", str(PARALLEL),
@@ -100,13 +139,21 @@ class LlamaServer:
                                      stdout=log, stderr=log, stdin=subprocess.DEVNULL)
         self.model = gguf_path
         for _ in range(300):
-            try:
-                if b"ok" in urllib.request.urlopen(f"http://127.0.0.1:{PORT}/health", timeout=2).read():
-                    return
-            except Exception:
-                pass
             if self.proc.poll() is not None:
                 raise RuntimeError("llama-server exited during start-up (see queue/llama_server.log)")
+            try:
+                if b"ok" in urllib.request.urlopen(f"http://127.0.0.1:{PORT}/health", timeout=2).read():
+                    time.sleep(1)   # a server that failed to bind exits within milliseconds; make sure ours is the one answering
+                    if self.proc.poll() is not None:
+                        raise RuntimeError("llama-server exited during start-up (port taken? see queue/llama_server.log)")
+                    served = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORT}/props", timeout=5)).get("model_path")
+                    if served != gguf_path:
+                        raise RuntimeError(f"port {PORT} serves {served}, expected {gguf_path}")
+                    return
+            except RuntimeError:
+                self.stop(); raise
+            except Exception:
+                pass
             time.sleep(1)
         raise RuntimeError("llama-server did not become healthy")
 
@@ -116,7 +163,7 @@ class LlamaServer:
             try:
                 self.proc.wait(30)
             except Exception:
-                self.proc.kill()
+                self.proc.kill(); self.proc.wait(30)
         self.proc = None; self.model = None
 
     def ask(self, qid, sample=0, cap=THINK_CAP):
@@ -126,6 +173,8 @@ class LlamaServer:
         req = urllib.request.Request(f"http://127.0.0.1:{PORT}/v1/chat/completions", json.dumps(body).encode(),
                                      {"Content-Type": "application/json"})
         r = json.load(urllib.request.urlopen(req, timeout=48 * 3600))
+        if r.get("model") not in (None, self.model):   # D52: every answer must come from the requested weights
+            raise RuntimeError(f"answer served by {r.get('model')}, expected {self.model}")
         c = r["choices"][0]; raw = c["message"].get("content") or ""
         # raw = exactly what the model generated after the prompt (which ends with "<think>")
         if "</think>" in raw:

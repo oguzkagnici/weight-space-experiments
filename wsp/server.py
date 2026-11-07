@@ -181,6 +181,8 @@ class Server:
             flag = os.path.join(QUEUE, "RESTART")
             if os.path.exists(flag):          # graceful restart between jobs (picks up code changes)
                 os.remove(flag); self.beat("restarting")
+                if self.llama is not None:
+                    self.llama.stop()     # D52: execv keeps child processes; an orphaned llama-server kept the port
                 os.execv(sys.executable, [sys.executable, "-m", "wsp.server"])
             fn = self.next_job()
             if not fn:
