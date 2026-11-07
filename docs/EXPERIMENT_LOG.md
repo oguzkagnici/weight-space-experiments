@@ -572,3 +572,12 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - New finding (ed_a): L23 contains near-duplicate neurons ({1228, 3401, 3793, 6986}, {331, 5105, 881}, {5821, 2400}). Merging them frees slots with 4× less output change than removing the quietest neurons.
 - Process note: ed_a's attempt to create `report.md` was refused by the tool's permissions. It appended its report to `notes.md` (`## REPORT`) instead; `ga brief` falls back to notes.md. The orchestrator did not write the file on its behalf.
 - `ga select --priority 9`: 1 candidate on the 128 hidden questions (the champion run is already done).
+
+### 2026-11-07 — gen 7 selection and decision (D54)
+| candidate | acc | diff vs champion (46.09) | SE | z | +/− | cut |
+|---|---|---|---|---|---|---|
+| ed_a_g7_short_answer_dupfold_L23 | 49.22 | +3.12 | 2.9 | 1.08 | +9/−5 | 58 → 52 |
+
+- D52 validity check: 1/128 traces byte-identical; 74/76 finished answers in the edit's short form.
+- Event analysis: the champion closed the thinking and was then cut inside the answer in 5 traces. The edit rescued 1 of them. The other 8 gains and 5 losses are resampling.
+- Champion survives (elitism). Cosmetic: `ga report` labels generate passes "read None texts".

@@ -290,3 +290,39 @@ flowchart LR
 - Median first divergence from the parent's trace: 7% of the trace (`claude`, L21), 14% (`ed_a`, L23 ×3), 22% (carried L23 edit). Only 3-16 of 128 thinking traces stayed identical.
 - The swaps follow the finish/cut boundary: a resampled finished trace sometimes runs to the cap (loss), and a resampled cut trace sometimes finishes (gain). This yields 11-26 swaps per edit and SE 2.6-4.0 pp on 128 questions, regardless of what the edit targets.
 - Consequence: a mechanism whose true effect is +2 to +4 pp (a cue that occurs in 5-15% of questions) cannot pass z ≥ 2 on 128 questions. Editors' 32-question holdouts also overstate effects: +3 to +6 there vs ±0.8 on selection.
+
+## Generation 7: why an edit cannot be silent, sink tokens, and duplicate neurons
+
+```mermaid
+flowchart LR
+    E["edit repurposes neuron j"] --> R["original output of j removed<br/>(|h_j|·||w2_j|| ≈ 0.02 per token, never 0 after Q8)"]
+    E --> G["new gated function<br/>(exactly 0 after Q8 off-target)"]
+    R --> L["logit change ~1e-4 to 1e-2"]
+    L --> S["temperature-0.6 sampling: a near-tie token flips<br/>within the first 5-19% of the trace"]
+    S --> D["trace resampled: correctness flips on ~7% of questions<br/>(paired SE ≈ 2.4-2.9 pp at 128)"]
+```
+
+- **No neuron is free after Q8_0** (both editors, independently).
+  - llama.cpp quantises the MLP activation vector to Q8_0 in blocks of 32 before w2. A neuron contributes exactly 0 only where |h_j| < (block maximum)/254.
+  - In L12–L23 even the quietest neuron is nonzero on 30–80% of tokens; the median neuron on 92–95%.
+  - No w2 column quantises to all zeros.
+- **Divergence comes from what is removed, not from what is added.**
+  - `claude`'s L22 n1786 gate is exactly silent before the first diverging token in 31 of 32 traces.
+  - Removing n1786's original output, about 0.02 per token and the second-quietest in L12–L23, still diverges 95 of 96 traces, at a median 5.6% into the trace.
+  - `ed_a` freed slots by merging near-duplicate neurons, which changes the output by only 2.6e-4. Traces still diverged at 13–19%, with 2–6 of 32 identical.
+- **Near-duplicate neurons in L23** (`ed_a`):
+  - {1228, 3401, 3793, 6986}: w1/w3/w2 cos ≥ 0.9998, activation correlation 0.9999;
+  - {331, 5105, 881}: 0.9995;
+  - {5821, 2400}: 0.997.
+  - Merging one into its twin (`w2_k += s·w2_j`) frees the slot algebraically.
+- **Prompt-sink tokens break bias-proxy gates** (`claude`).
+  - The first prompt tokens (BOS, `<|im_start|>`, `user`, `\n`) have low norm and the same activation in every text.
+  - A gate whose threshold comes from the mean-input direction fires on them at L22/L23. That would change every question through the KV cache.
+  - Projecting the gate off their 4-dim subspace fixes it.
+- **The only exactly silent carrier is out of scope.**
+  - Sampling applies top-k 20 first, so a token's logit matters only while it ranks in the top 20.
+  - The tied embedding row of a never-used token would therefore be an exactly silent linear gate. `model.embed_tokens` may not be edited.
+- **The mechanisms work where they fire, but their events are rare.**
+  - Two-finalist commit: a commit opener after a two-finalist paragraph 10/29 vs the parent's 3/39 (gen 6: 11/37 vs 5/59). Accuracy +1.0 pp (SE 2.8) on 96 paired bank questions.
+  - Short visible answer: 32 of 33 finished DEV answers become exactly "The answer is (X)" with the parent's letter. It rescues traces that close the thinking late and are cut inside the answer (4 of 4 on DEV; 1 of 5 in selection).
+  - In selection: +3.1 pp, z 1.08.

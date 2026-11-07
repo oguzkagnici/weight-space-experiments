@@ -1,0 +1,36 @@
+{
+ "gen": 7,
+ "parent": "gen005_carry_gate_wrapup_L20",
+ "champion_selection": {
+  "n": 128,
+  "acc": 46.09,
+  "se": 4.41,
+  "cut_share": 45.3,
+  "acc_if_finished": 84.3,
+  "no_answer_finished": 0,
+  "mean_tokens": 2090.4,
+  "mean_tokens_finished": 1277.1
+ },
+ "candidates": [
+  {
+   "name": "ed_a/ed_a_g7_short_answer_dupfold_L23",
+   "acc": 49.22,
+   "n": 128,
+   "acc_diff": 3.12,
+   "acc_diff_se": 2.9,
+   "wrong_to_right": 9,
+   "right_to_wrong": 5,
+   "cut_share_diff": -4.69,
+   "cut_share_diff_se": 3.5,
+   "tokens_diff": -132.2,
+   "tokens_diff_se": 36.848,
+   "logp_correct_diff": 0.0,
+   "z": 1.08,
+   "weights_changed": 20455,
+   "description": "# ed_a_g7_short_answer_dupfold_L23: a short visible answer, hosted in freed DUPLICATE neurons of layer 23\n\nTARGETED BEHAVIOUR. After </think> the parent re-derives the whole solution in the visible answer (~250 tokens) before\n\"The answer is (X)\"; in 41 of 43 finished bank traces that letter equals the last letter stated inside the thinking.\nWhen the thinking ends late (>~2,800 tokens) this redundant text is what the 3,072-token cap cuts: 5 of 53 cut bank\ntraces had closed the thinking, 4 of them with the right answer already stated.\n\nCHANGE (layer 23 MLP only; w1 rows / w3 rows / w2 columns of 3 neurons + one folded w2 column).\n1. Free three slots without deleting function: L23 has a cluster of 4 duplicate neurons {1228, 3401, 3793, 6986}\n   (cos of w1 rows .9998, w3 rows +-.9999, w2 columns +-.9998; activation correlation .9999). Their contributions are\n   algebraically merged into 1228: w2[:,1228] += w2[:,3401] - w2[:,3793] - w2[:,6986] (signs from the duplicate\n   structure; no fitting). Q8 simulation: off-target change 2.6e-4 vs 1.0e-3 for removing the 3 quietest neurons.\n2. Three gated units, all reading the L23 MLP input:\n   - n3401 fires at </think> and writes '\"The';\n   - n3793 fires at '\"The' right after </think> and writes ' answer';\n   - n6986 fires at ')\".' ending that answer line and writes <|im_end|>.\n   Gate (w1 row) = shrinkage-LDA direction (lam .1) target-vs-all-other-tokens on 128k recorded tokens of 61 traces\n   minus T x a whitened bias proxy (CV .03), scaled so the gate is -20 at the max negative token and +20 at the\n   min positive (2-fold CV by text: pos min z 19-34, neg max z 9-15). silu(-20) quantises to exactly 0 in Q8.\n   Up (w3 row) = 4 x bias proxy. Write (w2 column) = gf*(E[target] - mean E[top-10 competitors])/gpf, scaled into\n   the Q8 block absmax of every row (block scales preserved exactly; cos .99 to the ideal direction).\n   The answer letter is copied from the thinking's last line by the model itself (P = 1.00).\n\nEVIDENCE.\n- Read pass (46 synthetic post-think answers): P('\"The'|</think>) = P(' answer') = P(<|im_end|>) = 1.000 (min);\n  thinking tokens mean |dlogp| 2.7e-4 (fp32 engine), no firing on 30 unseen cut traces (~100k tokens).\n- DEV (32 bank questions incl. the 5 closed-but-cut targets): 11 -> 16 correct, +15.6 pts (+6/-1); the 4 targets with\n  a stated answer (1740, 6014, 8198, 9274) now finish with '\"The answer is (X)\"'; tokens -273.\n- HOLDOUT (64 fresh practice questions, seeds 777/778): 27 -> 25, -3.1 pts (SE ~3.8; +2/-4). Neither holdout sample\n  contained a closed-but-cut parent trace, so all 6 swaps are resampling (traces diverged early: only 10/64 thinking\n  traces byte-identical, first difference at median 16-19% of the trace). 32 of 33 edited finished answers are exactly\n  '\"The answer is (X)\"' with the parent's letter (one thinking ended in \\boxed{F}; unit did not fire, long answer).\n- Expected effect on random questions is small (closed-but-cut traces: 5 of 160 questions seen); the edit does NOT\n  achieve off-target silence, so selection will mostly measure resampling noise."
+  }
+ ],
+ "winner": null,
+ "rule": "z >= 2.0",
+ "time": 1794093435.1624832
+}
