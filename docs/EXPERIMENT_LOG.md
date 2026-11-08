@@ -588,3 +588,11 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Carry: `stack_shortans_L23_finalist_L22`, the union of generation 7's L23 short answer (ed_a) and L22 two-finalist gate (claude).
 - `ga select --priority 9`: champion and carry queued.
 - Bank cut rate by category (for the briefs): law 9/12, health 9/11, physics 6/13, math 5/7, economics 5/10, psychology 5/9, engineering 4/5. Cut traces contain fewer numbers than finished ones (4.9 vs 6.5 per 1k characters), so long computation is not the main cause of cuts.
+
+### 2026-11-08 — container restart during gen 8
+- The container restarted. Lost: the forward-pass server, the watchdog, the `ed_a` sub-agent and the editors' wait loops. Files and git were intact; the champion's gen-8 selection run (128 rows) had completed.
+- Recovery:
+  - `./start_server.sh` requeued the interrupted job (`claude` p01) without counting it as a crash.
+  - The watchdog was restarted.
+  - The `ed_a` agent was resumed from its saved transcript.
+- Queue after recovery: `claude` p01, `ed_a` p01, then the carry selection run.
