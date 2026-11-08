@@ -1,0 +1,9 @@
+{
+ "editor": "claude",
+ "gen": 9,
+ "gen_name": "gen_009",
+ "parent": "gen008_carry_stack_shortans_L23_finalist_L22",
+ "parent_weights": "/home/user/weight-space-experiments/runs/champions/gen008_carry_stack_shortans_L23_finalist_L22/weights",
+ "budget": 6,
+ "max_candidates": 1
+}

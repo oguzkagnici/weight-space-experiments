@@ -696,3 +696,11 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - This matches the selection estimate (+5.47), so the gain holds up on untouched questions. The +1.0 on the bank was the low draw.
 - Next in the queue: the champion trace bank (running), then GPQA Diamond 198.
 - D57: a holdout bank of 96 untouched practice questions is queued at priority 2, behind the main bank. The champion's GPQA run was moved to priority 6 (transfer reporting only), so generation 9 can start sooner.
+
+### 2026-11-08 — generation 9 created (D58)
+- New champion bank (same 96 ids): 39.6% (SE 5.0); 47/96 cut; 78% correct when finished; visible answer ~19 characters (gen-5 champion: ~985).
+  - Against the gen-5 champion on the bank: +1.0 (+6/−5); cut 10 → finished, 4 finished → cut.
+  - These traces are byte-identical to `claude`'s gen-8 pass-5/6 carry-alone generations, as expected under `det1`.
+- 13 of the 47 cut traces state an answer inside the thinking (7 correct).
+- Brief `editor_task_think_g9.md`; focus in `runs/gen_009/focus.json`; the parent's selection run is queued.
+- The holdout bank (D57) is still generating, at priority 2, ahead of editor passes.
