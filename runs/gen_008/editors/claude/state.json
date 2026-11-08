@@ -1,7 +1,8 @@
 {
  "passes_used": 4,
  "pending": [
-  "gen_008_claude_p05_52d880"
+  "gen_008_claude_p05_52d880",
+  "gen_008_claude_p06_7527ea"
  ],
  "passes": [
   {

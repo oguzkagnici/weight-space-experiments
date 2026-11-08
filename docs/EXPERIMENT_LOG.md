@@ -618,3 +618,11 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - Result: +14.6 pp on 48 (SE 6.7, z 2.19), +9/−2; cuts 27 → 19.
   - DEV32 is in-sample: all 22 fit traces come from it (+18.8). The 16 out-of-sample questions gave +6.2 (+1/−0).
   - Pass 4 runs on REST48, which is fully out of sample.
+
+### 2026-11-08 — gen 8: claude passes 4–6, and a disk guard
+- `claude` pass 4 (stack + unit, REST48, fully out of sample): +10.4 pp (SE 4.5, z 2.34), +5/−0. On all 96 bank questions: +12.5 pp (SE 4.0, z 3.13), +14/−2; cuts 53 → 43.
+- Passes 5–6 isolate the unit's own effect: the carry alone on REST48 (pass 5) and on DEV32 + EXTRA16 (pass 6), paired against stack + unit.
+  - `edited/` held the carry tensors only while each snapshot was taken (6/6 files verified); the unit tensors were restored and verified.
+- Disk: 3.3 GB free, and one cache eviction frees only 1.8 GB, so the next build would likely fail again.
+  - Deleted `claude`'s untracked gen-7 activation arrays (fwd_01, fwd_02) and two snapshots, ≈ 1.3 GB.
+  - Now 4.5 GB free (6.3 GB after eviction).
