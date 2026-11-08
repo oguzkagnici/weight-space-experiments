@@ -1,0 +1,70 @@
+{
+ "gen": 8,
+ "parent": "gen005_carry_gate_wrapup_L20",
+ "champion_selection": {
+  "n": 128,
+  "acc": 41.41,
+  "se": 4.35,
+  "cut_share": 47.7,
+  "acc_if_finished": 79.1,
+  "no_answer_finished": 0,
+  "mean_tokens": 2190.1,
+  "mean_tokens_finished": 1387.2
+ },
+ "candidates": [
+  {
+   "name": "carry/stack_shortans_L23_finalist_L22",
+   "acc": 46.88,
+   "n": 128,
+   "acc_diff": 5.47,
+   "acc_diff_se": 2.3,
+   "wrong_to_right": 8,
+   "right_to_wrong": 1,
+   "cut_share_diff": -7.03,
+   "cut_share_diff_se": 3.2,
+   "tokens_diff": -171.1,
+   "tokens_diff_se": 46.196,
+   "logp_correct_diff": 0.0,
+   "z": 2.38,
+   "weights_changed": 26596,
+   "description": "# stack_shortans_L23_finalist_L22: generation 7's two in-scope mechanisms stacked on the parent\n\nThe two mechanisms touch disjoint tensors (layer 23 and layer 22), so the stack is a plain union of the two edits.\n\n1. **`ed_a_g7_short_answer_dupfold_L23`** (`ed_a`, generation 7).\n   - Slots are freed in a cluster of near-duplicate L23 neurons: `w2[:,1228] += w2[:,3401] - w2[:,3793] - w2[:,6986]`.\n   - Three gated units fill them: `</think>` -> '\"The', '\"The' -> ' answer', and ')\".' -> `<|im_end|>`. The visible answer becomes exactly \"The answer is (X)\", with the letter copied from the thinking.\n   - It targets traces that close the thinking late and are then cut inside the ~250-token re-derivation.\n   - Generation-7 selection: +3.1 pp (SE 2.9, z 1.08, +9/-5).\n2. **The two-finalist commit at L22 n1786** (`claude`, generation 7; built but not submitted).\n   - The gate is the mean-difference direction between paragraph breaks that end a two-finalist statement and other breaks (LOTO AUC 0.864), with a bias-proxy threshold of 7.5 and k 6.\n   - The gate row is projected off the prompt-sink subspace, so prompt tokens do not fire it.\n   - w3 = mu_hat/mp; the w2 column writes commit openers minus deliberation openers, clipped to the Q8 block absmax.\n   - Paired on all 96 bank questions: +1.0 pp (SE 2.8, +4/-3). After a two-finalist paragraph, a commit opener follows in 10/29 cases vs 3/39 for the parent.\n\n**Why carry it:** each mechanism converts a different, rare kind of cut trace. Every edit resamples traces, so neither can pass alone. The stack tests whether their gains add up on a fresh selection set.\n"
+  },
+  {
+   "name": "claude/claude_g8_stack_commit_opener_L23",
+   "acc": 46.09,
+   "n": 128,
+   "acc_diff": 4.69,
+   "acc_diff_se": 3.1,
+   "wrong_to_right": 11,
+   "right_to_wrong": 5,
+   "cut_share_diff": -5.47,
+   "cut_share_diff_se": 3.6,
+   "tokens_diff": -173.1,
+   "tokens_diff_se": 47.126,
+   "logp_correct_diff": 0.0,
+   "z": 1.51,
+   "weights_changed": 36834,
+   "description": "Stack: carried gen-8 stack (gen-7 claude L22 two-finalist gate n1786 + gen-7 ed_a L23 short visible answer on freed\nduplicate slots) PLUS a new L23 commit-opener unit on n881.\n\nTarget behaviour: after a paragraph that narrows the answer to two finalists (\"so the answer is either B or D\"), the\nparent opens the next paragraph with \"Thus\"/\"So\" and then continues deliberating (\" we\", \" let\", \" which option\",\n\" maybe\") until the 3,072-token cap cuts the trace (a cut scores 0). The unit makes that opener a decision\n(\"Thus I'll go with (B)\" / \"Thus answer is (B)\"); the parent's L20 wrap-up unit then closes the thinking.\n\nChange (L23 MLP only, on top of the carry):\n- Freed n881: it is a near-duplicate of n331/n5105 (h_881 = 1.139 h_331 - 0.158 h_5105, residual 1.4%);\n  w2[:,331] += 1.139 w2[:,881], w2[:,5105] += -0.158 w2[:,881].\n- n881 gate (w1 row): direction at the L23 MLP input separating \"Thus\"/\"So\" after a two-finalist paragraph from 103\n  other paragraph-initial openers (LOTO AUC 0.963), bias proxy (mu_hat) with threshold 6.0, prompt-sink subspace\n  projected off and penalised; w3 row = mu_hat/|mu|; w2 column (norm 1.43, clipped to Q8_0 block absmax) writes\n  \" I\"/\" answer\" minus \" we\"/\" let\"/\" which\"/\" option\"/\" what\"/\" list\"/\" maybe\"/\" need\".\n- Built by code/004_build_opener_unit.py 6.0 0.5 4 2 (fold: code/003).\n\nEvidence (edited-only generate passes on the 96 trace-bank questions, same seeds, paired):\n- Teacher-forced (pass 2): at the target openers P(\" I\"/\" answer\") 0.096 -> 0.779, P(\" we\") 0.361 -> 0.029.\n  Elsewhere mean |dlogp| 0.00021 per token (99,534 tokens).\n- Stack+unit vs parent (bank): all 96 +12.5 pp (SE 4.0, z 3.13), +14/-2, cut 53 -> 43.\n  REST48 (no overlap with the fit): +10.4 pp (SE 4.5), +5/-0.\n- Unit's own effect, stack+unit vs carry alone (passes 3-6): all 96 +11.5 pp (SE 3.9, z 2.95), +13/-2, cut 47 -> 43;\n  REST48 (out of sample) +8.3 pp (SE 4.0, z 2.07), +4/-0; EXTRA16 +12.5 (+2/-0); DEV32 (in-sample: all 22 fit traces)\n  +15.6 (+7/-2). 14/96 traces byte-identical to the carry.\n- Carry alone vs parent on the same 96: +1.0 pp (SE 3.5), +6/-5 (its gen-8 selection: +5.47, z 2.38).\n"
+  },
+  {
+   "name": "ed_a/ed_a_g8_sweep_end_hence_L23",
+   "acc": 44.53,
+   "n": 128,
+   "acc_diff": 3.12,
+   "acc_diff_se": 2.5,
+   "wrong_to_right": 7,
+   "right_to_wrong": 3,
+   "cut_share_diff": -6.25,
+   "cut_share_diff_se": 2.9,
+   "tokens_diff": -78.9,
+   "tokens_diff_se": 33.296,
+   "logp_correct_diff": 0.0,
+   "z": 1.25,
+   "weights_changed": 8191,
+   "description": "# ed_a_g8_sweep_end_hence_L23: commit at the end of an option sweep (\"Hence\") instead of deliberating again\n\nTARGETED BEHAVIOUR. On knowledge questions (law, health, psychology, economics) the parent evaluates the options one by one\n(\"Option A: ... Option J: ...\"). Then, instead of concluding, it opens another round (\"We need to determine ...\", \"Given ...\",\n\"Let's examine each option ...\") and runs to the 3,072-token cap. Cut bank traces sweep the options 2.9 times on average;\nfinished traces sweep 1.3 times. At the paragraph break right after a sweep's LAST option (\"sweep end\"), the next paragraph\ncommits (\"Thus/Hence/Therefore ... answer\") 17 of 48 times in finished traces but only 20 of 123 times in cut traces.\n39 of 53 cut bank traces contain a sweep end. Parent next token there: Thus .33, We .26, Given .08, Option .07, Hence .006.\nParagraphs that open with \"Hence\" state an answer 79% of the time (\"Thus\": 21%).\n\nVALUE OF COMMITTING THERE (pass 2, forced \"Hence, the answer is (\" at the sweep end, teacher-forced bank prefixes):\n- cut traces (which score 0): correct at the 1st sweep end 14/39 (36%), at the 2nd 14/30 (47%), at the 3rd 8/23;\n- finished traces: 18/25 at the 1st sweep end, against 19/25 for the trace's own answer (same letter 21/25).\n\nCHANGE (layer 23 MLP only; 3 tensors, about 8.2k weights).\n1. Free a slot: L23 n5105 is a near-duplicate of n331 (cos w1 .9995, w3 .9996, w2 .9995). w2[:,331] += 1.0089*w2[:,5105]\n   (the scale is the w1 x w3 projection ratio).\n2. Repurpose n5105 as a gated unit:\n   - gate (w1 row) = K*(d/s - (m/s + THR)*p), with K=1 and THR=8.\n     d is a shrinkage-LDA direction at the L23 MLP input: sweep-end breaks (168) against all other paragraph breaks (2,789),\n     from pass-1 activations of 80 bank traces. Grouped (by trace) 5-fold CV AUC is 0.968.\n     m and s standardise d over all tokens. p is a minimum-variance bias proxy (p.x = 1.00 +- .04).\n     In sample, z > 8 catches 85% of sweep ends, 77 other breaks (mostly \"just evaluated the candidates\" spots) and 0.10% of\n     all tokens. The prompt and sink tokens reach at most z 3.3.\n   - up (w3 row) = p, so the unit outputs about silu(z - 8).\n   - down (w2 column) = 1.5 * unit(g_post23 * g_final * (E[Hence] - the prob-weighted mean of E[We, Given, Option, Let, But,\n     The, Now, Between, Our, Which, Both, I, -])), clipped to 0.98 x the absmax of the other 31 entries of its Q8_0 block\n     (norm 1.26).\n   An L23 MLP unit only changes the logits at the positions where it fires.\n\nMECHANISM MEASURED (pass 2, read, edited). P(Hence) at the sweep-end break rises with the gate score: z 10-12: .15;\nz 12-14: .62; z 14-16: .94; z >= 16: .99. Off-target: mean |dlogp| is 0.0039 per token, coming from the fold and gate leak.\nIn the generations, 67 of 96 edited bank traces contain an inserted \"\\n\\nHence\" paragraph. 74 of 160 such paragraphs state an\nanswer or a letter; \"Hence we need ...\" (no commit) is the most common non-committing form.\n\nEVIDENCE (thinking mode, cap 3,072, fixed seeds, paired against the parent).\n- All 96 trace-bank questions (edited-only generate, paired against the byte-identical bank; DEV):\n  38.5 -> 44.8, **+6.2 (SE 3.2), +8/-2**; cut 53 -> 50.\n  - Half A: +10.4 (SE 4.5, +5/-0). Half B: +2.1 (SE 4.7, +3/-2).\n- Fresh HOLDOUT (64 practice questions not in the bank, both models generated):\n  46.9 -> 43.8, **-3.1 (SE 3.8), +2/-4**.\n  - Holdout A: 0.0 (+2/-2). Holdout B: -6.2 (+0/-2).\n- Only 4/96 bank and 3/64 holdout traces stay byte-identical; the first difference comes at a median 12-20% of the trace.\n- Attribution:\n  - Swaps where the edited trace contains inserted Hence paragraphs: +8/-2.\n  - Swaps without any: +2/-4. All 4 holdout losses are finished-correct traces resampled to the cap with no Hence inserted.\n- Combined over 160 questions: +2.5 points.\n"
+  }
+ ],
+ "winner": "carry/stack_shortans_L23_finalist_L22",
+ "rule": "z >= 2.0",
+ "time": 1794135694.639193
+}

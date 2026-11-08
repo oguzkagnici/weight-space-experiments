@@ -669,3 +669,12 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - But REST48 had already been looked at in generation 7, and this generation chose its next steps after about 10 looks at bank results (winner's curse).
   - Bank and selection have disagreed before, in the other direction (D46: the gen-5 champion is +5/−5 on its own bank against +9.4 on fresh questions).
   - Treat a bank gain as a screen. Measure on fresh questions before submitting.
+
+### 2026-11-08 — gen 8 decision (D56): the carry stack becomes champion
+- `ga decide` result:
+  - **WINNER: `carry/stack_shortans_L23_finalist_L22`** (+5.47, z 2.38, +8/−1). New champion: `gen008_carry_stack_shortans_L23_finalist_L22`.
+  - `claude`: +4.69, z 1.51.
+  - `ed_a`: +3.12 (SE 2.5, z 1.25), +7/−3. Its traces carry 84 "Hence" paragraphs against the champion's 38, so the edit was active; 11/128 traces are byte-identical.
+- `ga report` wrote `runs/gen_008/REPORT.md`.
+- Queued held-out confirmation at priority 1: MMLU-Pro 128 (thinking), then GPQA Diamond 198 (thinking). Logs: `runs/heldout/think_gen008_{mmlupro,gpqa}.log`.
+- The gen-5 champion, for comparison: held-out 40.62% (+7.03 vs base, z 2.8).

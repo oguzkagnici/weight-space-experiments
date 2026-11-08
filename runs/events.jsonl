@@ -63,3 +63,6 @@
 {"time": "2026-11-07T23:22:02Z", "cmd": "brief", "args": {"editor": "claude"}}
 {"time": "2026-11-07T23:22:05Z", "cmd": "brief", "args": {"editor": "ed_a"}}
 {"time": "2026-11-08T08:24:40Z", "cmd": "select", "args": {"wait": false, "priority": 9}}
+{"time": "2026-11-08T11:01:34Z", "cmd": "decide", "args": {"z": 2.0, "force": null, "keep": false}}
+{"time": "2026-11-08T11:01:56Z", "cmd": "report", "args": {"gen": null}}
+{"time": "2026-11-08T11:02:19Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "mmlupro", "protocol": "think"}}
