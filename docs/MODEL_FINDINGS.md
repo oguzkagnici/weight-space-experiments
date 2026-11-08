@@ -326,3 +326,41 @@ flowchart LR
   - Two-finalist commit: a commit opener after a two-finalist paragraph 10/29 vs the parent's 3/39 (gen 6: 11/37 vs 5/59). Accuracy +1.0 pp (SE 2.8) on 96 paired bank questions.
   - Short visible answer: 32 of 33 finished DEV answers become exactly "The answer is (X)" with the parent's letter. It rescues traces that close the thinking late and are cut inside the answer (4 of 4 on DEV; 1 of 5 in selection).
   - In selection: +3.1 pp, z 1.08.
+
+## Generation 8: commit points in long traces, and a stack that passes
+
+### Where the model fails to commit
+Cut traces (cut at 3,072 tokens, scoring 0) pass through several points where a finished trace would commit. In cut traces the model keeps deliberating instead:
+
+| commit point | what the parent does next | evidence |
+|---|---|---|
+| two finalists stated ("so the answer is B or D") | the next paragraph opens with "Thus"/"So", then " we" (P 0.36), " let", " which", " maybe"; " I"/" answer" only 0.10 | `claude`, L23 MLP input: the state "Thus after two finalists" is separable from other paragraph openers (LOTO AUC 0.963) |
+| end of a full pass through the options (a "sweep end") | "Thus" .33, "We" .26, "Given" .08, "Hence" .006 | `ed_a`, L23 MLP input: AUC 0.968. Cut traces sweep 2.9× on average, finished ones 1.3× |
+| the thinking is closed but the visible answer re-derives everything | the answer gets cut | gen 7 `ed_a`; now part of the champion |
+
+- **A forced commit is often right.** Forced "Hence, the answer is (" at a sweep end is right in 36–47% of cut traces, which score 0 now. In finished traces it costs ~1 in 25.
+- **No counting of sweeps.** A gate for "start of a 2nd sweep" separates it from other breaks (AUC 0.89) but not from 1st-sweep starts (0.64). The L23 residual stream encodes "a sweep begins", not how many have happened.
+- **A connective word alone is not a commit.** Paragraphs that open with "Hence" state an answer 79% of the time in the parent. Of the "Hence" paragraphs the edit inserted, only 46% did ("Hence we need …" continues deliberating). The commit is decided after the connective, by the next one or two tokens.
+
+### The current champion (generation 8): three gated units on top of the base
+
+```mermaid
+flowchart LR
+  subgraph T["thinking"]
+    A["two-finalist paragraph ends"] -->|"L22 n1786 gate<br/>writes Thus/So/Therefore"| B["commit opener"]
+    B --> C["answer stated"]
+    C -->|"L20 wrap-up unit (gen 5)"| D["&lt;/think&gt;"]
+  end
+  D -->|"L23 duplicate slots (gen 7 ed_a):<br/>&lt;/think&gt; → 'The' → 'answer' … → &lt;|im_end|&gt;"| E["short visible answer<br/>The answer is (X)"]
+```
+
+- Selection: +5.47 pp vs the gen-5 champion (z 2.38, +8/−1). Cut share 47.7 → 40.6%.
+- **The gains add up.** Alone, the L22 gate gave +1.0 on the bank and the L23 short answer +3.1 (z 1.08) in gen-7 selection. Stacked, they pass.
+- Held-out confirmation is pending.
+
+### What did not transfer
+- `claude`'s L23 n881 unit turns "Thus" after two finalists into "Thus I'll go with (X)" (P 0.10 → 0.78 teacher-forced). Off-target change: mean |dlogp| 0.0002 per token.
+  - On bank questions not used for the fit: +8.3 pp over the stack.
+  - On the 128 selection questions: −0.8.
+  - Only 23 of 128 selection traces reach a two-finalist statement. Every edit resamples the other traces, so a mechanism that rare cannot be seen at n = 128.
+- **Bank gains are a screen, not a measurement.** Gains on the 96-question bank, even out of sample for the fit, came in ~2.5 SE above selection. The bank questions were looked at many times across generations.
