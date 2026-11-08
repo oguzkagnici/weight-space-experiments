@@ -706,3 +706,10 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The holdout bank (D57) is still generating, at priority 2, ahead of editor passes.
 - Holdout bank (D57) done: 96 rows, `runs/shared/holdout_bank_gen008champ_cap3072_det1.jsonl`. Its aggregate numbers are not recorded here and not shown to editors, so the editors' final measurement on it stays untouched.
 - The champion's GPQA run (priority 6) started before any gen-9 editor pass had been submitted, so editor passes wait ~2.5 h behind it. It was not interrupted, since mid-job restarts caused D52.
+
+### 2026-11-08 17:30 — Gen-8 champion on GPQA Diamond (transfer, thinking mode, 198 questions)
+- Champion `gen008_carry_stack_shortans_L23_finalist_L22`: 19.19% (SE 2.8). Cut share 75.8%; accuracy on finished traces 79%; mean 2,774 tokens.
+- Paired against base: 12.63 → 19.19, **+6.57 pp (SE 2.0, z 3.23), +15/−2**. Cut answers 168 → 150.
+- Paired against the gen-5 champion: 16.67 → 19.19, +2.53 pp (SE 2.3, z 1.09), +13/−8. Cut answers 158 → 150.
+- Reading: the gain over base is now significant on GPQA, which was never used for tuning. The step from gen 5 to gen 8 points the same way as on MMLU-Pro but is not significant at n = 198. GPQA still mostly measures whether a trace concludes (76% are cut), so it scores below the 25% chance level.
+- Log: `runs/heldout/think_gen008_gpqa.log`.

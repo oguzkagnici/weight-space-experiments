@@ -356,7 +356,8 @@ flowchart LR
 
 - Selection: +5.47 pp vs the gen-5 champion (z 2.38, +8/−1). Cut share 47.7 → 40.6%.
 - **The gains add up.** Alone, the L22 gate gave +1.0 on the bank and the L23 short answer +3.1 (z 1.08) in gen-7 selection. Stacked, they pass.
-- Held-out confirmation is pending.
+- **Held out (128 untouched MMLU-Pro questions, thinking):** +11.7 pp vs base (z 3.8, +16/−1); +4.7 vs the gen-5 champion (z 1.34).
+- **Transfer to GPQA Diamond (198, thinking):** 12.6% → 19.2%, +6.6 pp vs base (SE 2.0, z 3.2, +15/−2), cut answers 168 → 150. vs the gen-5 champion: +2.5 (z 1.1). The gain over base now transfers significantly to a benchmark never used for tuning.
 
 ### What did not transfer
 - `claude`'s L23 n881 unit turns "Thus" after two finalists into "Thus I'll go with (X)" (P 0.10 → 0.78 teacher-forced). Off-target change: mean |dlogp| 0.0002 per token.

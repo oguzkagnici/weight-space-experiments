@@ -15,3 +15,27 @@ Disclosure: as the GA operator I created the holdout bank. I saw its aggregate n
 ## Pass 1 (read, parent): L20 MLP inputs at all positions + top-20 + token logprobs
 - Texts: 24 traces with a mid-trace statement (prefix up to the first statement + 600 characters) and 15 full finished traces with a final statement. 69,386 tokens.
 - Goal: profile the L20 n5414 gate at hedged vs firm statements, and find a direction for "single-letter hedged statement just completed".
+
+## Pass 1 result (code/004-006)
+- **Why the L20 wrap-up unit misses these statements.** It fires at the paragraph break after a statement line. Most mid-trace statements in cut traces do not end their line: "Thus likely answer is (E). Let's examine all options", "... is J? But let's", "... is (I) because ...". At the following newline the gate is far below threshold (z −8 to −14). Where a single-letter statement ends its line, the gate fires: unhedged z +11 to +14 (act ~9), hedged z +5 to +7. Yet the parent still reopens (P(But/We/Let) 0.45–0.65).
+- **Correctness of mid-trace statements** (24 bank traces):
+  - Cut, single-letter: 10 statements. Right: 2147 (J), 2731 (I), 8198 (C, firm), 2017 (G, cut at the very end). The other 6 are wrong.
+  - Finished traces with a hedged first statement: the first equals the final answer in all 6.
+  - Two-letter statements ("B or H?"): excluded.
+  - Ceiling of "close at a stated single letter": about +3 of 96 on the bank, at almost no cost.
+- **Where the cut budget goes** (code/005, all 96 bank traces): cut traces have 49 paragraphs vs 28 in finished ones.
+  - Per trace: churn openers 2.6 vs 0.4; "Let's ..." 3.7 vs 1.1; commit paragraphs 1.6 vs 2.9.
+  - After a paragraph that ends uncertain, P(churn) is 0.12 vs 0.04. No single category dominates the extra paragraphs.
+- **Statement-end tokens are separable at the L20 MLP input.** I used the last token of a single-letter answer statement, including trailing ")." / "?" (53 in 39 texts).
+  - Mean-difference direction, leave-one-text-out AUC 0.988.
+  - The highest "negatives" are conclusions my regex missed ("Thus answer should be C.", "Thus I'd pick (E).", "Therefore answer likely (E)."), which are real targets. The prompt's instruction tokens reach at most +5 and post-think tokens +15, against a positive median of +32.
+- **The parent at statement ends:** P(</think>) is 0.98 where it closes (14 statements, all quoted final statements) and 0.000 at the other 39.
+- **Design: Unit A at L23** (no dilution by later layers).
+  - Gate: the statement-end direction at the L23 MLP input, minus a threshold.
+  - Write: </think> against the reopen words.
+  - After </think>, the parent's short-answer units copy the letter.
+  - L23 has no other tight duplicates: only ed_a's {331, 881, 5105}; {5821, 2400} is only cos 0.997. So I repurpose a quiet L23 neuron.
+
+## Pass 2 plan: read, parent, same 39 texts (code/007)
+- Record the L23 MLP input, L23 MLP output and h24, at all positions.
+- Use: build the gate, choose a quiet slot, and estimate the logit change at statement ends and everywhere else (post_ffn_norm + final-norm read-out).
