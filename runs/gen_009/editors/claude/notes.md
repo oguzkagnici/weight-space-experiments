@@ -83,3 +83,17 @@ Disclosure: as the GA operator I created the holdout bank. I saw its aggregate n
 - The edit is unchanged for the final measurement; no variant was tried (no passes left for one).
 
 ## Passes 5-6: holdout bank (96 ids, 48 per pass), Unit A unchanged
+- Pass 6 (first attempt, gen_009_claude_p06_2ec58a) FAILED in the server: llama-quantize ran out of disk while building the GGUF. It was not charged. Freed 1.6 GB (old gens' `edited/` dirs that are byte-identical to a saved candidate) and requeued with the same request (work/req_06.json).
+
+## Pass 5 result: holdout H[:48] (code/012 --holdout 5)
+| set | parent → edited | diff (SE, z) | +/− | cut | tokens |
+|---|---|---|---|---|---|
+| holdout 48 | 29 → 29 | **+0.0 (5.2, 0.00)** | +3/−3 | 16 → 15 | +64 |
+- Gains:
+  - 11722 and 4105: cut → close right after a firm conclusion ("Thus answer should be (I).").
+  - 2721: early divergence at 11%; a fresh trajectory reached F.
+- Losses:
+  - 4235 and 4740: parent right and finished, edited trace newly cut (diverged at 22–27%).
+  - 2134: closed on a wrong conclusion ("Thus I'll go with F.").
+- Only 3 of 48 traces are identical. The unit perturbs nearly every trace early. Each perturbation is a fresh sample: it rescues some cut traces and breaks some finished ones.
+- Reading: the in-bank +8.3 was largely in-sample. On held-out questions the targeted mechanism still works (2 of 2 firm-conclusion rescues), but the gain is about the size of the resampling noise (±3).

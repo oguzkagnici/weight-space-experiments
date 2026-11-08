@@ -43,3 +43,13 @@ Parent openers after eval sweep ends: Thus 27, We 18, Given 6, Let's 3, other 7.
 - Edit v1 (fixed build) = current edit. Silence read-out: |h|>0.005 on 0.056% / 0.058% of recorded tokens.
 
 ## Pass 3 (generate, edited, bank ids[:48]) work/req3.json; Pass 4 = bank ids[48:] (work/req4.json)
+
+## Pass 3 results (generate, edited v1, bank ids[:48], paired vs bank; code/022, 024)
+- 31.2 -> 43.8: +12.5 (SE 4.8), +6/-0; cut 24 -> 22; tokens 2329 -> 2249; 6/48 byte-identical; first diff median 17% of trace.
+- 22 traces got an inserted "Hence answer": correct 6 -> 11 (cut 9 -> 8). Without insertion: 9 -> 10.
+- What follows "Hence answer": often a confident statement ("likely (E).", "is (F).") that then closes the thinking,
+  but often a hedge ("likely either F or J", "might be (H) or (E)") followed by more deliberation; 7 traces stay cut.
+- Considered a 3rd unit forcing " is (" after "Hence answer" (turn hedges into a letter): rejected. Hedged cases that
+  later finish correct (10964, 2654, 7019, 4811, 2731) would be coin flips, and still-cut traces' forced letters are
+  right only ~30-50%: expected net ~0. v1 commits when the model is confident and keeps deliberating when torn.
+- DECISION: v1 is final. Queue pass 4 (bank ids[48:]) and passes 5-6 (holdout bank, 48+48) with v1.

@@ -725,3 +725,9 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - gen-2 ed_b `p1_feats.npz`;
   - my gen-9 pass-1/2 activation arrays.
   - Free space went from 2.4 to 4.1 GB.
+- 20:48 `claude` pass 6 (holdout H[48:], gen_009_claude_p06_2ec58a) FAILED in `llama-quantize`. Cause: disk exhausted during the GGUF build; it was not charged.
+  - Freed 1.6 GB by deleting old gens' editor `edited/` dirs (gen 4–8) that are byte-identical to a saved candidate. Checked with `diff -rq`; dirs without an identical candidate were kept.
+  - Also deleted the pass-5 snapshot. Free space went from 4.4 to 6.0 GB.
+  - Requeued as gen_009_claude_p06_8ed421.
+  - Recurring cause: with MAX_GGUF_CACHE = 3, the cache holds about 3.7 GB after eviction, and builds need about 5.3 GB of scratch on top. Recommendation: lower MAX_GGUF_CACHE to 2 (only 1 q8 file left after eviction) and delete snapshots of finished passes automatically.
+- `claude` holdout pass 5 (H[:48]): Unit A +0.0 pp (SE 5.2; +3/−3; cut 16 → 15). The in-bank +8.3 does not carry over to this half.
