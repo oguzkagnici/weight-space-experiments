@@ -26,3 +26,12 @@
 - fold L23 n5105 into its duplicate n331 (w2[:,331] += 1.0089*w2[:,5105]);
 - n5105: w1 = K(d/s - (m/s+THR) p) (p = min-variance bias proxy, p.x = 1.00 +- .04), w3 = C p, w2 col = 1.5 * unit(g_post*g_final*(E[Hence] - weighted E[We,Given,Option,Let,But,...])), clipped to 0.98 x Q8 block absmax (norm 1.26).
 ## Pass 2 (read, edited v1): 140 forced-commit probes at sweep ends (k=1: 64, k=2: 43, k=3: 31), text = prefix + "Hence, the answer is ("
+
+## Pass 2 results (code/016)
+- Dose (P(Hence) at sweep-end break vs gate z): z<10 ~0.0-0.08; 10-12 .15; 12-14 .62; 14-16 .94; >=16 .99. Overall 69% of probes >0.5.
+- After "Hence": "," .24, " we" .21, " the" .09, " likely" .07 (some "Hence we ..." will not commit).
+- Forced letter after "Hence, the answer is (" at sweep end k: cut traces k=1 14/39 (36%), k=2 14/30 (47%), k=3 8/23 (35%);
+  finished traces k=1 18/25 (trace itself 19/25; same letter 21/25), k=2 10/13 (10/13), k=3 5/8 (5/8).
+  => committing at a sweep end is worth ~0.35-0.47 per cut trace, costs ~0.04 per finished trace.
+- Off-target: mean |dlogp| 0.0039/token, 175 of 188,796 tokens with |d|>0.1 (fold + leak; expect resampling as in gen 6-7).
+## Pass 3 plan: generate, edited v1 (unchanged), bank half A (48 q, split seed 8, code/017); paired vs bank.

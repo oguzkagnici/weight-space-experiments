@@ -596,3 +596,11 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - The watchdog was restarted.
   - The `ed_a` agent was resumed from its saved transcript.
 - Queue after recovery: `claude` p01, `ed_a` p01, then the carry selection run.
+
+### 2026-11-08 — gen 8: disk-full build failures, passes re-submitted
+- `claude` passes 3–4 and `ed_a`'s pass 3 failed in `llama-quantize`; failed passes are not charged. Free disk was 1.3 GB, while a GGUF build needs ~5.3 GB of scratch.
+- Freed 1.9 GB of `claude`'s own files:
+  - the pass-1 L23 activations (the fitted direction is saved);
+  - four 361 MB per-pass weight snapshots of finished or failed passes.
+- Re-submitted `claude` passes 3–4; `ed_a` re-submitted its own pass. The carry selection run is now running.
+- The per-pass snapshots (361 MB each with two edited layers) are the main recurring disk cost. Snapshots of finished passes could be deleted automatically.
