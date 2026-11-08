@@ -1,0 +1,26 @@
+{
+ "label": "ed_a_g8_sweep_end_hence_L23",
+ "editor": "ed_a",
+ "gen": 8,
+ "time": 1794122077.3465538,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.03784458711743355,
+   "sha_bf16": "68a18477f367856c"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 4095,
+   "numel": 15728640,
+   "rel_change": 0.019340448081493378,
+   "sha_bf16": "95c026deb8f850a6"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.012374377809464931,
+   "sha_bf16": "da9f1ba3e620ffa6"
+  }
+ }
+}

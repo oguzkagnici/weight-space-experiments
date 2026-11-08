@@ -50,3 +50,13 @@
   finished-correct -> cut; their inserted Hence paragraphs were mostly "Hence we need ..." (no commit), so the trace kept deliberating.
 - 35/48 traces contain inserted Hence paragraphs (88), 39 state an answer/letter; "Hence we need" 20.
 ## ALL 96 bank questions (passes 3+4, paired vs bank): 38.5 -> 44.8, +6.2 (SE 3.2), +8/-2; cut 53 -> 50; byte-identical 4/96.
+
+## Pass 5 results (generate BOTH, holdout A: 32 fresh, seed 808 first half; code/021)
+- 37.5 -> 37.5, 0.0 (SE 6.4), +2/-2; cut 19 -> 18; identical 2/32; median first diff 15%.
+- Gains 5647, 5657 (cut -> finished correct, 3 and 6 inserted Hence paragraphs); 4857 cut -> finished wrong (3 Hence).
+  Losses 7130, 8839: finished correct -> cut with NO inserted Hence (resampling after early divergence).
+
+## Pass 6 results (generate BOTH, holdout B: 32 fresh)
+- 56.2 -> 50.0, -6.2 (SE 4.3), +0/-2; cut 12 -> 14; losses 10177, 4663 (finished-correct -> cut, no Hence inserted: resampling).
+- Holdout total 64: -3.1 (SE 3.8), +2/-4. Swaps with inserted Hence (bank+holdout): +8/-2; without: +2/-4.
+## SUBMITTED: ed_a_g8_sweep_end_hence_L23 (= edit v1). Report in report.md.

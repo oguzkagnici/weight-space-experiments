@@ -626,3 +626,15 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Disk: 3.3 GB free, and one cache eviction frees only 1.8 GB, so the next build would likely fail again.
   - Deleted `claude`'s untracked gen-7 activation arrays (fwd_01, fwd_02) and two snapshots, ≈ 1.3 GB.
   - Now 4.5 GB free (6.3 GB after eviction).
+
+### 2026-11-08 — gen 8: ed_a hand-back
+- Candidate: `ed_a_g8_sweep_end_hence_L23`. Six passes used; report in `runs/gen_008/editors/ed_a/report.md`.
+- Mechanism: at the paragraph break that ends a full pass through the options (a "sweep end"), a gated unit writes "Hence" instead of "Thus"/"We"/"Given".
+  - The gate is a shrinkage-LDA direction at the L23 MLP input (AUC 0.968), firing at z > 8.
+  - The unit sits on L23 n5105, freed by folding n5105 into its twin n331 (cos 0.9995).
+- Evidence:
+  - All 96 bank questions: +6.2 pp (SE 3.2), +8/−2.
+  - 64 fresh holdout questions: −3.1 pp (SE 3.8), +2/−4.
+  - ed_a expects 0 to +3 pp in selection.
+- Finding: forcing "Hence, the answer is (" at a sweep end is right in 36% of cut traces (they score 0 now) and costs ~1 in 25 finished traces. But only 74 of the 160 inserted "Hence" paragraphs state an answer ("Hence we need …" keeps deliberating).
+- Stacking conflict: ed_a's g8 unit and `claude`'s g8 opener unit both use the L23 duplicate group {331, 5105, 881}. `claude` folds n881 into n331 + n5105; ed_a repurposes n5105. They cannot be combined as is; a stack needs a different free slot for one of them.
