@@ -664,7 +664,8 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Coverage is smaller in the selection set: 23 of 128 carry traces have a two-finalist statement. Of the 13 swaps against the carry:
   - 5 gains show the unit's commit ("Thus I'd go with A", "Thus answer (A)");
   - the losses include traces that were resampled into the cap (1274, 10813, 11756, 3813), plus 2 commits to a wrong option (646, 10979).
-- Lesson: an out-of-sample split of the same 96-question bank is not a holdout for the decision.
-  - The bank questions were picked as cut-heavy, two-finalist-rich traces, so the mechanism's base rate there is higher than on random questions.
-  - This generation picked its editor tests by looking at bank results ~10 times (winner's curse).
-  - Future briefs: size an effect by base rate × conversion on a random sample, not on the bank.
+- Lesson: an out-of-sample split of the same 96-question bank is not a full holdout for the decision.
+  - The bank is a random sample of practice questions (D33). Correction: an earlier version of this entry said the bank was picked as cut-heavy; it was not.
+  - But REST48 had already been looked at in generation 7, and this generation chose its next steps after about 10 looks at bank results (winner's curse).
+  - Bank and selection have disagreed before, in the other direction (D46: the gen-5 champion is +5/−5 on its own bank against +9.4 on fresh questions).
+  - Treat a bank gain as a screen. Measure on fresh questions before submitting.
