@@ -651,3 +651,20 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - The carry alone vs the parent on the bank: +1.0 (3.5), +6/−5. Its +5.47 on the selection set is probably partly luck.
 - Submitted `claude_g8_stack_commit_opener_L23` (carry + L23 n881 commit opener); report in `runs/gen_008/editors/claude/report.md`.
 - `ga select --priority 9` queued both candidates (claude, then ed_a) on the 128 hidden questions.
+
+### 2026-11-08 — gen 8 selection: claude candidate
+- Result on the 128 hidden questions:
+
+| candidate | acc | diff vs champion (41.41) | SE | z | +/− | cut |
+|---|---|---|---|---|---|---|
+| `claude_g8_stack_commit_opener_L23` | 46.09 | +4.69 | 3.1 | 1.51 | +11/−5 | 47.7 → 42.2 % |
+
+- It fails z ≥ 2. Paired against the carry on the same 128 questions it is −0.78 (SE 2.8), +6/−7; 16/128 traces are identical to the carry's.
+- The bank effect (unit vs carry +8.3 on REST48, +11.5 on 96) did not transfer: the two estimates differ by about 2.5 SE.
+- Coverage is smaller in the selection set: 23 of 128 carry traces have a two-finalist statement. Of the 13 swaps against the carry:
+  - 5 gains show the unit's commit ("Thus I'd go with A", "Thus answer (A)");
+  - the losses include traces that were resampled into the cap (1274, 10813, 11756, 3813), plus 2 commits to a wrong option (646, 10979).
+- Lesson: an out-of-sample split of the same 96-question bank is not a holdout for the decision.
+  - The bank questions were picked as cut-heavy, two-finalist-rich traces, so the mechanism's base rate there is higher than on random questions.
+  - This generation picked its editor tests by looking at bank results ~10 times (winner's curse).
+  - Future briefs: size an effect by base rate × conversion on a random sample, not on the bank.
