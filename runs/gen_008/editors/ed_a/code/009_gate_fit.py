@@ -5,7 +5,7 @@ from sklearn.metrics import roc_auc_score
 fwd=sys.argv[1]; layer=sys.argv[2] if len(sys.argv)>2 else '23'
 meta=json.load(open(f'{fwd}/meta.json'))
 fn=[f for f in meta['files'] if f'layers.{layer}.feed_forward.w1' in f][0]
-X=np.load(f'{fwd}/'+meta['files'][fn][0] if isinstance(meta['files'][fn],list) and isinstance(meta['files'][fn][0],str) else f'{fwd}/{fn.replace(":","_")}.npy', mmap_mode='r')
+X=np.load(f"{fwd}/in_model.layers.{layer}.feed_forward.w1.npy", mmap_mode="r")
 R=np.load('work/labels_p1.npy'); assert len(R)==X.shape[0], (len(R), X.shape)
 ti=R[:,0].astype(int); isb=R[:,1]==1; pos=R[:,2]==1; first=R[:,3]==1; near=R[:,4]==1
 rng=np.random.default_rng(0)

@@ -22,3 +22,11 @@
   " we"/" let"/" which"/" option"/" what"/" list"/" maybe"/" need". In-sample: positives median pre-activation +12.9,
   11 of 33,185 other tokens > 0, prompt-sink max -9.9.
 - Pass 2: read, edited (stack + unit), same 54 texts, topk 20 + token logprobs: the exact effect of the unit vs pass 1.
+
+## Pass 2 result (read, stack + unit vs pass 1) -> code/005
+- At positives: P(" I"/" answer") 0.096 -> 0.779, P(" we") 0.361 -> 0.029; " I"/" answer" top-1 in 77% (the rest are
+  positives where the gate stays below threshold, e.g. 1275, 1740-Thus: unchanged).
+- Off-target: mean |dlogp| 0.00021 over 99,534 teacher-forced tokens (gen 6 L21: 0.004), p99 0.0015, 22% exactly 0.
+  Largest changes are near-target firings (end of "Thus answer letter B or D." -> " Let" -1.08 .. -0.38).
+- Passes 3-4: generate edited (stack + unit) on the 96 bank questions (same split as gen 7: DEV32+EXTRA16, REST48),
+  paired against the bank; also compare with gen-7 claude pass 3-4 (L22 gate alone) on the same questions.
