@@ -30,3 +30,13 @@
   Largest changes are near-target firings (end of "Thus answer letter B or D." -> " Let" -1.08 .. -0.38).
 - Passes 3-4: generate edited (stack + unit) on the 96 bank questions (same split as gen 7: DEV32+EXTRA16, REST48),
   paired against the bank; also compare with gen-7 claude pass 3-4 (L22 gate alone) on the same questions.
+
+## Pass 3 result (generate, stack + unit, DEV32 + EXTRA16, paired vs bank) -> code/006
+- ALL 48: parent 18 -> 25 (+14.6 pp, SE 6.7, z 2.19), +9/-2, cut 27 -> 19, byte-identical 0/48.
+  DEV32 +18.8 (+8/-2, cut 21 -> 15); EXTRA16 +6.2 (+1/-0).
+- CAVEAT: all 22 positive traces the opener direction was fitted on are DEV32 questions -> DEV32 is in-sample.
+  EXTRA16 and REST48 have no overlap with the fit.
+- Two-finalist commits in the edited traces: 10 (bank 3); two-finalist paragraphs 21 (bank 39).
+- Reference, same 48, gen-7 claude pass 3 (L22 gate alone): -4.2 pp (+1/-3, cut 27 -> 27).
+  The gen-8 run also contains ed_a's L23 short answer (carry), so this is stack + unit vs parent, not the unit alone.
+- Pass 4 (REST48, out of sample) is the honest test; gen-7 L22 alone gave +6.2 there (+3/-0).

@@ -35,3 +35,10 @@
   => committing at a sweep end is worth ~0.35-0.47 per cut trace, costs ~0.04 per finished trace.
 - Off-target: mean |dlogp| 0.0039/token, 175 of 188,796 tokens with |d|>0.1 (fold + leak; expect resampling as in gen 6-7).
 ## Pass 3 plan: generate, edited v1 (unchanged), bank half A (48 q, split seed 8, code/017); paired vs bank.
+## Pass 4 plan: generate, edited v1 (unchanged), bank half B (48 q). Queued before pass 3 finished (same edit).
+
+## Pass 3 results (generate edited v1, bank half A, 48 q; code/018, 020)
+- 43.8 -> 54.2, +10.4 (SE 4.5), +5/-0 (paired vs bank); cut 24 -> 20; tokens 2241 -> 2246; byte-identical 3/48; median first diff 10% of trace.
+- Gains: 1171 law (divergence at an inserted Hence), 7373 econ (4 extra Hence), 8198 math (1 extra), 4811 hist, 4192 chem (no Hence: resampling).
+  Other swaps: 1375, 7187 finished-wrong -> cut-wrong; 6829, 2687 cut-wrong -> finished-wrong (no accuracy change).
+- 32/48 edited traces contain inserted "\n\nHence" paragraphs (72 total); 35/72 state an answer/letter; 16 are "Hence we need ..." (no commit).

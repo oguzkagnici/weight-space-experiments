@@ -604,3 +604,17 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - four 361 MB per-pass weight snapshots of finished or failed passes.
 - Re-submitted `claude` passes 3–4; `ed_a` re-submitted its own pass. The carry selection run is now running.
 - The per-pass snapshots (361 MB each with two edited layers) are the main recurring disk cost. Snapshots of finished passes could be deleted automatically.
+
+### 2026-11-08 — gen 8: carry selection, and claude pass 3
+- Selection, 128 hidden questions. The champion scores 41.41 on this generation's hidden set.
+
+| candidate | acc | diff vs champion | SE | z | +/− | cut |
+|---|---|---|---|---|---|---|
+| carry `stack_shortans_L23_finalist_L22` | 46.88 | +5.47 | 2.3 | 2.38 | +8/−1 | 47.7 → 40.6 % |
+
+- Validity (D52): 1/128 traces byte-identical, so the edit is active. Mean tokens 2,190 → 2,019.
+- The carry passes z ≥ 2. Taken separately, neither part passed in gen 7: the L23 short answer had z 1.08; the L22 two-finalist gate was never submitted. So stacking two weak mechanisms crossed the threshold.
+- `claude` pass 3: carry plus the new L23 n881 commit-opener unit, generated on DEV32 + EXTRA16 and paired against the bank.
+  - Result: +14.6 pp on 48 (SE 6.7, z 2.19), +9/−2; cuts 27 → 19.
+  - DEV32 is in-sample: all 22 fit traces come from it (+18.8). The 16 out-of-sample questions gave +6.2 (+1/−0).
+  - Pass 4 runs on REST48, which is fully out of sample.
