@@ -72,3 +72,14 @@ Disclosure: as the GA operator I created the holdout bank. I saw its aggregate n
 - Traces diverge early (median at 16% of the trace; 1 of 48 identical). Removing n5217's small old output resamples every trace, so the target gains are partly fresh trajectories that also conclude.
 - One loss (5822: the trace diverged at 6% and concluded B instead of J).
 - 4 newly cut traces were all wrong before and after.
+
+## Pass 4 result: B2 (the other 48 bank ids); full bank (passes 3+4)
+| set | parent → edited | diff (SE, z) | +/− | cut |
+|---|---|---|---|---|
+| B2 (no targets) | 20 → 22 of 48 | +4.2 (2.9, 1.43) | +2/−0 | 24 → 22 |
+| non-target 88 | 38 → 42 | +4.5 (2.8, 1.65) | +5/−1 | 39 → 38 |
+| **all 96 bank** | 38 → 46 | **+8.3 (3.2, 2.60)** | **+9/−1** | 47 → 41 |
+- Caveat: the gate direction was fit on 39 texts taken from bank traces. The bank is therefore not out of sample for the direction, though it is for the generated outcome. The holdout bank is the measurement.
+- The edit is unchanged for the final measurement; no variant was tried (no passes left for one).
+
+## Passes 5-6: holdout bank (96 ids, 48 per pass), Unit A unchanged
