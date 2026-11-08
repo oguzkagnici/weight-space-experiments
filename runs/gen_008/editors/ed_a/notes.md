@@ -43,3 +43,10 @@
   Other swaps: 1375, 7187 finished-wrong -> cut-wrong; 6829, 2687 cut-wrong -> finished-wrong (no accuracy change).
 - 32/48 edited traces contain inserted "\n\nHence" paragraphs (72 total); 35/72 state an answer/letter; 16 are "Hence we need ..." (no commit).
 ## Passes 5, 6 plan: generate BOTH (parent vs edited v1, unchanged) on 2 x 32 fresh practice questions (not in bank; code/019 seed 808). Queued while pass 4 waits.
+
+## Pass 4 results (generate edited v1, bank half B, 48 q)
+- 33.3 -> 35.4, +2.1 (SE 4.7), +3/-2; cut 29 -> 30; byte-identical 1/48; median first diff 13%.
+- Gains 8262 math, 1740 law, 6804 health (cut -> finished correct). Losses 10393 cs (4 extra Hence), 2147 psych (7 extra Hence):
+  finished-correct -> cut; their inserted Hence paragraphs were mostly "Hence we need ..." (no commit), so the trace kept deliberating.
+- 35/48 traces contain inserted Hence paragraphs (88), 39 state an answer/letter; "Hence we need" 20.
+## ALL 96 bank questions (passes 3+4, paired vs bank): 38.5 -> 44.8, +6.2 (SE 3.2), +8/-2; cut 53 -> 50; byte-identical 4/96.
