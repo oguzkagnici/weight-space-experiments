@@ -695,3 +695,4 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Against the gen-5 champion: +4.69 pp (SE 3.5, z 1.34), +13/−7; cut share −6.3 pp; −198 tokens.
 - This matches the selection estimate (+5.47), so the gain holds up on untouched questions. The +1.0 on the bank was the low draw.
 - Next in the queue: the champion trace bank (running), then GPQA Diamond 198.
+- D57: a holdout bank of 96 untouched practice questions is queued at priority 2, behind the main bank. The champion's GPQA run was moved to priority 6 (transfer reporting only), so generation 9 can start sooner.
