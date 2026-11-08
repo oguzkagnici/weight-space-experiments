@@ -2,8 +2,8 @@
 import json, numpy as np, glob, torch
 from wsp.editor import *
 rows=json.load(open('work/p1_rows.json')); D=json.load(open('work/pass1_plan.json'))
-f=[p for p in glob.glob('work/fwd_1/*.npy') if 'w1' in p][0]; X=np.load(f,mmap_mode='r')
-M=json.load(open('work/fwd_1/meta.json')); off=np.concatenate([[0],np.cumsum(M['n_tokens'])])
+f=[p for p in glob.glob('work/fwd_01/*.npy') if 'w1' in p][0]; X=np.load(f,mmap_mode='r')
+M=json.load(open('work/fwd_01/meta.json')); off=np.concatenate([[0],np.cumsum(M['n_tokens'])])
 TH=tok.encode('</think>',add_special_tokens=False); print('</think> ids',TH)
 pos=[]
 for ti,t in enumerate(D['texts']):

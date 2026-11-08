@@ -39,3 +39,25 @@ Disclosure: as the GA operator I created the holdout bank. I saw its aggregate n
 ## Pass 2 plan: read, parent, same 39 texts (code/007)
 - Record the L23 MLP input, L23 MLP output and h24, at all positions.
 - Use: build the gate, choose a quiet slot, and estimate the logit change at statement ends and everywhere else (post_ffn_norm + final-norm read-out).
+
+## Pass 2 result and Unit A (code/008-010)
+- **L23 MLP input, single-letter statement ends vs all other tokens:** LOTO AUC 0.982, positive median 12.5, negative 99.9th percentile 7.4.
+- **Hedged statements score low.** "Thus likely answer is (E).", "J?" and mid-sentence "(I) because" fall below any clean threshold. The direction reads FIRM conclusions, in any wording: "Thus answer should be C.", "Thus I'd pick (E).", "Thus correct answer J.", "Therefore answer likely (E).".
+- **Coverage on the bank (code/010).**
+  - 8 of 47 cut traces contain a firm conclusion; the first one is right in 5 (8198, 2017, 2147, 10393, 7373).
+  - In finished traces the first firm conclusion equals the final answer in 38 of 39; net −1 if closed there.
+  - Ceiling: about +4 of 96.
+- **Slot.** L23 has no free tight duplicate besides ed_a's group. n5217 is quiet: mean |out| 0.028, max 0.25 over 8,000 tokens; median neuron 0.053.
+- **UNIT A (current edit, staged in edited/): L23 n5217 repurposed.**
+  - Gate (w1 row) = 2·(d − 8·muh/m). d is the unit mean-difference direction (statement ends minus all other tokens) at the L23 MLP input; muh/m is the mean think-token input, scaled so that c = x·muh/m ≈ 1.
+  - Up (w3 row) = muh/m.
+  - Write (w2 column) = residual direction raising </think> against the observed continuations (But/Let/We/Hence/Therefore/...). It is taken through the final-norm gain, inverted through the post_ffn_norm gain (regularised), at |col| 1.0, clipped per Q8 block to 0.98× the neighbours' absmax (0.94 kept).
+  - Pre-screen (linear read-out of pass-2 recordings):
+    - Fires (act > 0.5) on 72% of statement ends. At those, P(</think>) goes 0.000 → 0.999 (median); overall P > 0.5 goes 0.38 → 0.64.
+    - Off-target: 72 of 69k tokens change by more than 0.5 logit, all conclusion-like. Nothing changes on prompt tokens (max act 0.05), two-letter statements or post-think tokens.
+  - Threshold 6.5 doubles off-target firing for no gain in coverage, so 8 is kept.
+- Disk: L20 inputs of pass 1 deleted.
+
+## Passes 3-4 plan: generate, edited only, full bank (paired against the bank = parent)
+- Pass 3: B1 = the 8 target cut traces + 40 random bank ids. Pass 4: B2 = the other 48.
+- Then passes 5–6: holdout bank (96 ids, 48 per pass) for the final measurement.

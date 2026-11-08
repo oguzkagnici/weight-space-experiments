@@ -3,7 +3,7 @@ import json, numpy as np
 from wsp.editor import *
 D=json.load(open('work/pass1_plan.json')); S=json.load(open('work/sweeps.json'))
 B={json.loads(l)['id']:json.loads(l) for l in open('/home/user/weight-space-experiments/runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl')}
-M=json.load(open('work/fwd_1/meta.json'))
+M=json.load(open('work/fwd_01/meta.json'))
 nt=M['n_tokens']; off=np.concatenate([[0],np.cumsum(nt)])
 FORCE="Hence answer is ("
 rows=[]  # (global_row, text_idx, qid, kind, extra)

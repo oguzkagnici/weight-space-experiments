@@ -2,7 +2,7 @@
 import json, numpy as np, collections
 from wsp.editor import *
 rows=json.load(open('work/p1_rows.json')); D=json.load(open('work/pass1_plan.json'))
-TI=np.load('work/fwd_1/topk_ids.npy',mmap_mode='r'); TL=np.load('work/fwd_1/topk_logprobs.npy',mmap_mode='r')
+TI=np.load('work/fwd_01/topk_ids.npy',mmap_mode='r'); TL=np.load('work/fwd_01/topk_logprobs.npy',mmap_mode='r')
 W=lambda s: tok.encode(s,add_special_tokens=False)
 names=['Hence','Thus','We','Given','Option','Let','But','So','Therefore','The','Now','Between','Which','Alternatively','However','Since','Based','In','Looking','Answer','Final','I']
 ids={n:W(n)[0] for n in names}

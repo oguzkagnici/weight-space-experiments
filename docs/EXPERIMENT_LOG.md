@@ -713,3 +713,15 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Paired against the gen-5 champion: 16.67 → 19.19, +2.53 pp (SE 2.3, z 1.09), +13/−8. Cut answers 158 → 150.
 - Reading: the gain over base is now significant on GPQA, which was never used for tuning. The step from gen 5 to gen 8 points the same way as on MMLU-Pro but is not significant at n = 198. GPQA still mostly measures whether a trace concludes (76% are cut), so it scores below the 25% chance level.
 - Log: `runs/heldout/think_gen008_gpqa.log`.
+
+### 2026-11-08 18:05 — Server OOM-killed by an editor analysis (claude, gen 9)
+- My pass-2 analysis (`code/008`) loaded three 69k×2048 float32 arrays plus the 128k-token embedding (~4 GB) while the server ran ed_a's read pass (~10 GB). The 15 GB memory cgroup killed the server (pid 213).
+- The watchdog restarted it (pid 3780) and requeued ed_a's job (`gen_009_ed_a_p02`). No pass was charged twice and none was lost.
+- Fix: editor analyses use memory-mapped arrays, chunked products and a bf16 embedding (~1 GB peak). This is noted for future briefs as a pitfall: "keep analyses under ~3 GB; the server needs ~10 GB during read passes".
+- 18:20 Disk cleanup so the next GGUF builds fit (they need ~5.3 GB of scratch; eviction frees 1.8 GB). Deleted git-ignored scratch only:
+  - gen-8 editors' per-pass weight snapshots (ed_a fwd_02–06);
+  - the gen-7 ed_a fwd_04 snapshot;
+  - my gen-8 `work/unit_edited` (identical to the submitted candidate in `candidates/`);
+  - gen-2 ed_b `p1_feats.npz`;
+  - my gen-9 pass-1/2 activation arrays.
+  - Free space went from 2.4 to 4.1 GB.

@@ -2,7 +2,7 @@
 import json, numpy as np, glob
 from sklearn.metrics import roc_auc_score
 rows=json.load(open('work/p1_rows.json'))
-f=[p for p in glob.glob('work/fwd_1/*.npy') if 'w1' in p][0]
+f=[p for p in glob.glob('work/fwd_01/*.npy') if 'w1' in p][0]
 X=np.load(f,mmap_mode='r'); print(f,X.shape)
 rng=np.random.default_rng(0)
 lab=np.array([r[3] for r in rows]); gid=np.array([r[0] for r in rows]); qid=np.array([r[2] for r in rows])
