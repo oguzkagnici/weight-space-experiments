@@ -97,3 +97,18 @@ Disclosure: as the GA operator I created the holdout bank. I saw its aggregate n
   - 2134: closed on a wrong conclusion ("Thus I'll go with F.").
 - Only 3 of 48 traces are identical. The unit perturbs nearly every trace early. Each perturbation is a fresh sample: it rescues some cut traces and breaks some finished ones.
 - Reading: the in-bank +8.3 was largely in-sample. On held-out questions the targeted mechanism still works (2 of 2 firm-conclusion rescues), but the gain is about the size of the resampling noise (±3).
+
+## Pass 6 result: holdout H[48:]; full holdout (code/012 --holdout 5 6)
+| set | parent → edited | diff (SE, z) | +/− | cut |
+|---|---|---|---|---|
+| H[48:] | 17 → 19 of 48 | +4.2 (5.9, 0.70) | +5/−3 | 26 → 23 |
+| **holdout 96** | 46 → 48 | **+2.1 (3.9, 0.53)** | **+8/−6** | 42 → 38 |
+- Rescues: 11 of the 42 cut holdout traces now close right after a conclusion ("Thus final answer: The answer is (D)."). 7 of the 11 are right, consistent with the 38/39 "first firm conclusion = final answer" rate in finished traces (cut traces are harder).
+  - 7 of the 8 gains are such rescues.
+  - Rescued traces diverge early (2–6% into the trace) but close at a conclusion.
+- Losses:
+  - 5 of 6 are finished-and-right parent traces that the edit resampled into new cuts (first divergence at 15–40%). These are not closes at a wrong place.
+  - 1 (2134) closed on a wrong conclusion.
+- Verdict: the mechanism does what it targets (cut → closed: 11 of 42, 64% right), but the resampling of other traces costs about as much. The net gain is +2.1 ± 3.9.
+
+## Submitted: claude_g9_firm_conclusion_close_L23 (code/014): Unit A unchanged (edited/ == fwd_06 snapshot, checked with diff -rq)

@@ -62,3 +62,9 @@ activation file, old snapshots) and resubmitted as gen_009_ed_a_p06_8b21ea (does
 - 17 traces with inserted "Hence answer": 10 -> 8 (+1/-3). Without insertion: 19 -> 17 (+1/-3, pure resampling: 4206, 4235, 10276 now cut).
 - The losses with insertion (11253, 2134, 4740) are hedged statements ("likely (A) or (C)", "likely F. But let's examine nuance")
   followed by more deliberation that ends wrong or cut: the insertion re-samples the rest of the trace rather than committing.
+
+## Pass 6a results (generate, edited v1, HOLDOUT ids[48:])
+- 35.4 -> 39.6: +4.2 (SE 5.1), +4/-2; cut 26 -> 23; 6/48 identical; first diff median 14%.
+- 18 traces with insertion: 5 -> 6, cut 11 -> 9. Without: 12 -> 13.
+## HOLDOUT 96 (final measurement of v1): 47.9 -> 45.8, -2.1 (SE 3.9), +6/-8; cut 42 -> 42; tokens 2087 -> 2055;
+   12/96 byte-identical; traces with insertion (35): 15 -> 14; without (61): 31 -> 30.

@@ -1,0 +1,26 @@
+{
+ "label": "claude_g9_firm_conclusion_close_L23",
+ "editor": "claude",
+ "gen": 9,
+ "time": 1794176869.19149,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2047,
+   "numel": 15728640,
+   "rel_change": 0.028870461508631706,
+   "sha_bf16": "e2f3bf5799534679"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 2047,
+   "numel": 15728640,
+   "rel_change": 0.014503121376037598,
+   "sha_bf16": "7fda94483d285ec9"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.011158379726111889,
+   "sha_bf16": "0c4228ebba9cbe7a"
+  }
+ }
+}

@@ -731,3 +731,7 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - Requeued as gen_009_claude_p06_8ed421.
   - Recurring cause: with MAX_GGUF_CACHE = 3, the cache holds about 3.7 GB after eviction, and builds need about 5.3 GB of scratch on top. Recommendation: lower MAX_GGUF_CACHE to 2 (only 1 q8 file left after eviction) and delete snapshots of finished passes automatically.
 - `claude` holdout pass 5 (H[:48]): Unit A +0.0 pp (SE 5.2; +3/−3; cut 16 → 15). The in-bank +8.3 does not carry over to this half.
+- `claude` holdout pass 6 (H[48:]) +4.2 (SE 5.9). Full holdout 96: Unit A **+2.1 pp (SE 3.9, z 0.53, +8/−6)**, cut 42 → 38.
+  - Mechanism: 11 of 42 cut traces close right after a conclusion; 7 of those 11 are right.
+  - Losses: 5 of 6 are finished traces resampled into new cuts.
+  - Submitted as `claude_g9_firm_conclusion_close_L23` (code/014); report in runs/gen_009/editors/claude/report.md.
