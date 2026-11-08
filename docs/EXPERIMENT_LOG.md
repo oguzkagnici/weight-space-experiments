@@ -735,3 +735,13 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - Mechanism: 11 of 42 cut traces close right after a conclusion; 7 of those 11 are right.
   - Losses: 5 of 6 are finished traces resampled into new cuts.
   - Submitted as `claude_g9_firm_conclusion_close_L23` (code/014); report in runs/gen_009/editors/claude/report.md.
+
+### 2026-11-08 — gen 9 candidates and selection
+- `ed_a` (background agent) submitted `ed_a_g9_sweep_end_hence_answer_L23`, using all 6 passes (2 read, 4 generate).
+  - Edit: L23 n5105/n881 freed by folding into duplicate n331. Unit A writes "Hence" at sweep-end breaks; Unit B writes " answer" after Hence/Thus at a sweep end. 14,330 weights.
+  - Holdout bank 96: **−2.1 pp (SE 3.9, +6/−8)**. Main bank: +4.2 (SE 3.6). Report: runs/gen_009/editors/ed_a/report.md.
+  - Reasons it reports: after "Hence answer" the model hedges ("likely either F or J"); when it does commit, the parent would mostly have reached the same letter anyway.
+  - Pitfall: its resubmitted failed pass got the same pass number as a queued one, and that pass's output overwrote its `work/fwd_06` jsonl. The per-question rows of its holdout half B are lost; the summary was recorded first.
+- `claude` submitted `claude_g9_firm_conclusion_close_L23`: holdout **+2.1 (SE 3.9)**.
+- Neither candidate is significant on the holdout bank. Both still go to selection, per protocol.
+- `ga select --priority 9` queued: champion (cached, D35), then claude, then ed_a, on the 128 hidden questions (seed `selection-gen-9`).

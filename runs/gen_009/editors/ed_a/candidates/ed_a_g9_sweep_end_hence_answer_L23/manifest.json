@@ -1,0 +1,26 @@
+{
+ "label": "ed_a_g9_sweep_end_hence_answer_L23",
+ "editor": "ed_a",
+ "gen": 9,
+ "time": 1794178592.622233,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 4096,
+   "numel": 15728640,
+   "rel_change": 0.25542792677879333,
+   "sha_bf16": "e3671fc043756928"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 6142,
+   "numel": 15728640,
+   "rel_change": 0.026332898065447807,
+   "sha_bf16": "64150e8266e34fe3"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 4092,
+   "numel": 15728640,
+   "rel_change": 0.07016950100660324,
+   "sha_bf16": "ddf2aa0a11b1fc0e"
+  }
+ }
+}

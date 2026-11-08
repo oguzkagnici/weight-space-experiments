@@ -68,3 +68,11 @@ activation file, old snapshots) and resubmitted as gen_009_ed_a_p06_8b21ea (does
 - 18 traces with insertion: 5 -> 6, cut 11 -> 9. Without: 12 -> 13.
 ## HOLDOUT 96 (final measurement of v1): 47.9 -> 45.8, -2.1 (SE 3.9), +6/-8; cut 42 -> 42; tokens 2087 -> 2055;
    12/96 byte-identical; traces with insertion (35): 15 -> 14; without (61): 31 -> 30.
+
+## Pass 6b results (generate, edited v1, bank ids[48:]); NOTE: written to work/fwd_06 and overwrote the holdout-B
+jsonl (both passes were numbered 6 after the failed pass 4); the holdout-B numbers above were computed before that.
+- 47.9 -> 43.8: -4.2 (SE 5.1), +2/-4; insertion traces (27) 11 -> 9; without (21) 12 -> 12.
+- BANK 96: 39.6 -> 43.8, +4.2 (SE 3.6), +8/-4; cut 47 -> 44; insertion traces (49) 17 -> 20; without (47) 21 -> 22.
+- Bank + holdout (192): +1.0 pp (+14/-12). The mechanism fires as designed but its net effect is ~0.
+
+## Submitted: ed_a_g9_sweep_end_hence_answer_L23 (v1). Report in report.md.
