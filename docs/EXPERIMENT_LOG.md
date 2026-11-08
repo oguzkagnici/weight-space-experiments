@@ -704,3 +704,5 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - 13 of the 47 cut traces state an answer inside the thinking (7 correct).
 - Brief `editor_task_think_g9.md`; focus in `runs/gen_009/focus.json`; the parent's selection run is queued.
 - The holdout bank (D57) is still generating, at priority 2, ahead of editor passes.
+- Holdout bank (D57) done: 96 rows, `runs/shared/holdout_bank_gen008champ_cap3072_det1.jsonl`. Its aggregate numbers are not recorded here and not shown to editors, so the editors' final measurement on it stays untouched.
+- The champion's GPQA run (priority 6) started before any gen-9 editor pass had been submitted, so editor passes wait ~2.5 h behind it. It was not interrupted, since mid-job restarts caused D52.
