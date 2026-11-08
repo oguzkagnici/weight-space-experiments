@@ -638,3 +638,16 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
   - ed_a expects 0 to +3 pp in selection.
 - Finding: forcing "Hence, the answer is (" at a sweep end is right in 36% of cut traces (they score 0 now) and costs ~1 in 25 finished traces. But only 74 of the 160 inserted "Hence" paragraphs state an answer ("Hence we need …" keeps deliberating).
 - Stacking conflict: ed_a's g8 unit and `claude`'s g8 opener unit both use the L23 duplicate group {331, 5105, 881}. `claude` folds n881 into n331 + n5105; ed_a repurposes n5105. They cannot be combined as is; a stack needs a different free slot for one of them.
+
+### 2026-11-08 — gen 8: claude candidate submitted, selection queued
+- Unit-vs-carry control (passes 5–6, carry alone, generate). Stack + unit vs carry:
+
+| questions | diff (SE) | z | +/− |
+|---|---|---|---|
+| all 96 | +11.5 (3.9) | 2.95 | +13/−2 |
+| REST48 (out of sample) | +8.3 (4.0) | 2.07 | +4/−0 |
+
+  - 14/96 traces were byte-identical to the carry's.
+  - The carry alone vs the parent on the bank: +1.0 (3.5), +6/−5. Its +5.47 on the selection set is probably partly luck.
+- Submitted `claude_g8_stack_commit_opener_L23` (carry + L23 n881 commit opener); report in `runs/gen_008/editors/claude/report.md`.
+- `ga select --priority 9` queued both candidates (claude, then ed_a) on the 128 hidden questions.

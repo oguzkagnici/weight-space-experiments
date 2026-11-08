@@ -1,0 +1,44 @@
+{
+ "label": "claude_g8_stack_commit_opener_L23",
+ "editor": "claude",
+ "gen": 8,
+ "time": 1794126250.358111,
+ "tensors": {
+  "model.layers.22.feed_forward.w1.weight": {
+   "changed_bf16": 2046,
+   "numel": 15728640,
+   "rel_change": 0.10305610299110413,
+   "sha_bf16": "cc764327e95ddbc1"
+  },
+  "model.layers.22.feed_forward.w2.weight": {
+   "changed_bf16": 2047,
+   "numel": 15728640,
+   "rel_change": 0.018890369683504105,
+   "sha_bf16": "32675f2e7589ae86"
+  },
+  "model.layers.22.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.019423607736825943,
+   "sha_bf16": "2e363167f7d11901"
+  },
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 8189,
+   "numel": 15728640,
+   "rel_change": 0.7071175575256348,
+   "sha_bf16": "9b4691cc8c82a361"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 14324,
+   "numel": 15728640,
+   "rel_change": 0.038602519780397415,
+   "sha_bf16": "eb4462537e33aafe"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 8180,
+   "numel": 15728640,
+   "rel_change": 0.03584122657775879,
+   "sha_bf16": "90a7da7e6f26058f"
+  }
+ }
+}

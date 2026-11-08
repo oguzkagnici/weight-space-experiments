@@ -51,3 +51,9 @@
 ## Pass 5 (submitted): carry alone, generate, REST48
 - edited/ was temporarily replaced by the carry tensors for the submit (snapshot verified = carry, 6/6 files), then the unit
   tensors were restored (verified 6/6; backup in work/unit_edited/). Paired carry vs stack+unit on REST48 = the unit's own effect.
+
+## Passes 5-6 result (carry alone, generate) -> code/007
+- stack+unit vs carry: ALL 96 +11.5 (SE 3.9, z 2.95) +13/-2; REST48 +8.3 (SE 4.0, z 2.07) +4/-0; EXTRA16 +12.5;
+  DEV32 +15.6 (in-sample). 14/96 identical to carry.
+- carry vs parent on the bank: +1.0 (SE 3.5), +6/-5, cut 53 -> 47.
+- Submitted `claude_g8_stack_commit_opener_L23` (code/008). Report in report.md.
