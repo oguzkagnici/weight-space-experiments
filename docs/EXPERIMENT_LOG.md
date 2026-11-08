@@ -678,3 +678,6 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - `ga report` wrote `runs/gen_008/REPORT.md`.
 - Queued held-out confirmation at priority 1: MMLU-Pro 128 (thinking), then GPQA Diamond 198 (thinking). Logs: `runs/heldout/think_gen008_{mmlupro,gpqa}.log`.
 - The gen-5 champion, for comparison: held-out 40.62% (+7.03 vs base, z 2.8).
+- The new champion's trace bank (same 96 practice ids, `det1`) is queued at priority 2 → `runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl`, for generation 9.
+- The champion's weights touch L20 (gen 5), L22 and L23 (gen 8).
+- MODEL_FINDINGS has a generation-8 section: commit points in long traces, and the champion's three-unit pipeline (diagram).
