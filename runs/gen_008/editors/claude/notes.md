@@ -40,3 +40,14 @@
 - Reference, same 48, gen-7 claude pass 3 (L22 gate alone): -4.2 pp (+1/-3, cut 27 -> 27).
   The gen-8 run also contains ed_a's L23 short answer (carry), so this is stack + unit vs parent, not the unit alone.
 - Pass 4 (REST48, out of sample) is the honest test; gen-7 L22 alone gave +6.2 there (+3/-0).
+
+## Pass 4 result (generate, stack + unit, REST48 — fully out of sample)
+- REST48: parent 19 -> 24 (+10.4 pp, SE 4.5, z 2.34), +5/-0, cut 26 -> 24. Gen-7 L22 alone on the same 48: +6.2 (+3/-0).
+- All 96 (passes 3+4): 37 -> 49 (+12.5 pp, SE 4.0, z 3.13), +14/-2, cut 53 -> 43.
+- Gains in REST48 (2017, 4192, 6014, 7261, 5822): each edited trace has an early "Thus answer (likely) X" / "Thus I think
+  answer is X" that the bank trace lacks, then finishes. 3 of 5 were cut in the bank.
+- Not yet attributable: the run contains carry (L22 gate + ed_a L23 short answer) + my unit.
+
+## Pass 5 (submitted): carry alone, generate, REST48
+- edited/ was temporarily replaced by the carry tensors for the submit (snapshot verified = carry, 6/6 files), then the unit
+  tensors were restored (verified 6/6; backup in work/unit_edited/). Paired carry vs stack+unit on REST48 = the unit's own effect.

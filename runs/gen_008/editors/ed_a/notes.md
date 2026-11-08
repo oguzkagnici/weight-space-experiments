@@ -42,3 +42,4 @@
 - Gains: 1171 law (divergence at an inserted Hence), 7373 econ (4 extra Hence), 8198 math (1 extra), 4811 hist, 4192 chem (no Hence: resampling).
   Other swaps: 1375, 7187 finished-wrong -> cut-wrong; 6829, 2687 cut-wrong -> finished-wrong (no accuracy change).
 - 32/48 edited traces contain inserted "\n\nHence" paragraphs (72 total); 35/72 state an answer/letter; 16 are "Hence we need ..." (no commit).
+## Passes 5, 6 plan: generate BOTH (parent vs edited v1, unchanged) on 2 x 32 fresh practice questions (not in bank; code/019 seed 808). Queued while pass 4 waits.
