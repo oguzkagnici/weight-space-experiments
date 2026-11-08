@@ -53,3 +53,12 @@ Parent openers after eval sweep ends: Thus 27, We 18, Given 6, Let's 3, other 7.
   later finish correct (10964, 2654, 7019, 4811, 2731) would be coin flips, and still-cut traces' forced letters are
   right only ~30-50%: expected net ~0. v1 commits when the model is confident and keeps deliberating when torn.
 - DECISION: v1 is final. Queue pass 4 (bank ids[48:]) and passes 5-6 (holdout bank, 48+48) with v1.
+
+## Pass 4 (bank ids[48:]) FAILED in llama-quantize (disk full: 1.4 GB free). Freed 1.3 GB in my work/ (pass-1
+activation file, old snapshots) and resubmitted as gen_009_ed_a_p06_8b21ea (does not count twice).
+
+## Pass 5 results (generate, edited v1, HOLDOUT ids[:48], paired vs holdout bank)
+- 60.4 -> 52.1: -8.3 (SE 5.8), +2/-6; cut 16 -> 19; 6/48 byte-identical; first diff median 18%.
+- 17 traces with inserted "Hence answer": 10 -> 8 (+1/-3). Without insertion: 19 -> 17 (+1/-3, pure resampling: 4206, 4235, 10276 now cut).
+- The losses with insertion (11253, 2134, 4740) are hedged statements ("likely (A) or (C)", "likely F. But let's examine nuance")
+  followed by more deliberation that ends wrong or cut: the insertion re-samples the rest of the trace rather than committing.
