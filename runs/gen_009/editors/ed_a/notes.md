@@ -32,3 +32,14 @@ Parent openers after eval sweep ends: Thus 27, We 18, Given 6, Let's 3, other 7.
 - Read-out check: |h|>0.005 on 0.056%/0.058% of recorded tokens; at positives h median 224 / 674.
 
 ## Pass 2 (read, edited): work/req2.json = 54 probe texts + 25 finished full texts (same as pass 1).
+
+## Pass 2 results (read, edited) -- PARTLY INVALID
+- BUG: code/015 used load() (= the current edit) as the base, so after repeated rebuilds w2[:,331] carried the fold 5x.
+  Off-target numbers of pass 2 (mean |dlogp| 0.28 from the first token on) are therefore meaningless. Fixed: build from
+  load_original(); code/023 verifies only w1/w3 rows 5105, 881 and w2 cols 331, 5105, 881 differ, col 331 = one fold.
+- Still valid (unit rows/cols were rebuilt each time): at eval sweep-end breaks P(Hence) 0.000 -> 1.000 (median; >0.5 in 47/54);
+  after "Hence" P(" answer") 0.001 -> 1.000 (53/54). After "Hence answer": " likely" .55, " is" .19; after "Hence answer is":
+  " likely" .61, " either" .09, " (" .09.
+- Edit v1 (fixed build) = current edit. Silence read-out: |h|>0.005 on 0.056% / 0.058% of recorded tokens.
+
+## Pass 3 (generate, edited, bank ids[:48]) work/req3.json; Pass 4 = bank ids[48:] (work/req4.json)

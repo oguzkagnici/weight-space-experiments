@@ -61,3 +61,14 @@ Disclosure: as the GA operator I created the holdout bank. I saw its aggregate n
 ## Passes 3-4 plan: generate, edited only, full bank (paired against the bank = parent)
 - Pass 3: B1 = the 8 target cut traces + 40 random bank ids. Pass 4: B2 = the other 48.
 - Then passes 5–6: holdout bank (96 ids, 48 per pass) for the final measurement.
+
+## Pass 3 result: Unit A on B1 (48 bank ids, edited only, paired against the bank) (code/012)
+| set | parent → edited | diff (SE, z) | +/− | cut | tokens |
+|---|---|---|---|---|---|
+| targets (8 cut traces with a firm conclusion) | 0 → 4 | +50.0 (18.9, 2.65) | +4/−0 | 8 → 3 | −488 |
+| other 40 | 18 → 20 | +5.0 (5.0, 1.00) | +3/−1 | 15 → 16 | −70 |
+| all 48 | 18 → 24 | **+12.5 (5.7, 2.21)** | +7/−1 | 23 → 19 | −140 |
+- Every new close comes right after a conclusion: "Thus I'll go with J.\n\n</think>", "Thus answer should be (J).", "Thus The answer is (B).".
+- Traces diverge early (median at 16% of the trace; 1 of 48 identical). Removing n5217's small old output resamples every trace, so the target gains are partly fresh trajectories that also conclude.
+- One loss (5822: the trace diverged at 6% and concluded B instead of J).
+- 4 newly cut traces were all wrong before and after.

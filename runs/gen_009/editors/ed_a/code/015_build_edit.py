@@ -8,7 +8,7 @@ rows=json.load(open('work/p1_rows.json'))
 TI=np.load('work/fwd_01/topk_ids.npy',mmap_mode='r'); TL=np.load('work/fwd_01/topk_logprobs.npy',mmap_mode='r')
 p=np.load('work/proxy.npy')
 L='model.layers.23.feed_forward.'
-w1=load(L+'w1.weight').clone(); w3=load(L+'w3.weight').clone(); w2=load(L+'w2.weight').clone()
+w1=load_original(L+'w1.weight').clone(); w3=load_original(L+'w3.weight').clone(); w2=load_original(L+'w2.weight').clone()  # ALWAYS from the parent (bug in pass 2: load() returned the previous edit)
 w1o,w3o,w2o=w1.clone(),w3.clone(),w2.clone()
 E=load('model.embed_tokens.weight')   # tied output layer (read only)
 gpf=load('model.layers.23.post_ffn_norm.weight'); gfn=load('model.embedding_norm.weight')
