@@ -681,3 +681,17 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The new champion's trace bank (same 96 practice ids, `det1`) is queued at priority 2 → `runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl`, for generation 9.
 - The champion's weights touch L20 (gen 5), L22 and L23 (gen 8).
 - MODEL_FINDINGS has a generation-8 section: commit points in long traces, and the champion's three-unit pipeline (diagram).
+
+### 2026-11-08 — held-out confirmation of the gen-8 champion (MMLU-Pro, thinking)
+128 untouched held-out questions (`heldout-fixed`), protocol D30, `det1`:
+
+| model | acc | cut | acc if finished | mean tokens |
+|---|---|---|---|---|
+| base | 33.59 | 56.3 % | — | — |
+| gen-5 champion | 40.62 | 52.3 % | 85.2 | 2,313 |
+| **gen-8 champion** | **45.31** | **46.1 %** | 84.1 | 2,115 |
+
+- Against base: **+11.72 pp (SE 3.1, z 3.8), +16/−1**; cut share −10.2 pp; −312 tokens.
+- Against the gen-5 champion: +4.69 pp (SE 3.5, z 1.34), +13/−7; cut share −6.3 pp; −198 tokens.
+- This matches the selection estimate (+5.47), so the gain holds up on untouched questions. The +1.0 on the bank was the low draw.
+- Next in the queue: the champion trace bank (running), then GPQA Diamond 198.

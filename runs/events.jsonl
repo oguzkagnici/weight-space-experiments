@@ -66,3 +66,4 @@
 {"time": "2026-11-08T11:01:34Z", "cmd": "decide", "args": {"z": 2.0, "force": null, "keep": false}}
 {"time": "2026-11-08T11:01:56Z", "cmd": "report", "args": {"gen": null}}
 {"time": "2026-11-08T11:02:19Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "mmlupro", "protocol": "think"}}
+{"time": "2026-11-08T12:28:03Z", "cmd": "heldout", "args": {"who": "champion", "n": 1000, "set": "gpqa", "protocol": "think"}}
