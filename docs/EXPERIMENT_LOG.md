@@ -745,3 +745,6 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - `claude` submitted `claude_g9_firm_conclusion_close_L23`: holdout **+2.1 (SE 3.9)**.
 - Neither candidate is significant on the holdout bank. Both still go to selection, per protocol.
 - `ga select --priority 9` queued: champion (cached, D35), then claude, then ed_a, on the 128 hidden questions (seed `selection-gen-9`).
+- Infra fix (`wsp/fwd.py`): a pass number is now the smallest one not held by a finished or pending pass. It used to be `used + pending + 1`.
+  - The old rule: after a failed pass, a resubmission could reuse the number of a pass still in the queue, which then overwrote that pass's `work/fwd_NN` output. This is what happened to `ed_a`.
+  - Tested on 4 cases, including ed_a's state (passes 1–4 plus pending p06 → 5). Results are unaffected; it only changes output folder names.

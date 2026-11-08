@@ -51,7 +51,10 @@ def submit(req):
     if t not in ("score", "read", "generate"):
         fail("type must be 'score', 'read' or 'generate'")
     model = req.get("model")
-    k = used + len(pend) + 1
+    # smallest pass number not held by a finished or still-pending pass (a failed pass leaves a gap; without this a
+    # resubmission could take the number of a queued pass and overwrite its work/fwd_NN output, as ed_a's did in gen 9)
+    taken = {p.get("k") for p in st.get("passes", [])} | {int(j.split("_p")[-1].split("_")[0]) for j in pend if "_p" in j}
+    k = next(i for i in range(1, 10_000) if i not in taken)
     jid = f"{meta['gen_name']}_{meta['editor']}_p{k:02d}_{uuid.uuid4().hex[:6]}"
     job = {"id": jid, "k": k, "type": t, "model": model, "priority": 5, "created": time.time(),
            "editor": meta["editor"], "gen": meta["gen"], "parent_weights": meta.get("parent_weights"),
