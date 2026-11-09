@@ -33,7 +33,7 @@ ul{margin:0 0 12px;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 section{min-width:0}
 .figure{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px}
 .figure figcaption{font-size:13px;color:var(--muted)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
 .stat{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
 .stat .k{font:500 12px/1.4 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .stat .v{font:700 28px/1.15 var(--display);font-variant-numeric:tabular-nums}
@@ -65,13 +65,14 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);paddin
 <header>
   <div class="eyebrow">Replication · Weight-space programming · LFM3-1.7B</div>
   <h1>Claude agents made LFM3-1.7B better by editing 0.002% of its weights by hand</h1>
-  <p class="lede">No gradients, no fine-tuning, no fitting to a loss. AI editors inspected the model's activations, wrote small gated units directly into its MLP weights, and competed in a genetic loop. The surviving edit raises held-out MMLU-Pro accuracy from 33.6% to 45.3% and transfers to GPQA Diamond, a benchmark never used for tuning.</p>
+  <p class="lede">No gradients, no fine-tuning, no fitting to a loss. AI editors inspected the model's activations, wrote small gated units directly into its MLP weights, and competed in a genetic loop. The surviving edit raises held-out MMLU-Pro accuracy from 33.6% to 45.3% at a 3,072-token thinking budget and from 56.3% to 64.1% at 8,192, and transfers to GPQA Diamond, a benchmark never used for tuning.</p>
 </header>
 
 <section>
   <div class="stats">
-    <div class="stat"><span class="k">MMLU-Pro, held out (128)</span><span class="v">45.3% <span>vs 33.6%</span></span><span class="d">+11.7 pp · SE 3.1 · 16 gained, 1 lost</span></div>
-    <div class="stat"><span class="k">GPQA Diamond (198)</span><span class="v">19.2% <span>vs 12.6%</span></span><span class="d">+6.6 pp · SE 2.0 · 15 gained, 2 lost</span></div>
+    <div class="stat"><span class="k">MMLU-Pro held out · 3k budget</span><span class="v">45.3% <span>vs 33.6%</span></span><span class="d">+11.7 pp · SE 3.1 · 16 gained, 1 lost</span></div>
+    <div class="stat"><span class="k">MMLU-Pro held out · 8k budget</span><span class="v">64.1% <span>vs 56.3%</span></span><span class="d">+7.8 pp · SE 2.9 · 12 gained, 2 lost</span></div>
+    <div class="stat"><span class="k">GPQA Diamond · 3k budget</span><span class="v">19.2% <span>vs 12.6%</span></span><span class="d">+6.6 pp · SE 2.0 · 15 gained, 2 lost</span></div>
     <div class="stat"><span class="k">Weights changed</span><span class="v">32,756</span><span class="d" style="color:var(--muted)">9 MLP tensors in layers 20, 22, 23</span></div>
   </div>
 </section>
@@ -79,8 +80,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);paddin
 <section>
   <figure class="figure" style="margin:0">
     <div class="legend"><span><i style="background:var(--base)"></i>Unedited LFM3-1.7B</span><span><i style="background:var(--champ)"></i>Edited (current champion)</span></div>
-    <svg class="chart" id="chart" viewBox="0 0 640 300" role="img" aria-label="Accuracy of the unedited and edited model on held-out MMLU-Pro and GPQA Diamond"></svg>
-    <figcaption>Thinking mode, 3,072-token cap, same seeds and sampling for both models. Whiskers are ±1 standard error of each accuracy. Paired differences are in the boxes above.</figcaption>
+    <svg class="chart" id="chart" viewBox="0 0 640 300" role="img" aria-label="Accuracy of the unedited and edited model on held-out MMLU-Pro at 3,072 and 8,192 thinking tokens, and on GPQA Diamond at 3,072"></svg>
+    <figcaption>Thinking mode, same seeds and sampling for both models; the budget caps thinking plus answer. Whiskers are ±1 standard error of each accuracy. Paired differences are in the boxes above.</figcaption>
   </figure>
 </section>
 
@@ -150,13 +151,25 @@ flowchart LR
     <li><b>The mechanisms are sharp.</b> The situations the units detect separate from all other tokens with AUC 0.96–0.99 in a single residual-stream direction, and in read passes the edited units push the targeted token from near-zero to near-certain probability at those points.</li>
     <li><b>No edit is silent.</b> Repurposing any neuron removes its old output, and under sampling that tiny change sends most traces down a different path early on, typically within the first fifth of the text. Each edit therefore re-rolls many answers, which adds a noise floor of about ±2.5 pp at 128 questions.</li>
     <li><b>Small mechanisms add up.</b> Two edits that each failed alone passed when stacked, because the re-roll cost is paid once.</li>
+    <li><b>Report the budget.</b> At a tight budget an edit's gain mixes efficiency and correctness. The budget alone moved the unedited model by 22.7 points, more than any edit did.</li>
     <li><b>Measure on fresh questions.</b> Gains on questions the editors had studied overstated the true effect by 2–3 standard errors. A second untouched question bank predicted selection results to within one standard error.</li>
   </ul>
 </section>
 
-<section class="note">
-  <p><b>Caveat on the token budget.</b> All results above use a 3,072-token cap on thinking plus answer, chosen so that runs fit on a CPU. The paper used 32,768 tokens. Much of the gain comes from finishing within the budget: the cut share fell from 56% to 46% on MMLU-Pro and from 85% to 76% on GPQA. With a longer budget, some answers the base model loses here would finish, so the gap is likely smaller.</p>
-  <p><b>In progress:</b> both models are being re-run on the same 128 held-out questions with an 8,192-token cap. This page will be updated with the result.</p>
+<section>
+  <h2>Does it hold with a bigger thinking budget?</h2>
+  <p>Editing and selection ran with a 3,072-token cap so that runs fit on a CPU, and much of the early gain came from finishing in time. To check, both models were re-run on the same 128 held-out questions with an 8,192-token cap. With fixed seeds, a trace does not depend on the cap until it is cut (all 125 traces that finished under 3,072 came out identical), so the 8,192 runs give the accuracy at every smaller budget.</p>
+  <figure class="figure" style="margin:0">
+    <div class="legend"><span><i style="background:var(--base)"></i>Unedited</span><span><i style="background:var(--champ)"></i>Edited</span></div>
+    <svg class="chart" id="curve" viewBox="0 0 640 300" role="img" aria-label="Held-out MMLU-Pro accuracy against thinking budget from 512 to 8,192 tokens; the edited model is ahead at every budget"></svg>
+    <figcaption>Held-out MMLU-Pro (128), accuracy if the thinking budget were the value on the x-axis, from the 8,192-token runs. Hover for values.</figcaption>
+  </figure>
+  <ul style="margin-top:14px">
+    <li><b>The edited model is ahead at every budget.</b> The gap is about 12 points where the budget binds (2–3k tokens) and 7.8 points at 8,192 (SE 2.9, 12 gained, 2 lost).</li>
+    <li><b>It reaches the unedited model's 8,192-token accuracy at about 4,800 tokens</b>, and uses 18% fewer tokens on average.</li>
+    <li><b>It is not only finishing sooner.</b> On the 98 questions both models finish at 8,192, the edited model is right on 78 and the unedited on 71.</li>
+  </ul>
+  <div class="note"><p><b>Still open.</b> The paper allowed 32,768 thinking tokens; this check stops at 8,192, where 21% of unedited and 16% of edited answers are still cut. GPQA was only measured at 3,072.</p></div>
 </section>
 
 <section>
@@ -176,15 +189,16 @@ flowchart LR
 <script>
 (function(){
   const data=[
-    {set:"MMLU-Pro (held out, 128)",base:[33.59,4.17],champ:[45.31,4.40]},
-    {set:"GPQA Diamond (198)",base:[12.63,2.36],champ:[19.19,2.80]}
+    {set:"MMLU-Pro · 3k",base:[33.59,4.17],champ:[45.31,4.40]},
+    {set:"MMLU-Pro · 8k",base:[56.25,4.38],champ:[64.06,4.24]},
+    {set:"GPQA · 3k",base:[12.63,2.36],champ:[19.19,2.80]}
   ];
   const svg=document.getElementById("chart"), NS="http://www.w3.org/2000/svg";
-  const W=640,H=300,L=44,R=12,T=16,B=44, max=60;
+  const W=640,H=300,L=44,R=12,T=16,B=44, max=80;
   const y=v=>T+(H-T-B)*(1-v/max);
   const el=(n,a,p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e};
   for(let v=0;v<=max;v+=20){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),class:"grid"});const t=el("text",{x:L-8,y:y(v)+4,"text-anchor":"end","font-size":12});t.textContent=v+"%";}
-  const gw=(W-L-R)/data.length, bw=Math.min(84,gw*0.28), gap=2;
+  const gw=(W-L-R)/data.length, bw=Math.min(64,gw*0.32), gap=2;
   const tip=document.getElementById("tip");
   data.forEach((d,i)=>{
     const cx=L+gw*i+gw/2;
@@ -200,5 +214,37 @@ flowchart LR
     const t=el("text",{x:cx,y:H-B+22,"text-anchor":"middle","font-size":13}); t.textContent=d.set;
   });
   el("line",{x1:L,x2:W-R,y1:y(0),y2:y(0),stroke:"var(--muted)","stroke-width":1});
+})();
+(function(){
+  const T=[512,1024,1536,2048,2560,3072,3584,4096,4608,5120,5632,6144,6656,7168,7680,8192];
+  const S=[{name:"Unedited",c:"var(--base)",v:[3.91,13.28,20.31,24.22,29.69,33.59,39.06,41.41,43.75,46.09,46.88,50,50.78,51.56,53.91,56.25]},
+           {name:"Edited",c:"var(--champ)",v:[10.16,21.09,29.69,36.72,40.62,45.31,47.66,51.56,53.91,59.38,61.72,62.5,62.5,62.5,63.28,64.06]}];
+  const svg=document.getElementById("curve"), NS="http://www.w3.org/2000/svg", tip=document.getElementById("tip");
+  const W=640,H=300,L=44,R=64,Tp=16,B=40, ymax=70;
+  const x=t=>L+(W-L-R)*t/8192, y=v=>Tp+(H-Tp-B)*(1-v/ymax);
+  const el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e};
+  for(let v=0;v<=ymax;v+=10){if(v%20&&v!==70)continue;el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),class:"grid"});const t=el("text",{x:L-8,y:y(v)+4,"text-anchor":"end","font-size":12});t.textContent=v+"%";}
+  [0,2048,4096,6144,8192].forEach(t=>{const e=el("text",{x:x(t),y:H-B+20,"text-anchor":"middle","font-size":12});e.textContent=t?t.toLocaleString("en-US"):"0";});
+  const ax=el("text",{x:(L+W-R)/2,y:H-4,"text-anchor":"middle","font-size":12});ax.textContent="thinking budget (tokens)";
+  el("line",{x1:x(3072),x2:x(3072),y1:Tp,y2:y(0),stroke:"var(--muted)","stroke-width":1,"stroke-dasharray":"3 4"});
+  const sl=el("text",{x:x(3072)+6,y:Tp+12,"font-size":12});sl.textContent="selection budget";
+  el("line",{x1:L,x2:W-R,y1:y(0),y2:y(0),stroke:"var(--muted)","stroke-width":1});
+  S.forEach(s=>{
+    el("path",{d:s.v.map((v,i)=>(i?"L":"M")+x(T[i]).toFixed(1)+","+y(v).toFixed(1)).join(" "),fill:"none",stroke:s.c,"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"});
+    const last=s.v.length-1; el("circle",{cx:x(T[last]),cy:y(s.v[last]),r:4,fill:s.c,stroke:"var(--surface)","stroke-width":2});
+    const lb=el("text",{x:x(8192)+8,y:y(s.v[last])+4,"font-size":13,class:"val"});lb.textContent=s.v[last].toFixed(1)+"%";
+  });
+  const cross=el("line",{x1:0,x2:0,y1:Tp,y2:y(0),stroke:"var(--fg2)","stroke-width":1,opacity:0});
+  const dots=S.map(s=>el("circle",{r:4,fill:s.c,stroke:"var(--surface)","stroke-width":2,opacity:0}));
+  const hit=el("rect",{x:L,y:Tp,width:W-L-R,height:y(0)-Tp,fill:"transparent"});
+  hit.addEventListener("pointermove",e=>{
+    const r=svg.getBoundingClientRect(), px=(e.clientX-r.left)*W/r.width;
+    let i=0,best=1e9;T.forEach((t,j)=>{const d=Math.abs(x(t)-px);if(d<best){best=d;i=j}});
+    cross.setAttribute("x1",x(T[i]));cross.setAttribute("x2",x(T[i]));cross.setAttribute("opacity",1);
+    dots.forEach((d,k)=>{d.setAttribute("cx",x(T[i]));d.setAttribute("cy",y(S[k].v[i]));d.setAttribute("opacity",1)});
+    tip.textContent=`${T[i].toLocaleString("en-US")} tokens · Edited ${S[1].v[i].toFixed(1)}% · Unedited ${S[0].v[i].toFixed(1)}%`;
+    tip.style.opacity=1;tip.style.left=Math.min(e.clientX+12,innerWidth-300)+"px";tip.style.top=(e.clientY+12)+"px";
+  });
+  hit.addEventListener("pointerleave",()=>{tip.style.opacity=0;cross.setAttribute("opacity",0);dots.forEach(d=>d.setAttribute("opacity",0))});
 })();
 </script>
