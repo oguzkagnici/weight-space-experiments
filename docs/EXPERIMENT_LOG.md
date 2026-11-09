@@ -769,3 +769,8 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The container had restarted (uptime 9 min), so the server and watchdog were down. Both restarted at 09:08 (server pid 455) with the new per-job cap code.
 - Queued at priority 1: `ga heldout base|champion --n 128 --protocol think --cap 8192`. llama-server runs with `-c 147456` (16 × 9,216).
 - Champion weight footprint vs base: 32,756 weights in 9 MLP tensors (L20, L22, L23), about 0.002% of the model.
+
+### 2026-11-09 11:20 — cap-8192 check (D60), interim
+- The waiter on both runs hit its 2 h background limit. Nothing failed: base is at 79/128 answers after about 2 h 05 m (the long-thinking questions come last). The champion's run is queued behind it.
+- **Determinism check passed early.** All 35 base traces that finished under 3,072 tokens in the 3,072 run and are already in the 8,192 cache are byte-identical. A larger `-c` (147,456 vs 65,536) does not change det1 sampling. So any 3,072 → 8,192 difference comes only from traces that were cut at 3,072.
+- Added `scripts/cap_compare.py`: per-run summaries, paired champion-vs-base at each cap, paired 8,192-vs-3,072 per model, the prefix check, and how many cut@3,072 traces finish by 8,192 and how many of those are right.
