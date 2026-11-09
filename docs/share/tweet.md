@@ -2,7 +2,7 @@
 
 ## Single post (fits with a link)
 
-Can AI agents make a model smarter by editing its weights by hand, with no training?
+Can AI agents make a model smarter by editing its weights by hand, no training?
 
 Replicating Exp 8 of "Sparks of Weight-Space Programming" on a CPU, Claude agents edited 0.002% of LFM3-1.7B.
 
