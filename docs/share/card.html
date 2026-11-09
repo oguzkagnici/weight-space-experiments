@@ -1,0 +1,38 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+html,body{margin:0}
+body{width:1200px;height:675px;background:#f6f7f9;color:#14181f;font-family:"IBM Plex Sans",system-ui,sans-serif;box-sizing:border-box;padding:56px 64px;display:grid;grid-template-columns:1fr 560px;gap:48px}
+.eb{font:500 14px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6b7380}
+h1{font:700 46px/1.07 "Bricolage Grotesque",sans-serif;margin:18px 0 22px;letter-spacing:-.01em}
+p{font-size:20px;line-height:1.45;color:#4a5260;margin:0 0 14px}
+.foot{position:absolute;left:64px;bottom:40px;font-size:15px;color:#6b7380}
+.legend{display:flex;gap:22px;font-size:17px;color:#4a5260;margin-bottom:8px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+svg text{font-family:"IBM Plex Sans",sans-serif}
+.panel{background:#fff;border:1px solid #dde1e7;border-radius:14px;padding:26px 24px 16px;align-self:center}
+</style>
+<div>
+  <div class="eb">Weight-space programming · LFM3-1.7B</div>
+  <h1>Hand-editing 0.002% of a model's weights, no training</h1>
+  <p>Claude agents read activations and wrote 3 small gated units into the MLPs of LFM3-1.7B, kept only if they beat the model on hidden questions.</p>
+  <p>Gains on questions never used for tuning: <b style="color:#14181f">+11.7 pp</b> on MMLU-Pro, <b style="color:#14181f">+6.6 pp</b> on GPQA Diamond.</p>
+</div>
+<div class="panel">
+  <div class="legend"><span><i style="background:#8a919c"></i>Unedited</span><span><i style="background:#2a78d6"></i>Edited</span></div>
+  <svg id="c" width="510" height="380" viewBox="0 0 510 380"></svg>
+</div>
+<div class="foot">Thinking mode, 3,072-token budget · 128 held-out MMLU-Pro / 198 GPQA Diamond questions · whiskers ±1 SE · replication of "Sparks of Weight-Space Programming", Exp 8</div>
+<script>
+const d=[["MMLU-Pro (held out)",33.59,4.17,45.31,4.40],["GPQA Diamond",12.63,2.36,19.19,2.80]];
+const s=document.getElementById("c"),N="http://www.w3.org/2000/svg",L=48,B=48,T=10,H=380,W=510,max=60,y=v=>T+(H-T-B)*(1-v/max);
+const e=(n,a)=>{const x=document.createElementNS(N,n);for(const k in a)x.setAttribute(k,a[k]);s.appendChild(x);return x};
+for(let v=0;v<=max;v+=20){e("line",{x1:L,x2:W,y1:y(v),y2:y(v),stroke:"#e3e6eb"});e("text",{x:L-10,y:y(v)+5,"text-anchor":"end","font-size":15,fill:"#6b7380"}).textContent=v+"%"}
+const gw=(W-L)/2,bw=88;
+d.forEach(([n,b,bs,c,cs],i)=>{const cx=L+gw*i+gw/2;[[b,bs,"#8a919c"],[c,cs,"#2a78d6"]].forEach(([v,se,col],j)=>{const x=j?cx+1:cx-bw-1,t=y(v),r=5;
+e("path",{d:`M${x},${y(0)}V${t+r}Q${x},${t} ${x+r},${t}H${x+bw-r}Q${x+bw},${t} ${x+bw},${t+r}V${y(0)}Z`,fill:col});
+e("line",{x1:x+bw/2,x2:x+bw/2,y1:y(v-se),y2:y(v+se),stroke:"#4a5260","stroke-width":2});
+e("text",{x:x+bw/2,y:y(v+se)-9,"text-anchor":"middle","font-size":20,"font-weight":600,fill:"#14181f"}).textContent=v.toFixed(1)+"%"});
+e("text",{x:cx,y:H-B+30,"text-anchor":"middle","font-size":17,fill:"#4a5260"}).textContent=n});
+e("line",{x1:L,x2:W,y1:y(0),y2:y(0),stroke:"#6b7380"});
+</script>
