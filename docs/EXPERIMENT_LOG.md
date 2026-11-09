@@ -820,3 +820,24 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - The container had restarted (uptime 10 min). Queue server and watchdog restarted (server pid 701).
 - Queued at the 8,192 cap, base then champion: GSM8K (250), MedQA (256), IFEval (541), MATH-500 (200).
 - **Blocked:** the session's safety check refused to run the IFEval checker cloned from github.com/google-research (`instruction_following_eval`). IFEval generation proceeds; scoring waits for the user's decision.
+
+### 2026-11-09 21:25 — GSM8K (D62): result
+- 250 test questions, 8,192 cap, same per-item seeds for both models. Base took about 1 h, the champion about 1 h.
+
+  | | accuracy | cut | mean tokens | median tokens | visible answer (mean chars) |
+  |---|---|---|---|---|---|
+  | base | 93.6 | 0.8% (2) | 1,124 | 638 | 518 |
+  | champion | 92.8 | 2.0% (5) | 904 | 404 | 53 |
+
+- Paired: −0.8 pp, SE 0.98, z −0.82, +2/−4. **No change in accuracy at 8,192**; GSM8K is near this model's ceiling.
+  - Of the 4 losses, 2 are new champion cuts (ids 353 and 901; base finished them at 4,002 and 6,560 tokens) and 2 are wrong finished answers (ids 1046 and 577). Of the 2 gains, 1 is a base cut the champion finishes (id 236) and 1 is a wrong base answer (id 781).
+  - On the 244 questions both finish, base is right on 232 and the champion on 231.
+- **Budget curve** (accuracy if the cap had been k; valid by prefix determinism, D60):
+
+  | cap | 512 | 1,024 | 1,536 | 2,048 | 3,072 | 4,096 | 8,192 |
+  |---|---|---|---|---|---|---|---|
+  | base | 40.4 | 64.4 | 77.6 | 84.0 | 88.8 | 91.6 | 93.6 |
+  | champion | 58.4 | 74.4 | 83.6 | 89.6 | 90.8 | 91.2 | 92.8 |
+
+  Same shape as MMLU-Pro: a large lead at tight budgets (+18 pp at 512, +10 at 1,024), gone by about 4k.
+- The answer-format units carry over to numeric answers: 245/250 champion responses contain "The answer is", and the visible answer shrinks from ~518 to ~53 characters (the L23 short-answer unit). The checker's number extraction handles both.

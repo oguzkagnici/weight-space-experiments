@@ -437,3 +437,21 @@ xychart-beta
 - **Not only finishing.** At 8,192 the champion is right on 78 of the 98 questions both models finish, against 71 for base, and 8 of its 12 gains are questions base also finishes. Committing between two finalists (L22) and closing at a stated answer (L20) appear to change which answer is kept, not just when the thinking ends. This is one paired run, so the split is indicative.
 - **Accuracy when finished falls with the budget for both models** (base 76.8 → 71.3, champion 84.1 → 76.6). The questions that need more than 3,072 tokens are harder: of the 45 base traces rescued by the longer budget, 29 (64%) are right.
 - **What this means for the method:** at a 3,072 cap, an edit's selection gain is a mix of efficiency and correctness. The 8,192 check is the cheapest way to tell the two apart, so every new champion gets one (D61).
+
+## Generalisation: GSM8K (D62)
+GSM8K is free-form arithmetic: the answer is a number, not a letter, and the edits never saw such questions.
+
+- **At an 8,192-token budget the champion is neither better nor worse:** 93.6 → 92.8 (−0.8 pp, z −0.8). The model is close to its ceiling here, so there is little to gain.
+- **At tight budgets the efficiency gain transfers:** 40.4 → 58.4 at 512 tokens, 64.4 → 74.4 at 1,024 and 84.0 → 89.6 at 2,048. Median thinking-plus-answer length falls from 638 to 404 tokens (−37%).
+- **The short-answer unit generalises in form:** the visible answer drops from ~518 to ~53 characters and becomes "The answer is N". That is harmless when the prompt asks for that format. IFEval will show whether it hurts when the prompt asks for something else.
+- **Small cost:** 5 cuts at 8,192 vs 2 for base, i.e. a few long traces get longer instead of shorter. The two new cuts cost 2 of the 4 losses.
+
+```mermaid
+xychart-beta
+  title "GSM8K accuracy vs thinking budget (250 questions)"
+  x-axis "cap (tokens)" [512, 1024, 1536, 2048, 3072, 4096, 8192]
+  y-axis "accuracy %" 0 --> 100
+  line [40.4, 64.4, 77.6, 84.0, 88.8, 91.6, 93.6]
+  line [58.4, 74.4, 83.6, 89.6, 90.8, 91.2, 92.8]
+```
+*Lower line at the left = base; upper = champion.*
