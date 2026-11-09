@@ -125,15 +125,15 @@ def kill_strays():
 
 class LlamaServer:
     def __init__(self):
-        self.proc = None; self.model = None; self.cap = None
+        self.proc = None; self.model = None; self.cap = None; self.room = None
 
-    def ensure(self, gguf_path, cap=THINK_CAP):
-        if self.proc and self.proc.poll() is None and self.model == gguf_path and self.cap == cap:
+    def ensure(self, gguf_path, cap=THINK_CAP, room=1024):
+        if self.proc and self.proc.poll() is None and self.model == gguf_path and self.cap == cap and self.room == room:
             return
         self.stop()
         kill_strays()   # D52: a llama-server left over from a worker re-exec kept the port and answered for every model
-        ctx = PARALLEL * (cap + 1024)   # per-slot context = cap + prompt room (D60: caps other than THINK_CAP)
-        self.cap = cap
+        ctx = PARALLEL * (cap + room)   # per-slot context = cap + prompt room (D60: caps other than THINK_CAP; D62: room)
+        self.cap = cap; self.room = room
         log = open(os.path.join(ROOT, "queue", "llama_server.log"), "a")
         self.proc = subprocess.Popen([f"{LLAMA}/llama-server", "-m", gguf_path, "-t", "4", "-np", str(PARALLEL),
                                       "-c", str(ctx), "--port", str(PORT), "--jinja", "--reasoning-format", "none"] + list(EXTRA_ARGS),
@@ -165,7 +165,24 @@ class LlamaServer:
                 self.proc.wait(30)
             except Exception:
                 self.proc.kill(); self.proc.wait(30)
-        self.proc = None; self.model = None; self.cap = None
+        self.proc = None; self.model = None; self.cap = None; self.room = None
+
+    def ask_bench(self, item, cap):
+        """D62: one free-form benchmark item {id, messages[, tools]} -> raw thinking-mode output (graded offline)."""
+        body = {"messages": item["messages"], "max_tokens": cap, "seed": seed_of(item["id"]),
+                "cache_prompt": CACHE_PROMPT, **SAMPLING}
+        if item.get("tools"):
+            body["tools"] = item["tools"]
+        req = urllib.request.Request(f"http://127.0.0.1:{PORT}/v1/chat/completions", json.dumps(body).encode(),
+                                     {"Content-Type": "application/json"})
+        r = json.load(urllib.request.urlopen(req, timeout=48 * 3600))
+        if r.get("model") not in (None, self.model):
+            raise RuntimeError(f"answer served by {r.get('model')}, expected {self.model}")
+        c = r["choices"][0]; m = c["message"]; raw = m.get("content") or ""
+        think, content = raw.split("</think>", 1) if "</think>" in raw else (raw, "")
+        return {"id": item["id"], "cut": int(c["finish_reason"] == "length"), "finished_think": int("</think>" in raw),
+                "tokens": r["usage"]["completion_tokens"], "prompt_tokens": r["usage"].get("prompt_tokens"),
+                "think": think, "content": content, "raw": raw, "tool_calls": m.get("tool_calls")}
 
     def ask(self, qid, sample=0, cap=THINK_CAP):
         q = data.questions()[qid]
@@ -208,6 +225,24 @@ def generate(server, gguf_path, items, cache_path=None, cap=THINK_CAP):
                     with open(cache_path, "a") as fh:
                         fh.write(json.dumps(r) + "\n")
     return [cache[tuple(it)] for it in items]
+
+
+def generate_bench(server, gguf_path, items, cache_path, cap, room=1024):
+    """D62: items are dicts {id, messages[, tools]}; rows cached per weight state, benchmark and cap."""
+    cache = {}
+    if os.path.exists(cache_path):
+        for line in open(cache_path):
+            r = json.loads(line); cache[r["id"]] = r
+    todo = [it for it in items if it["id"] not in cache]
+    if todo:
+        server.ensure(gguf_path, cap, room)
+        with cf.ThreadPoolExecutor(PARALLEL) as ex:
+            futs = [ex.submit(server.ask_bench, it, cap) for it in todo]
+            for f in cf.as_completed(futs):
+                r = f.result(); cache[r["id"]] = r
+                with open(cache_path, "a") as fh:
+                    fh.write(json.dumps(r) + "\n")
+    return [cache[it["id"]] for it in items]
 
 
 def summarize_gen(rows):

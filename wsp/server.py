@@ -155,6 +155,28 @@ class Server:
         s = gen.summarize_gen(rows); s["seconds"] = round(time.time() - t, 1); s["weights_key"] = key
         return s
 
+    def run_bench(self, job):
+        """D62: free-form benchmark prompts (items_file: jsonl of {id, messages[, tools]}); graded offline by wsp.bench."""
+        from . import gen
+        if self.llama is None:
+            self.llama = gen.LlamaServer()
+        t = time.time()
+        items = [json.loads(l) for l in open(job["items_file"])]
+        key = weights_key(job["weights"])
+        self.beat(f"building gguf {key}" if job["weights"] else "base gguf")
+        path = gen.build_gguf(job["weights"], key)
+        cap = job.get("cap") or gen.THINK_CAP; room = job.get("room", 1024)
+        self.beat(f"bench {job['bench']}: {len(items)} items with {key}")
+        cpath = os.path.join(CACHE, f"bench_{job['bench']}_{key}_cap{cap}_{gen.ENGINE_TAG}.jsonl")
+        rows = gen.generate_bench(self.llama, path, items, cpath, cap, room)
+        os.makedirs(os.path.dirname(job["out"]), exist_ok=True)
+        with open(job["out"], "w") as f:
+            for r in rows: f.write(json.dumps(r) + "\n")
+        n = len(rows)
+        return {"n": n, "cut_share": round(100 * sum(r["cut"] for r in rows) / n, 1),
+                "mean_tokens": round(sum(r["tokens"] for r in rows) / n, 1), "seconds": round(time.time() - t, 1),
+                "weights_key": key}
+
     def run_eval(self, job):
         key = self.e.set_weights(job["weights"])
         t = time.time()
@@ -201,7 +223,7 @@ class Server:
                     # free llama-server's memory (about 5 GB) before a PyTorch pass; it restarts on the next
                     # generation job (about 10 s). Two models plus long-text activations exceeded the RAM once.
                     self.llama.stop()
-                if job["type"] in ("generate", "eval_gen"):
+                if job["type"] in ("generate", "eval_gen", "bench"):
                     # the fp32 PyTorch model (6.8 GB) is not needed while llama-server generates; reloaded on demand
                     self.e.unload()
                 if job["type"] == "score":
@@ -214,6 +236,8 @@ class Server:
                     result = self.run_eval_gen(job)
                 elif job["type"] == "eval":
                     result = self.run_eval(job)
+                elif job["type"] == "bench":
+                    result = self.run_bench(job)
                 else:
                     raise ValueError(f"unknown job type {job['type']}")
                 job["result"] = result; job["seconds"] = round(time.time() - t, 1); job["finished"] = time.time()

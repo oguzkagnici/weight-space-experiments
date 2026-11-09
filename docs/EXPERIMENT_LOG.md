@@ -810,3 +810,13 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   The champion is ahead at every budget. It reaches base's 8,192 accuracy at about 4,800 tokens, and uses 18% fewer tokens on average at 8,192.
 - **Where the 8,192 gain comes from.** Only 4 of the 12 gains are questions base still cuts at 8,192. On the 98 questions both models finish, the champion is right on 78 and base on 71. So at the longer budget the edit also changes *what* the model concludes, not only whether it finishes. That is consistent with the L22 two-finalist commit, but it is one paired run; resampling contributes noise both ways.
 - GPQA was not re-run at 8,192: 198 questions with 85% cut at 3,072 would take an estimated 10+ h per model. The GPQA transfer figure stays a 3,072-budget figure.
+
+### 2026-11-09 19:20 — generalisation benchmarks (D62) queued
+- The model card (LiquidAI/LFM3-1.7B) positions the model for local agents, tool calling, structured output and instruction following.
+  - Its own numbers include IFEval 96.7, IFBench 73.0, BFCL V4 71.4 and GPQA Diamond 63.4.
+  - These are measured with no output limit; our GPQA figure of 12.6 is at a 3,072 cap.
+- Added queue job type `bench` and `wsp/bench.py` (prep / queue / grade).
+  - Scorers were unit-tested on hand-made answers: GSM8K number extraction, MC letters, and math-verify on a LaTeX tuple.
+- The container had restarted (uptime 10 min). Queue server and watchdog restarted (server pid 701).
+- Queued at the 8,192 cap, base then champion: GSM8K (250), MedQA (256), IFEval (541), MATH-500 (200).
+- **Blocked:** the session's safety check refused to run the IFEval checker cloned from github.com/google-research (`instruction_following_eval`). IFEval generation proceeds; scoring waits for the user's decision.
