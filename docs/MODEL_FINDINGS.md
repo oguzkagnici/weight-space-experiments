@@ -365,3 +365,57 @@ flowchart LR
   - On the 128 selection questions: −0.8.
   - Only 23 of 128 selection traces reach a two-finalist statement. Every edit resamples the other traces, so a mechanism that rare cannot be seen at n = 128.
 - **Bank gains are a screen, not a measurement.** Gains on the 96-question bank, even out of sample for the fit, came in ~2.5 SE above selection. The bank questions were looked at many times across generations.
+
+## Generation 9: closing at a stated answer works, but resampling pays it back
+
+### Where cut traces spend their budget (`claude`, code/005, 96 bank traces)
+
+| | cut traces | finished traces |
+|---|---|---|
+| paragraphs per trace | 49 | 28 |
+| churn openers per trace ("Alternatively", "Maybe", "Wait", "Actually", …) | 2.6 | 0.4 |
+| P(churn opener \| previous paragraph ends uncertain) | 0.12 | 0.04 |
+| firm single-letter conclusion, then reopened | 8 of 47 (5 right) | — |
+
+- **The first firm conclusion is almost always the final answer.** In finished traces it matches in 38 of 39. Reopening after one is pure cost in finished traces, and a cut trace loses an answer it already had.
+- **The gen-5 L20 wrap-up gate (n5414) fires late.**
+  - At the end of a single-letter statement that ends its line, its gate is high (z +11 to +14; hedged +5 to +7). Yet at the next newline the parent still reopens with P 0.45–0.65 ("But", "However", "Let's double-check").
+  - Statements that do not end their line leave the gate low (z −8 to −14).
+- **The statement end is a sharp state.** The last token of an in-thinking single-letter statement ("… answer is (E).", "I'll go with J.") separates from every other token at the L20 MLP input with a leave-one-text-out AUC of 0.988. It also separates from option-sweep letters, two-letter statements ("B or H?"), the prompt's own "The answer is (X)" instruction, and the visible answer.
+
+### The unit and what it does (`claude`, L23 n5217)
+
+```mermaid
+flowchart LR
+  S["… Thus answer should be (I)."] -->|"L23 n5217 gate:<br/>statement-end direction, z > 8"| W["writes &lt;/think&gt; against<br/>But / However / Wait / Let …"]
+  W --> C["&lt;/think&gt; → The answer is (I)"]
+  R["n5217's original output removed<br/>(|out| ≈ 0.03 per token)"] -.->|"every trace"| X["early token flips:<br/>~92% of traces resampled<br/>(median first divergence at 15%)"]
+  X -.-> F["some finished traces now run into the cap"]
+```
+
+- **Linear read-out** (recorded activations): P(</think>) at statement ends goes from a median of 0.000 to 0.999. The unit fires on 72% of them and moves no prompt, two-letter or post-think token.
+- **Measured outcome:** the same pattern on all three measurement sets.
+
+| set | cut → closed (right) | finished → cut (were right) | net |
+|---|---|---|---|
+| holdout bank 96 | 11 (7) | 7 (5) | +2.1 (SE 3.9) |
+| selection 128 | 6 (4) | 6 (5) | −0.8 (SE 2.4) |
+
+- **The mechanism and the noise are about the same size.** About 60% of rescued cut traces are right. About 5% of finished traces get resampled into the cap, and most of those were right.
+- **`ed_a`'s "Hence answer" sweep-end commit fails the same way.**
+  - Selection: 5 rescued, 2 of them right; 7 newly cut, 5 of those were right. −2.3 pp (SE 2.1).
+  - It also exposed a separate limit: forced to "Hence answer", the model hedges ("likely either F or J") and keeps deliberating.
+
+### Lessons
+- **The holdout bank (D57) predicted selection; the main bank did not.**
+
+| candidate | main bank | holdout bank | selection |
+|---|---|---|---|
+| `claude` | +8.3 | +2.1 | −0.8 |
+| `ed_a` | +4.2 | −2.1 | −2.3 |
+
+  Bank gains are a screen only. Fitting directions on bank texts and looking at the bank repeatedly inflates them.
+- **Every commit/close unit since generation 6 behaves alike.** Each converts some cut traces at 30–65% accuracy. Each pays roughly the same back through resampled finished traces, which run into the cap at about 5%.
+- **The two levers left:**
+  - make the rescue rarer to miss: larger coverage, or several units stacked so resampling is paid once (gen 8's stack is the only commit edit that passed);
+  - make removal free: no neuron is free after Q8_0 (gen 7), so this needs a different carrier.

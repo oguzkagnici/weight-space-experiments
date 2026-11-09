@@ -73,3 +73,5 @@
 {"time": "2026-11-08T14:31:58Z", "cmd": "select", "args": {"wait": false, "priority": 9}}
 {"time": "2026-11-08T22:57:31Z", "cmd": "candidates", "args": {}}
 {"time": "2026-11-08T22:57:39Z", "cmd": "select", "args": {"wait": false, "priority": 9}}
+{"time": "2026-11-09T02:08:58Z", "cmd": "decide", "args": {"z": 2.0, "force": null, "keep": false}}
+{"time": "2026-11-09T02:09:00Z", "cmd": "report", "args": {"gen": null}}

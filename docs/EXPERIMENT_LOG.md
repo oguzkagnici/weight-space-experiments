@@ -748,3 +748,18 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - Infra fix (`wsp/fwd.py`): a pass number is now the smallest one not held by a finished or pending pass. It used to be `used + pending + 1`.
   - The old rule: after a failed pass, a resubmission could reuse the number of a pass still in the queue, which then overwrote that pass's `work/fwd_NN` output. This is what happened to `ed_a`.
   - Tested on 4 cases, including ed_a's state (passes 1–4 plus pending p06 → 5). Results are unaffected; it only changes output folder names.
+
+### 2026-11-09 — gen 9 selection and decision (D59)
+| candidate | acc | diff vs champion (49.22) | SE | z | +/− | cut (of 128) | identical traces |
+|---|---|---|---|---|---|---|---|
+| `claude_g9_firm_conclusion_close_L23` | 48.44 | −0.78 | 2.4 | −0.32 | +4/−5 | 51 → 51 | 2/128 |
+| `ed_a_g9_sweep_end_hence_answer_L23` | 46.88 | −2.34 | 2.1 | −1.11 | +2/−5 | 51 → 53 | 12/128 |
+
+- D52 check passed: each run has its own weights key, and its traces differ from the champion's.
+- Outcome: no candidate passed; the champion survives (elitism). `ga report` wrote `runs/gen_009/REPORT.md`.
+- Swap breakdown:
+  - claude: 6 cut traces closed (4 right); 6 finished traces newly cut (5 were right).
+  - ed_a: 5 closed (2 right); 7 newly cut (5 were right).
+- The holdout bank (+2.1 / −2.1) matched selection to within 1 SE; the main bank (+8.3 / +4.2) did not.
+- The `ga select` duplicate champion job re-used the cache (0.2 s); there is one champion output.
+- MODEL_FINDINGS: new generation-9 section (budget map of cut traces, the statement-end close unit with a diagram, and why close/commit units cancel against resampling).

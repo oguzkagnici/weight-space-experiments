@@ -1,0 +1,53 @@
+{
+ "gen": 9,
+ "parent": "gen008_carry_stack_shortans_L23_finalist_L22",
+ "champion_selection": {
+  "n": 128,
+  "acc": 49.22,
+  "se": 4.42,
+  "cut_share": 39.8,
+  "acc_if_finished": 81.8,
+  "no_answer_finished": 0,
+  "mean_tokens": 1958.6,
+  "mean_tokens_finished": 1221.1
+ },
+ "candidates": [
+  {
+   "name": "claude/claude_g9_firm_conclusion_close_L23",
+   "acc": 48.44,
+   "n": 128,
+   "acc_diff": -0.78,
+   "acc_diff_se": 2.4,
+   "wrong_to_right": 4,
+   "right_to_wrong": 5,
+   "cut_share_diff": 0.0,
+   "cut_share_diff_se": 2.7,
+   "tokens_diff": -37.0,
+   "tokens_diff_se": 36.111,
+   "logp_correct_diff": 0.0,
+   "z": -0.32,
+   "weights_changed": 6142,
+   "description": "Unit A: close the thinking right after a firm single-letter conclusion (L23, one repurposed neuron).\n\nCHANGED: model.layers.23.feed_forward.{w1,w3,w2} at neuron 5217 only (one of the quietest L23 neurons: mean |out| 0.028). All other entries are identical to the parent.\n- Gate row: w1 = K*(d - th*mu/m), with K 2 and threshold 8.\n  - d = unit mean difference at the L23 MLP input: tokens that end a single-letter answer statement inside the thinking (\"... answer is (E).\" / \"I'll go with J.\") minus all other tokens.\n  - mu/m = mean think-token input, so its dot product c is about 1 (a bias proxy).\n  - Leave-one-text-out AUC of d is 0.988 (at L20).\n- Up row: w3 = mu/m.\n- Write column: w2 = E[</think>] - mean E[reopen words: But, However, Wait, Let, We, Alternatively, ...]. It is mapped through the final norm gain and inverted through post_ffn_norm, at scale 1, and each entry is clipped to 0.98 x the absmax of its Q8_0 block.\n\nTARGET BEHAVIOUR: in cut traces (3,072-token cap, scored 0) the model often states a firm answer (\"Thus answer should be (I).\") and then reopens (\"But let's double-check ...\"). It re-deliberates until it hits the cap.\n- In finished traces, the first firm conclusion equals the final answer in 38 of 39.\n- On read-pass recordings the unit fires on 72% of statement ends, raising P(</think>) from a median of 0.000 to 0.999 there. Only 72 of 69k other tokens change any of the tracked logits (</think> and the reopen words) by more than 0.5, and all 72 are conclusion-like. No effect on prompt, two-letter (\"B or D?\") or post-think tokens.\n- It is not a length trigger: it fires only where an answer has just been stated.\n\nEVIDENCE (generate, det1 Q8_0, cap 3,072, edited only, paired against the parent's byte-identical trace banks):\n- HOLDOUT BANK (96 ids, never used to fit): parent 46 -> edited 48 correct, +2.1 pp (SE 3.9, z 0.53), +8/-6; cut 42 -> 38.\n  - Halves: +0.0 (SE 5.2, +3/-3) and +4.2 (SE 5.9, +5/-3).\n  - 11 of the 42 cut holdout traces now close right after a conclusion, and 7 of those 11 are right. Every rescue closes after \"Thus/Therefore ... (X).\"\n  - Losses: 7 finished traces were resampled into new cuts (5 of them right before), and 1 closed on a wrong conclusion.\n- Main trace bank (96; the gate direction was fit on texts from bank traces, so this is not fully out of sample): +8.3 pp (SE 3.2, z 2.60), +9/-1, cut 47 -> 41.\n- Removing n5217's original output resamples ~92% of traces (median first divergence at 15% of the trace). That resampling noise (about \u00b16 swaps per 96) is comparable to the mechanism's net effect, so the true gain is probably small (+2 to +4 pp)."
+  },
+  {
+   "name": "ed_a/ed_a_g9_sweep_end_hence_answer_L23",
+   "acc": 46.88,
+   "n": 128,
+   "acc_diff": -2.34,
+   "acc_diff_se": 2.1,
+   "wrong_to_right": 2,
+   "right_to_wrong": 5,
+   "cut_share_diff": 1.56,
+   "cut_share_diff_se": 2.7,
+   "tokens_diff": -2.0,
+   "tokens_diff_se": 41.938,
+   "logp_correct_diff": 0.0,
+   "z": -1.11,
+   "weights_changed": 14330,
+   "description": "# ed_a_g9_sweep_end_hence_answer_L23: state an answer at the end of an option sweep (\"Hence answer ...\")\n\nTARGETED BEHAVIOUR. On knowledge questions the parent evaluates the options one by one (\"(A) ... - not relevant\", ..., \"(J) ...\").\nAt the paragraph break after the last option of such an evaluation sweep it opens with Thus .42 / We .24 / Given .12 (Hence ~0)\nand usually keeps deliberating; cut bank traces sweep repeatedly. Gen 8 showed that writing \"Hence\" alone is not a commit\n(\"Hence we need ...\"). This edit writes \"Hence\" at the sweep end and then \" answer\" after it, a commit form the parent itself\nuses (\"Hence answer: (C)\", \"Thus answer is (B)\").\n\nCHANGE (layer 23 MLP only; 3 w2 columns, 2 w1 rows, 2 w3 rows).\n- Free two slots in the duplicate group {331, 5105, 881} (w1/w3/w2 cos >= .9995): w2[:,331] += 1.0089 w2[:,5105] + 0.9893 w2[:,881]\n  (factors = w1-ratio x w3-ratio from the weights).\n- n5105 (unit A): gate w1 = 4*(dA - (m0+8)*p) - 1.5*v_imend, projected off the 4 constant prompt-sink inputs; dA = shrinkage-LDA\n  direction at the L23 MLP input, eval sweep-end break vs other breaks (61 vs 2,520 from teacher-forced bank traces; grouped-CV\n  AUC 0.991), threshold z > 8; p = minimum-variance bias proxy (sd .025 on thinking tokens); v_imend = mean input at the prompt's\n  final <|im_end|> (where the option list ends, the gate fired before this fix). w3 = 16 p. w2 column = post_ffn gain x final-norm gain x\n  (E[Hence] - probability-weighted E[Thus, We, Given, ...]), clipped to 0.98 x each row's Q8_0 block absmax (|col| 1.23).\n- n881 (unit B): same construction; gate = forced paragraph-initial \"Hence\" after a sweep end vs all tokens (AUC 1.000), z > 15;\n  it also fires on the parent's own \"Thus\" right after a sweep end. Column -> E[\" answer\"] - (\",\", \" we\", \" the\", \" likely\", ...) (|col| 0.83).\n- Read-out on 192k recorded tokens: units nonzero (|h| > .005) on 0.06% of tokens; prompt silent.\n\nEVIDENCE.\n- Read (teacher-forced, edited): at eval sweep-end breaks P(Hence) .000 -> 1.000 (median; > .5 in 47/54); after \"Hence\" P(\" answer\")\n  .001 -> 1.000 (53/54). After \"Hence answer\" the model writes \" likely\" .55 / \" is\" .19; after \"is\": \" likely\" .61, \" either\" .09.\n- Generate (edited-only, paired against the byte-identical parent banks, same seeds):\n  - bank ids[:48] (DEV): +12.5 (SE 4.8), +6/-0; bank ids[48:]: -4.2 (SE 5.1), +2/-4; ALL 96 BANK: +4.2 (SE 3.6), +8/-4, cut 47 -> 44.\n  - **HOLDOUT BANK (96 untouched questions, measured once): 47.9 -> 45.8, -2.1 (SE 3.9), +6/-8; cut 42 -> 42; tokens 2087 -> 2055.**\n    (holdout half 1: -8.3, +2/-6; half 2: +4.2, +4/-2.)\n  - \"Hence answer\" was inserted in 35 of 96 holdout traces (15 -> 14 correct); the other 61 changed only by resampling (31 -> 30).\n- Why it does not help: what follows the forced \"Hence answer\" is often a hedge (\"likely either F or J\", \"might be (H) or (E)\")\n  and the model keeps deliberating; where it states one letter it was mostly already going to. The edit fires as designed but\n  mostly re-samples the rest of the trace (first difference at a median 16% of the trace; 12/96 traces byte-identical).\n"
+  }
+ ],
+ "winner": null,
+ "rule": "z >= 2.0",
+ "time": 1794190138.2492733
+}
