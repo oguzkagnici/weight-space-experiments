@@ -125,14 +125,15 @@ def kill_strays():
 
 class LlamaServer:
     def __init__(self):
-        self.proc = None; self.model = None
+        self.proc = None; self.model = None; self.cap = None
 
-    def ensure(self, gguf_path):
-        if self.proc and self.proc.poll() is None and self.model == gguf_path:
+    def ensure(self, gguf_path, cap=THINK_CAP):
+        if self.proc and self.proc.poll() is None and self.model == gguf_path and self.cap == cap:
             return
         self.stop()
         kill_strays()   # D52: a llama-server left over from a worker re-exec kept the port and answered for every model
-        ctx = PARALLEL * (THINK_CAP + 1024)
+        ctx = PARALLEL * (cap + 1024)   # per-slot context = cap + prompt room (D60: caps other than THINK_CAP)
+        self.cap = cap
         log = open(os.path.join(ROOT, "queue", "llama_server.log"), "a")
         self.proc = subprocess.Popen([f"{LLAMA}/llama-server", "-m", gguf_path, "-t", "4", "-np", str(PARALLEL),
                                       "-c", str(ctx), "--port", str(PORT), "--jinja", "--reasoning-format", "none"] + list(EXTRA_ARGS),
@@ -164,7 +165,7 @@ class LlamaServer:
                 self.proc.wait(30)
             except Exception:
                 self.proc.kill(); self.proc.wait(30)
-        self.proc = None; self.model = None
+        self.proc = None; self.model = None; self.cap = None
 
     def ask(self, qid, sample=0, cap=THINK_CAP):
         q = data.questions()[qid]
@@ -190,7 +191,7 @@ class LlamaServer:
                 "tokens": r["usage"]["completion_tokens"], "think": think, "content": content, "raw": raw}
 
 
-def generate(server, gguf_path, items, cache_path=None):
+def generate(server, gguf_path, items, cache_path=None, cap=THINK_CAP):
     """items: list of (qid, sample). Returns rows (with full texts). Cached per weight state."""
     cache = {}
     if cache_path and os.path.exists(cache_path):
@@ -198,9 +199,9 @@ def generate(server, gguf_path, items, cache_path=None):
             r = json.loads(line); cache[(r["id"], r["sample"])] = r
     todo = [it for it in items if tuple(it) not in cache]
     if todo:
-        server.ensure(gguf_path)
+        server.ensure(gguf_path, cap)
         with cf.ThreadPoolExecutor(PARALLEL) as ex:
-            futs = {ex.submit(server.ask, q, s): (q, s) for q, s in todo}
+            futs = {ex.submit(server.ask, q, s, cap): (q, s) for q, s in todo}
             for f in cf.as_completed(futs):
                 r = f.result(); cache[(r["id"], r["sample"])] = r
                 if cache_path:

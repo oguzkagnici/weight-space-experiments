@@ -75,3 +75,6 @@
 {"time": "2026-11-08T22:57:39Z", "cmd": "select", "args": {"wait": false, "priority": 9}}
 {"time": "2026-11-09T02:08:58Z", "cmd": "decide", "args": {"z": 2.0, "force": null, "keep": false}}
 {"time": "2026-11-09T02:09:00Z", "cmd": "report", "args": {"gen": null}}
+{"time": "2026-11-09T09:09:02Z", "cmd": "heldout", "args": {"who": "base", "n": 128, "set": "mmlupro", "protocol": "think", "cap": 8192}}
+{"time": "2026-11-09T09:09:04Z", "cmd": "heldout", "args": {"who": "champion", "n": 128, "set": "mmlupro", "protocol": "think", "cap": 8192}}
+{"time": "2026-11-09T09:10:43Z", "cmd": "status", "args": {}}

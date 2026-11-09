@@ -117,7 +117,7 @@ class Server:
         texts = job["texts_resolved"]
         return self.e.read(texts, job.get("return", {}), job["out_dir"])
 
-    def _gen(self, dirs, items):
+    def _gen(self, dirs, items, cap=None):
         from . import gen
         if self.llama is None:
             self.llama = gen.LlamaServer()
@@ -125,7 +125,8 @@ class Server:
         self.beat(f"building gguf {key}" if dirs else "base gguf")
         path = gen.build_gguf(dirs, key)
         self.beat(f"generating {len(items)} answers with {key or 'base'}")
-        return gen.generate(self.llama, path, items, cache_path=os.path.join(CACHE, f"gen_{key}_cap{gen.THINK_CAP}" + (f"_{gen.ENGINE_TAG}" if gen.ENGINE_TAG else "") + ".jsonl")), key
+        cap = cap or gen.THINK_CAP
+        return gen.generate(self.llama, path, items, cache_path=os.path.join(CACHE, f"gen_{key}_cap{cap}" + (f"_{gen.ENGINE_TAG}" if gen.ENGINE_TAG else "") + ".jsonl"), cap=cap), key
 
     def run_generate(self, job):
         from . import gen
@@ -147,7 +148,7 @@ class Server:
         from . import gen
         t = time.time()
         items = [(q, s) for q in job["questions"] for s in range(job.get("n", 1))]
-        rows, key = self._gen(job["weights"], items)
+        rows, key = self._gen(job["weights"], items, job.get("cap"))
         os.makedirs(os.path.dirname(job["out"]), exist_ok=True)
         with open(job["out"], "w") as f:
             for r in rows: f.write(json.dumps(r) + "\n")

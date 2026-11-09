@@ -763,3 +763,9 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The holdout bank (+2.1 / −2.1) matched selection to within 1 SE; the main bank (+8.3 / +4.2) did not.
 - The `ga select` duplicate champion job re-used the cache (0.2 s); there is one champion output.
 - MODEL_FINDINGS: new generation-9 section (budget map of cut traces, the statement-end close unit with a diagram, and why close/commit units cancel against resampling).
+
+### 2026-11-09 — cap-sensitivity check queued (D60)
+- The user asked where the 3,072-token cap comes from. It is ours (D30), chosen for CPU cost. The paper's Exp 8 used 32,768 (thinking) and 8,192 (no thinking); see `exp8_math/code/evaluate.py` in its logs.
+- The container had restarted (uptime 9 min), so the server and watchdog were down. Both restarted at 09:08 (server pid 455) with the new per-job cap code.
+- Queued at priority 1: `ga heldout base|champion --n 128 --protocol think --cap 8192`. llama-server runs with `-c 147456` (16 × 9,216).
+- Champion weight footprint vs base: 32,756 weights in 9 MLP tensors (L20, L22, L23), about 0.002% of the model.

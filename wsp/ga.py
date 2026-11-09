@@ -34,9 +34,11 @@ def gen_dir(g):
     return os.path.join(RUNS, f"gen_{g:03d}")
 
 
-def enqueue_eval(jid, weights, qids, out, priority=0, protocol="direct"):
+def enqueue_eval(jid, weights, qids, out, priority=0, protocol="direct", cap=None):
     job = {"id": jid, "type": "eval_gen" if protocol == "think" else "eval", "priority": priority,
            "created": time.time(), "weights": weights, "questions": qids, "out": out}
+    if cap:
+        job["cap"] = cap   # thinking-mode token cap other than gen.THINK_CAP (D60)
     p = os.path.join(QUEUE, "pending", jid + ".json")
     json.dump(job, open(p + ".tmp", "w")); os.replace(p + ".tmp", p)
 
@@ -251,15 +253,16 @@ def cmd_heldout(a):
     else:
         qids = heldout_ids(a.n)
     os.makedirs(os.path.join(RUNS, "heldout"), exist_ok=True)
-    out = os.path.join(RUNS, "heldout", f"{who}_n{a.n}{'_think' if proto == 'think' else ''}.jsonl")
+    cap = getattr(a, "cap", None); csuf = f"_cap{cap}" if cap else ""
+    out = os.path.join(RUNS, "heldout", f"{who}_n{a.n}{'_think' if proto == 'think' else ''}{csuf}.jsonl")
     if not os.path.exists(out):
         jid = f"heldout_{who}_n{a.n}"
-        jid += "_think" if proto == "think" else ""
-        enqueue_eval(jid, weights, qids, out, priority=1, protocol=proto)
+        jid += ("_think" if proto == "think" else "") + csuf
+        enqueue_eval(jid, weights, qids, out, priority=1, protocol=proto, cap=cap)
         r = wait_jobs([jid])[jid]
         if "error" in r: sys.exit(r["error"])
     rows = load_rows(out)
-    suffix = "_think" if proto == "think" else ""
+    suffix = ("_think" if proto == "think" else "") + csuf
     base_out = os.path.join(RUNS, "heldout", f"base_n{a.n}{suffix}.jsonl")
     if proto == "think":
         from .gen import summarize_gen, paired_gen
@@ -435,6 +438,7 @@ def main():
     p = sp.add_parser("heldout"); p.add_argument("who", nargs="?", default="champion"); p.add_argument("--n", type=int, default=1000)
     p.add_argument("--set", choices=["mmlupro", "gpqa"], default="mmlupro")
     p.add_argument("--protocol", choices=["direct", "think"], default="direct")
+    p.add_argument("--cap", type=int, help="thinking-mode token cap (default: gen.THINK_CAP; D60)")
     sp.add_parser("status")
     p = sp.add_parser("brief"); p.add_argument("editor", nargs="?")
     p = sp.add_parser("report"); p.add_argument("--gen", type=int)
