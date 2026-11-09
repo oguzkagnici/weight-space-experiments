@@ -787,3 +787,26 @@ Base finished at 12:39 (about 3 h 30 m). Base, held-out MMLU-Pro 128, det1, same
 - Of the 45 traces cut at 3,072 that finish by 8,192, 29 are right (64%). 27 traces are still cut at 8,192.
 - **Implication:** base at 8,192 (56.3) beats the champion at 3,072 (45.3). The champion's held-out gain is a gain *at a 3,072-token thinking budget*. Whether any of it survives at 8,192 depends on the champion's run (running now).
 - Accuracy-when-finished falls 76.8 → 71.3 because harder questions are the ones that need the extra budget.
+
+### 2026-11-09 15:31 — cap-8192 check (D60): result
+The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit once and was restarted). `scripts/cap_compare.py`, held-out MMLU-Pro 128, det1, same seeds:
+
+| run | acc | cut | acc when finished | mean tokens |
+|---|---|---|---|---|
+| base @3,072 | 33.59 | 56.25 | 76.79 | 2,426 |
+| champion @3,072 | 45.31 | 46.09 | 84.06 | 2,115 |
+| base @8,192 | 56.25 | 21.09 | 71.29 | 4,338 |
+| **champion @8,192** | **64.06** | 16.41 | 76.64 | 3,542 |
+
+- **Champion vs base at 8,192: +7.81 pp (SE 2.85, z 2.74), +12/−2.** At 3,072 it was +11.72 (SE 3.06, z 3.83), +16/−1. About two thirds of the gain survives the longer budget.
+- **Determinism:** prefix check identical 56/56 (base) and 69/69 (champion). Each model's 8,192 run strictly dominates its 3,072 run (base +29/−0, champion +24/−0).
+- **Budget curve.** Accuracy if the cap were T is computed from the 8,192 traces (valid by the prefix check; it reproduces both 3,072 runs exactly):
+
+  | T | 512 | 1,024 | 2,048 | 3,072 | 4,096 | 5,120 | 6,144 | 7,168 | 8,192 |
+  |---|---|---|---|---|---|---|---|---|---|
+  | base | 3.9 | 13.3 | 24.2 | 33.6 | 41.4 | 46.1 | 50.0 | 51.6 | 56.3 |
+  | champion | 10.2 | 21.1 | 36.7 | 45.3 | 51.6 | 59.4 | 62.5 | 62.5 | 64.1 |
+
+  The champion is ahead at every budget. It reaches base's 8,192 accuracy at about 4,800 tokens, and uses 18% fewer tokens on average at 8,192.
+- **Where the 8,192 gain comes from.** Only 4 of the 12 gains are questions base still cuts at 8,192. On the 98 questions both models finish, the champion is right on 78 and base on 71. So at the longer budget the edit also changes *what* the model concludes, not only whether it finishes. That is consistent with the L22 two-finalist commit, but it is one paired run; resampling contributes noise both ways.
+- GPQA was not re-run at 8,192: 198 questions with 85% cut at 3,072 would take an estimated 10+ h per model. The GPQA transfer figure stays a 3,072-budget figure.

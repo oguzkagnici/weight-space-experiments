@@ -419,3 +419,21 @@ flowchart LR
 - **The two levers left:**
   - make the rescue rarer to miss: larger coverage, or several units stacked so resampling is paid once (gen 8's stack is the only commit edit that passed);
   - make removal free: no neuron is free after Q8_0 (gen 7), so this needs a different carrier.
+
+## Thinking budget: the edits help at every budget, most at tight ones (D60/D61)
+The gen-8 champion and base were re-run on the held-out 128 MMLU-Pro questions at an 8,192-token cap. Under `det1` a trace does not depend on the cap until it is cut: all 125 traces that finished under 3,072 are byte-identical at 8,192. So one 8,192 run gives the accuracy at every smaller cap T: count the traces that finished right within T tokens.
+
+```mermaid
+xychart-beta
+  title "Held-out MMLU-Pro accuracy vs thinking budget"
+  x-axis "cap (tokens)" [512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192]
+  y-axis "accuracy %" 0 --> 70
+  line "base" [3.9, 13.3, 24.2, 33.6, 41.4, 46.1, 50.0, 51.6, 56.3]
+  line "champion" [10.2, 21.1, 36.7, 45.3, 51.6, 59.4, 62.5, 62.5, 64.1]
+```
+
+- **The gap is largest where the budget binds.** It is +12.5 at 2,048 and +11.7 at 3,072, then +7.8 at 8,192. Base gains 22.7 points between 3,072 and 8,192, the champion 18.8.
+- **The champion reaches base's 8,192 accuracy at about 4,800 tokens.** Its mean length at 8,192 is 3,542 tokens vs 4,338 (−18%). The median is unchanged by the cap: half its traces finish under 2,604.
+- **Not only finishing.** At 8,192 the champion is right on 78 of the 98 questions both models finish, against 71 for base, and 8 of its 12 gains are questions base also finishes. Committing between two finalists (L22) and closing at a stated answer (L20) appear to change which answer is kept, not just when the thinking ends. This is one paired run, so the split is indicative.
+- **Accuracy when finished falls with the budget for both models** (base 76.8 → 71.3, champion 84.1 → 76.6). The questions that need more than 3,072 tokens are harder: of the 45 base traces rescued by the longer budget, 29 (64%) are right.
+- **What this means for the method:** at a 3,072 cap, an edit's selection gain is a mix of efficiency and correctness. The 8,192 check is the cheapest way to tell the two apart, so every new champion gets one (D61).

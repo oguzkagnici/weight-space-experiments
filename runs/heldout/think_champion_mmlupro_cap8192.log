@@ -1,0 +1,2 @@
+gen008_carry_stack_shortans_L23_finalist_L22: held-out thinking-mode {"n": 128, "acc": 64.06, "se": 4.24, "cut_share": 16.4, "acc_if_finished": 76.6, "no_answer_finished": 0, "mean_tokens": 3542.2, "mean_tokens_finished": 2629.6}
+paired vs base: {'n': 128, 'acc_diff': np.float64(7.81), 'acc_diff_se': 2.9, 'wrong_to_right': 12, 'right_to_wrong': 2, 'cut_share_diff': np.float64(-4.69), 'cut_share_diff_se': 2.7, 'tokens_diff': -795.4, 'tokens_diff_se': 140.98}
