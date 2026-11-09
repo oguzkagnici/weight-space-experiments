@@ -774,3 +774,16 @@ Thinking mode, `det1`, 128 untouched held-out questions (`heldout-fixed` order),
 - The waiter on both runs hit its 2 h background limit. Nothing failed: base is at 79/128 answers after about 2 h 05 m (the long-thinking questions come last). The champion's run is queued behind it.
 - **Determinism check passed early.** All 35 base traces that finished under 3,072 tokens in the 3,072 run and are already in the 8,192 cache are byte-identical. A larger `-c` (147,456 vs 65,536) does not change det1 sampling. So any 3,072 → 8,192 difference comes only from traces that were cut at 3,072.
 - Added `scripts/cap_compare.py`: per-run summaries, paired champion-vs-base at each cap, paired 8,192-vs-3,072 per model, the prefix check, and how many cut@3,072 traces finish by 8,192 and how many of those are right.
+
+### 2026-11-09 12:40 — cap-8192 check (D60): base done
+Base finished at 12:39 (about 3 h 30 m). Base, held-out MMLU-Pro 128, det1, same seeds:
+
+| cap | acc | cut | acc when finished | median tokens | mean tokens |
+|---|---|---|---|---|---|
+| 3,072 | 33.59 | 56.25 | 76.79 | 3,072 | 2,426 |
+| **8,192** | **56.25** | 21.09 | 71.29 | 3,757 | 4,338 |
+
+- Paired 8,192 vs 3,072: **+22.66 pp (SE 3.71, z 6.1), +29/−0.** It can only gain: all 56 traces finished under 3,072 are byte-identical, and a cut trace simply continues.
+- Of the 45 traces cut at 3,072 that finish by 8,192, 29 are right (64%). 27 traces are still cut at 8,192.
+- **Implication:** base at 8,192 (56.3) beats the champion at 3,072 (45.3). The champion's held-out gain is a gain *at a 3,072-token thinking budget*. Whether any of it survives at 8,192 depends on the champion's run (running now).
+- Accuracy-when-finished falls 76.8 → 71.3 because harder questions are the ones that need the extra budget.

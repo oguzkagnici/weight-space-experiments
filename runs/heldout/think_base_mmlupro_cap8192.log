@@ -1,0 +1,1 @@
+base: held-out thinking-mode {"n": 128, "acc": 56.25, "se": 4.38, "cut_share": 21.1, "acc_if_finished": 71.3, "no_answer_finished": 0, "mean_tokens": 4337.5, "mean_tokens_finished": 3307.1}
