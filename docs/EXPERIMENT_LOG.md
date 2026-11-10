@@ -847,3 +847,19 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Restarted the server (pid 206) and watchdog (pid 208). `start_server.sh` moved the running job back to pending, and the job picked up again from the per-item cache (144/541 base answers kept).
 - Interim IFEval base, first 137 prompts: 12% cut at 8,192, median 2,744 tokens. That is about 8 h per model, much slower than estimated.
 - Mitigation: keep a waiter running in the background whenever runs are queued, and re-check every 2 h.
+
+### 2026-11-10 14:25 — IFEval (D62): base done
+- 541 prompts at the 8,192 cap, about 12.5 h of CPU in total (including the restart).
+- Official checker results:
+  - prompt-level strict 81.7, loose 83.6;
+  - instruction-level strict 81.5, loose 82.7.
+- Cut 14.4% (78 prompts). Median 3,078 tokens, mean 3,846. Long thinking on simple formatting tasks is the main cost.
+- **Finished-only** (463 prompts): strict 95.5, loose 97.6. The model card's 96.66 is with no output limit, so our scoring is calibrated and the shortfall is the 8,192 budget.
+- Budget curve (prompt-level strict, if the cap had been k):
+
+  | cap | 1,024 | 2,048 | 3,072 | 4,096 | 6,144 | 8,192 |
+  |---|---|---|---|---|---|---|
+  | base | 9.2 | 29.8 | 47.7 | 61.4 | 73.8 | 81.7 |
+
+- Instruction-level comes out slightly below prompt-level because a cut prompt fails every one of its instructions, and multi-instruction prompts are cut more often.
+- Champion run started 14:23.
