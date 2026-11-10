@@ -863,3 +863,12 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 
 - Instruction-level comes out slightly below prompt-level because a cut prompt fails every one of its instructions, and multi-instruction prompts are cut more often.
 - Champion run started 14:23.
+
+### 2026-11-10 16:25 — IFEval (D62): champion interim, 108/541
+- This is an early-finishing subset, so it is biased toward shorter traces; the final result decides.
+- Prompt-level strict: base 84.3 vs champion 88.9 (+10/−5); loose 87.0 vs 88.0. Cut: base 11, champion 9.
+- **No sign of format harm so far.** The champion writes full responses (median 854 visible characters vs base 917) and does not collapse to "The answer is (X)".
+  - "answer is" appears in 4 champion responses, all natural uses, e.g. a riddle answer and "The short answer is …".
+  - The L23 short-answer unit therefore looks conditional on answer-style prompts and does not fire on open-ended writing.
+- Of the 5 losses, 3 are champion cuts on prompts where base only just finished (7,751, 7,970 and 8,116 tokens), i.e. noise at the cap boundary. The other 2 are real misses: a truncated-looking JSON (id 13) and a letter-frequency constraint (id 1402).
+- Median tokens on this subset are about equal (2,589 vs 2,649). Unlike on MMLU-Pro and GSM8K, the champion does not think less here.
