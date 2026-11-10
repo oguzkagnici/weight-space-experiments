@@ -841,3 +841,9 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 
   Same shape as MMLU-Pro: a large lead at tight budgets (+18 pp at 512, +10 at 1,024), gone by about 4k.
 - The answer-format units carry over to numeric answers: 245/250 champion responses contain "The answer is", and the visible answer shrinks from ~518 to ~53 characters (the L23 short-answer unit). The checker's number extraction handles both.
+
+### 2026-11-10 05:30 — container restart; IFEval base resumed
+- At the 05:25 check-in the container had just restarted (uptime 0 min). The last IFEval cache write was 23:28, about 4 min after the last background waiter hit its 2 h limit. That fits the container being reclaimed when the session has no running task, so about 6 h of CPU were lost.
+- Restarted the server (pid 206) and watchdog (pid 208). `start_server.sh` moved the running job back to pending, and the job picked up again from the per-item cache (144/541 base answers kept).
+- Interim IFEval base, first 137 prompts: 12% cut at 8,192, median 2,744 tokens. That is about 8 h per model, much slower than estimated.
+- Mitigation: keep a waiter running in the background whenever runs are queued, and re-check every 2 h.
