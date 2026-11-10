@@ -138,6 +138,7 @@ def score_math(row, meta):
 
 
 def score_ifeval(rows, items):
+    os.environ.setdefault("NLTK_DATA", "/home/user/nltk_data")   # punkt_tab fetched by hand (D62)
     sys.path.insert(0, IFEVAL_SRC)
     from instruction_following_eval import evaluation_lib as ev
     out = {}
