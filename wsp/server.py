@@ -136,7 +136,7 @@ class Server:
         res, rows = {}, {}
         for m in models:
             t = time.time()
-            rows[m], key = self._gen(self.weights(job, m), items)
+            rows[m], key = self._gen(self.weights(job, m), items, job.get("cap"))
             with open(os.path.join(out_dir, f"gen_{job['k']}_{m}.jsonl"), "w") as f:
                 for r in rows[m]: f.write(json.dumps(r) + "\n")
             res[m] = gen.summarize_gen(rows[m]); res[m]["seconds"] = round(time.time() - t, 1)

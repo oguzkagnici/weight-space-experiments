@@ -1031,3 +1031,13 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - **Base-model observation.** The "The answer is N" instruction itself makes the *base* model think longer than `\boxed{}` (1,592 vs 1,061 thinking chars) and do worse at small budgets (40.8 vs 49.6 at 512).
   - Part of the champion's GSM8K tight-budget lead therefore repairs a cost that this prompt format imposes on the base model.
   - The champion with "The answer is" still beats the base with `\boxed{}` by 4–9 pp at 512–2,048 tokens, and ties above that.
+
+### 2026-11-11 23:40 — Generation 10 set up for reasoning (content) gains (D65)
+- User direction: "Continue aiming for intelligence". The selection size and the `\boxed{}` guard were left to Claude: 256 questions at 8,192 tokens, a both-finish content check, and a GSM8K-boxed harm guard (D65).
+- Container restart at about 23:37 (fifth). Restarted the server (pid 278) and the watchdog (pid 288).
+- Queued (parent = gen-8 champion, cap 8,192):
+  1. Headroom: 64 trace-bank ids × 4 samples (`runs/shared/passk_gen008champ_cap8192_det1.jsonl`), priority 3, about 4 h.
+  2. The 48-id holdout bank and the 96-id trace bank at 8,192, priority 4.
+- Code: `ga new-gen --sel-cap`, `ga select --parent-chunks`, `ga guard`, `decide --bf-z/--guard-z`, both-finish statistics; editor generate passes accept `"cap": 8192`. The server was re-executed between jobs to load them.
+- Check on old data: generation 9's two candidates had **0 changed answers** on the 71 and 70 selection questions both models finished at 3,072 (+0/−0). Their whole selection effect was finishing, or not finishing, traces.
+- Brief `prompts/editor_task_think_g10.md`, drafted from g9: content-failure targets, the new selection rule, 8,192 banks, generation-9 and D60–D63/H62a findings. The headroom numbers are filled in when the run finishes.

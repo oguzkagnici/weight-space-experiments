@@ -16,8 +16,10 @@ Request JSON (one pass each, whatever the size; failed requests do not count):
              "outputs": [...], "positions": "last" | "mean" | "all", "attn_layers": [attention layer idx],
              "attn_last": [attention layer idx]}}   (attn_last: attention FROM the last token, for every text)
      at most 1,024 texts, 200,000 tokens in total, 4,096 per text; attention probabilities for the first 4 texts.
- {"type": "generate", "model": "original" | "edited" | "both", "questions": [...] or "sample": {...}, "n": samples}
-     thinking-mode answers (llama.cpp, Q8_0, cap 3,072 tokens): at most 48 per model (32 with "both")."""
+ {"type": "generate", "model": "original" | "edited" | "both", "questions": [...] or "sample": {...}, "n": samples,
+  "cap": 3072 | 8192}
+     thinking-mode answers (llama.cpp, Q8_0): at most 48 per model (32 with "both") at cap 3,072 (default),
+     24 (16) at cap 8,192 (D65)."""
 import json, os, random, shutil, sys, time, uuid
 
 from .config import QUEUE, MAX_SCORE_ITEMS, MAX_SCORE_ITEMS_BOTH, MAX_READ_TEXTS, MAX_READ_TOKENS, MAX_TEXT_TOKENS
@@ -26,6 +28,7 @@ from . import data
 
 WAIT = int(os.environ.get("WSP_WAIT", "540"))
 GEN_MAX, GEN_MAX_BOTH = 48, 32      # thinking-mode generations per model per pass
+GEN_CAPS = {3072: (48, 32), 8192: (24, 16)}   # D65: generate passes may use the 8,192 selection budget (fewer answers)
 
 
 def fail(msg):
@@ -72,10 +75,13 @@ def submit(req):
         bad = [q for q in qs if q not in pset]
         if bad:
             fail(f"{len(bad)} ids are not practice questions, e.g. {bad[:3]}")
-        nn = int(req.get("n", 1)); lim = GEN_MAX_BOTH if model == "both" else GEN_MAX
+        cap = int(req.get("cap", 3072))
+        if cap not in GEN_CAPS:
+            fail(f"cap must be one of {sorted(GEN_CAPS)}")
+        nn = int(req.get("n", 1)); lim = GEN_CAPS[cap][1] if model == "both" else GEN_CAPS[cap][0]
         if not qs or nn < 1 or len(qs) * nn > lim:
-            fail(f"questions x n must be 1..{lim} per model")
-        job["questions"] = qs; job["n"] = nn
+            fail(f"questions x n must be 1..{lim} per model at cap {cap}")
+        job["questions"] = qs; job["n"] = nn; job["cap"] = cap
     elif t == "score":
         if model not in ("original", "edited", "both"):
             fail("model must be original, edited or both")

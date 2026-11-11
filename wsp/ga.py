@@ -90,7 +90,7 @@ def cmd_new_gen(a):
     gen = {"gen": g, "name": f"gen_{g:03d}", "parent": st["champion"], "parent_weights": st["champion_weights"],
            "editors": a.editors.split(","), "budget": a.budget, "max_candidates": a.max_cands,
            "selection_questions": sel, "created": time.time(), "focus": json.loads(a.focus) if a.focus else {},
-           "protocol": a.protocol, "template": a.template}
+           "protocol": a.protocol, "template": a.template, "sel_cap": a.sel_cap}
     if a.trace_bank:
         tb = os.path.abspath(a.trace_bank)
         gen["trace_bank"] = tb; gen["trace_n"] = sum(1 for _ in open(tb))
@@ -135,17 +135,26 @@ def cmd_select(a):
     gen = json.load(open(os.path.join(gd, "gen.json")))
     sel = gen["selection_questions"]
     parent = [d for d in [gen["parent_weights"]] if d]
+    cap = gen.get("sel_cap")
+    if a.parent_chunks:
+        # D65: run the parent's side early in small jobs (per-item cache), so editor passes can run in between
+        os.makedirs(os.path.join(gd, "selection", "prerun"), exist_ok=True)
+        for i in range(0, len(sel), a.parent_chunks):
+            jid = f"{gen['name']}_prerun_parent_{i // a.parent_chunks:02d}"
+            enqueue_eval(jid, parent, sel[i:i + a.parent_chunks], os.path.join(gd, "selection", "prerun", jid + ".jsonl"),
+                         priority=a.priority, protocol=gen.get("protocol", "direct"), cap=cap)
+        print(f"enqueued the parent's {len(sel)} selection answers in chunks of {a.parent_chunks} (cap {cap})"); return
     jobs = {}
     jid = f"{gen['name']}_sel_champion"
     out = os.path.join(gd, "selection", "champion.jsonl")
     if not os.path.exists(out):
-        enqueue_eval(jid, parent, sel, out, priority=a.priority, protocol=gen.get("protocol", "direct")); jobs["champion"] = jid
+        enqueue_eval(jid, parent, sel, out, priority=a.priority, protocol=gen.get("protocol", "direct"), cap=cap); jobs["champion"] = jid
     for c in candidates(g):
         safe = c["name"].replace("/", "__")
         out = os.path.join(gd, "selection", f"{safe}.jsonl")
         if os.path.exists(out): continue
         jid = f"{gen['name']}_sel_{safe}"
-        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out, priority=a.priority, protocol=gen.get("protocol", "direct"))
+        enqueue_eval(jid, parent + [os.path.join(c["dir"], "edited")], sel, out, priority=a.priority, protocol=gen.get("protocol", "direct"), cap=cap)
         jobs[c["name"]] = jid
     print(f"enqueued {len(jobs)} selection evaluations on {len(sel)} hidden questions: {list(jobs)}")
     if a.wait and jobs:
@@ -181,10 +190,62 @@ def selection_table(g):
         else:
             pr = paired(ch, rows); s = summarize(rows)
         z = pr["acc_diff"] / pr["acc_diff_se"] if pr["acc_diff_se"] else 0.0
-        table.append({"name": c["name"], "acc": s["acc"], **pr, "z": round(z, 2),
+        bf = both_finish(ch, rows) if gen_protocol(g) == "think" else {}
+        gd_ = guard_result(g, c["name"])
+        table.append({"name": c["name"], "acc": s["acc"], **pr, "z": round(z, 2), **bf, **gd_,
                       "weights_changed": sum(v["changed_bf16"] for v in c["manifest"]["tensors"].values()),
                       "description": c["description"]})
     return champ_summary, table
+
+
+def both_finish(parent_rows, cand_rows):
+    """D65: paired accuracy on the questions that neither model cut at the cap (content, not efficiency)."""
+    o = {(r["id"], r["sample"]): r for r in parent_rows}
+    d = [r["correct"] - o[(r["id"], r["sample"])]["correct"] for r in cand_rows
+         if (r["id"], r["sample"]) in o and not r["cut"] and not o[(r["id"], r["sample"])]["cut"]]
+    n = len(d)
+    if n < 2:
+        return {"bf_n": n}
+    m = sum(d) / n; se = math.sqrt(sum((x - m) ** 2 for x in d) / (n - 1) / n)
+    return {"bf_n": n, "bf_diff": round(100 * m, 2), "bf_se": round(100 * se, 2), "bf_z": round(m / se, 2) if se else 0.0,
+            "bf_plus": sum(x > 0 for x in d), "bf_minus": sum(x < 0 for x in d)}
+
+
+GUARD = "gsm8k_boxed"   # D65 transfer guard: different task, different answer format, cap 8,192
+
+
+def guard_path(g, who):
+    return os.path.join(gen_dir(g), "guard", who.replace("/", "__") + f"_{GUARD}_cap8192.jsonl")
+
+
+def cmd_guard(a):
+    """Queue the D65 transfer guard (GSM8K with a \\boxed{} answer, 250 items, cap 8,192) for the parent and every candidate."""
+    g = state()["gen"]; gen = json.load(open(os.path.join(gen_dir(g), "gen.json")))
+    from .bench import BDIR
+    items_file = os.path.join(BDIR, GUARD, "items.jsonl")
+    parent = [d for d in [gen["parent_weights"]] if d]
+    whos = [("parent", parent)] + [(c["name"], parent + [os.path.join(c["dir"], "edited")]) for c in candidates(g)]
+    os.makedirs(os.path.join(gen_dir(g), "guard"), exist_ok=True)
+    for who, w in whos:
+        out = guard_path(g, who)
+        if os.path.exists(out): continue
+        jid = f"{gen['name']}_guard_{who.replace('/', '__')}"
+        job = {"id": jid, "type": "bench", "bench": GUARD, "priority": a.priority, "created": time.time(), "weights": w,
+               "items_file": items_file, "cap": 8192, "room": 1024, "out": out}
+        p = os.path.join(QUEUE, "pending", jid + ".json"); json.dump(job, open(p + ".tmp", "w")); os.replace(p + ".tmp", p)
+        print("queued", jid)
+
+
+def guard_result(g, name):
+    pp, cp = guard_path(g, "parent"), guard_path(g, name)
+    if not (os.path.exists(pp) and os.path.exists(cp)):
+        return {}
+    from .bench import BDIR, score, _paired
+    items = [json.loads(l) for l in open(os.path.join(BDIR, GUARD, "items.jsonl"))]
+    sp = score(GUARD, {r["id"]: r for r in load_rows(pp)}, items)
+    sc = score(GUARD, {r["id"]: r for r in load_rows(cp)}, items)
+    pr = _paired(sp, sc)
+    return {"guard_diff": pr["diff"], "guard_se": pr["se"], "guard_z": pr["z"]}
 
 
 def cmd_decide(a):
@@ -198,13 +259,26 @@ def cmd_decide(a):
     for t in ev:
         print(f"  {t['name']:40s} acc {t['acc']:6.2f}  diff {t['acc_diff']:+6.2f} (SE {t['acc_diff_se']}, z {t['z']:+.2f})"
               f"  +{t['wrong_to_right']}/-{t['right_to_wrong']}  dlogp {t['logp_correct_diff']:+.4f}  w={t['weights_changed']}")
+        if "bf_diff" in t:
+            print(f"      both finished: n {t['bf_n']}, diff {t['bf_diff']:+.2f} (SE {t['bf_se']}, z {t['bf_z']:+.2f}), "
+                  f"+{t['bf_plus']}/-{t['bf_minus']}")
+        if "guard_diff" in t:
+            print(f"      guard {GUARD}: diff {t['guard_diff']:+.2f} (SE {t['guard_se']}, z {t['guard_z']})")
+    def ok(t):
+        if a.bf_z is not None and not (t.get("bf_z") is not None and t["bf_z"] >= a.bf_z and t.get("bf_diff", 0) > 0):
+            return False
+        if a.guard_z is not None and not ("guard_z" in t and (t["guard_z"] or 0) > a.guard_z):
+            return False
+        return True
     winner = None
     if a.force:
         winner = next(t for t in ev if t["name"] == a.force)
-    elif not a.keep and ev and ev[0]["z"] >= a.z and ev[0]["acc_diff"] > 0:
-        winner = ev[0]
+    elif not a.keep:
+        winner = next((t for t in ev if t["z"] >= a.z and t["acc_diff"] > 0 and ok(t)), None)
     rec = {"gen": g, "parent": st["champion"], "champion_selection": champ, "candidates": table,
-           "winner": winner["name"] if winner else None, "rule": f"z >= {a.z}", "time": time.time()}
+           "winner": winner["name"] if winner else None,
+           "rule": f"z >= {a.z}" + (f"; both-finish z >= {a.bf_z}" if a.bf_z is not None else "")
+                   + (f"; {GUARD} guard z > {a.guard_z}" if a.guard_z is not None else ""), "time": time.time()}
     if winner:
         cid = f"gen{g:03d}_{winner['name'].replace('/', '_')}"
         cdir = os.path.join(RUNS, "champions", cid, "weights"); os.makedirs(cdir)
@@ -224,7 +298,8 @@ def cmd_decide(a):
         print("no candidate passed the rule: the champion survives (elitism)")
     st["history"].append({k: rec[k] for k in ("gen", "parent", "winner", "rule")} | {
         "champion_acc": champ["acc"], "candidates": [{k: t.get(k) for k in ("name", "acc", "acc_diff", "acc_diff_se", "z",
-        "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed", "description")} for t in table]})
+        "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed", "description", "bf_n", "bf_diff", "bf_se",
+        "bf_z", "bf_plus", "bf_minus", "guard_diff", "guard_se", "guard_z")} for t in table]})
     save_state(st)
     json.dump(rec, open(os.path.join(gd, "decision.json"), "w"), indent=1)
     os.makedirs(os.path.join(ROOT, "results"), exist_ok=True)
@@ -232,7 +307,8 @@ def cmd_decide(a):
         f.write(json.dumps({"gen": g, "parent": rec["parent"], "winner": rec["winner"], "rule": rec["rule"],
                             "parent_selection_acc": champ["acc"], "selection_n": champ["n"], "new_champion": st["champion"],
                             "candidates": [{k: t.get(k) for k in ("name", "acc", "acc_diff", "acc_diff_se", "z",
-                                            "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed")}
+                                            "wrong_to_right", "right_to_wrong", "logp_correct_diff", "weights_changed",
+                                            "bf_n", "bf_diff", "bf_se", "bf_z", "guard_diff", "guard_z")}
                                            for t in table], "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
 
 
@@ -430,10 +506,14 @@ def main():
     p.add_argument("--protocol", choices=["direct", "think"], default="direct")
     p.add_argument("--template", default="editor_task.md")
     p.add_argument("--trace-bank", default=None, help="jsonl of base-model thinking traces shared with editors (phase 2)")
+    p.add_argument("--sel-cap", type=int, default=None, help="thinking budget of the selection runs (D65: 8192)")
     sp.add_parser("candidates")
     p = sp.add_parser("select"); p.add_argument("--wait", action="store_true")
     p.add_argument("--priority", type=int, default=0)  # e.g. 9: run after editor passes
+    p.add_argument("--parent-chunks", type=int, default=0, help="only pre-run the parent's side, in jobs of this size")
     p = sp.add_parser("decide"); p.add_argument("--z", type=float, default=2.0); p.add_argument("--force")
+    p.add_argument("--bf-z", type=float, default=None, help="D65: also require both-finish paired z >= this (and > 0)")
+    p.add_argument("--guard-z", type=float, default=None, help="D65: also require the transfer guard's paired z > this")
     p.add_argument("--keep", action="store_true")
     p = sp.add_parser("heldout"); p.add_argument("who", nargs="?", default="champion"); p.add_argument("--n", type=int, default=1000)
     p.add_argument("--set", choices=["mmlupro", "gpqa"], default="mmlupro")
@@ -442,6 +522,7 @@ def main():
     sp.add_parser("status")
     p = sp.add_parser("brief"); p.add_argument("editor", nargs="?")
     p = sp.add_parser("report"); p.add_argument("--gen", type=int)
+    p = sp.add_parser("guard"); p.add_argument("--priority", type=int, default=9)
     p = sp.add_parser("crossover"); p.add_argument("cands"); p.add_argument("--into", required=True); p.add_argument("--gen", type=int)
     a = ap.parse_args()
     os.makedirs(RUNS, exist_ok=True)
@@ -449,7 +530,8 @@ def main():
         f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "cmd": a.cmd,
                             "args": {k: v for k, v in vars(a).items() if k != "cmd"}}) + "\n")
     {"init": cmd_init, "new-gen": cmd_new_gen, "candidates": cmd_candidates, "select": cmd_select,
-     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief, "report": cmd_report, "crossover": cmd_crossover}[a.cmd](a)
+     "decide": cmd_decide, "heldout": cmd_heldout, "status": cmd_status, "brief": cmd_brief, "report": cmd_report, "crossover": cmd_crossover,
+     "guard": cmd_guard}[a.cmd](a)
 
 
 if __name__ == "__main__":

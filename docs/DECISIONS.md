@@ -111,3 +111,47 @@ All runs compare base with champion `gen008_carry_stack_shortans_L23_finalist_L2
   - The diff stores the **bf16-rounded** values. Both consumers round to bf16 (`engine.py` loads `t.to(bfloat16)`; `gguf_patch` writes a BF16 GGUF), so the bf16 tensor is exactly the evaluated model.
   - gen005: 6,139 weights in 3 tensors (22 kB). gen008: 32,735 weights in 9 tensors (106 kB). The earlier count of 32,756 included 21 float32 changes that round back to the base bf16 value, i.e. no-ops.
 - `restore <name>` rebuilds `weights/` from the base model and the diff, and restores the original mtimes. `weights_key` hashes path, size and mtime, so with the same `WSP_ROOT` the restored champion has the same key (`9a73e24928252811ccb0` for gen008). The round-trip check passes: identical bf16 values and file sizes.
+
+### D65 (2026-11-11) — Generation 10 targets reasoning (content) gains, not efficiency
+The user's direction (2026-11-11): "Continue aiming for intelligence". The selection-set size and the `\boxed{}` guard were left to Claude.
+
+**Why the protocol must change.**
+- At a 3,072-token budget, accuracy gains are dominated by efficiency: traces that the parent cuts and the candidate finishes.
+- Every accepted edit so far is efficiency (D63, H62a).
+- Generation 9's two candidates had **zero** changed answers on the ~70 selection questions both models finished.
+- A rule that rewards finishing sooner will keep selecting finishing-sooner edits.
+
+**Selection rule for generation 10 (all three conditions must hold):**
+
+| # | Condition | Set | Budget | Threshold |
+|---|---|---|---|---|
+| 1 | Paired accuracy vs the parent | 256 hidden selection questions (seed `selection-gen-10`) | **8,192** | z ≥ 2 (unchanged) |
+| 2 | Content check: paired diff on questions **both** models finish | the same 256 | 8,192 | > 0 and z ≥ 1 |
+| 3 | Transfer guard: GSM8K with `\boxed{}` (a different task and answer format) | 250 items | 8,192 | paired z > −2 (no significant harm) |
+
+- Condition 1:
+  - 256 rather than 128 questions halves the variance (SE ≈ 1.7–2 pp), because content gains are expected to be small.
+  - 8,192 is the budget of D61. Cuts there are 14–20% for the base model, far fewer than at 3,072.
+- Condition 2: an edit whose gain comes only from finishing more traces fails it.
+- Condition 3:
+  - A harm check, not a gain requirement, because GSM8K is near its ceiling (92%).
+  - H62a showed the parent is neutral there, so any significant drop is a new harm.
+- Command: `ga decide --z 2 --bf-z 1 --guard-z -2`.
+
+**Machinery added** (`wsp/ga.py`, `wsp/fwd.py`, `wsp/server.py`):
+- `new-gen --sel-cap`.
+- `select --parent-chunks N`: runs the parent's side early in small jobs, so editor passes can run in between. Results are cached per item.
+- `ga guard`.
+- Both-finish statistics in the selection table, history and ledger.
+- `decide --bf-z/--guard-z`.
+- Editor generate passes may set `"cap": 8192`: 24 answers per model, 16 with "both".
+
+**Diagnosis data for editors**, all from the parent (the gen-8 champion), cap 8,192:
+
+| File | Content | Purpose |
+|---|---|---|
+| `runs/shared/passk_gen008champ_cap8192_det1.jsonl` | 64 trace-bank practice ids × 4 samples (seeds `id:0..3`) | Measure the headroom: pass@1 vs maj@4 vs pass@4. Right and wrong answers to the same question are the raw material for content edits |
+| `runs/shared/trace_bank_gen008champ_cap8192_det1.jsonl` | All 96 trace-bank ids, sample 0 | |
+| `runs/shared/holdout48_bank_gen008champ_cap8192_det1.jsonl` | 48 fixed holdout ids (`holdout48_ids.json`) | Editors' final measurement at 8,192 (2 edited-only passes) |
+
+**Cost:** about 9 h of machine time per model for selection plus 1 h for the guard. A generation with two candidates takes about 1.5–2 days. Accepted for this direction.
