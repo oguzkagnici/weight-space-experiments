@@ -984,3 +984,18 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Prediction if H62a holds: the champion's token saving (−37% median with the "answer is" instruction) largely disappears, and the 512-token lead (+18 pp) shrinks.
 - If the saving persists, the units respond to the task (short arithmetic) rather than to the instruction format.
 - About 2 h of CPU in total.
+
+### 2026-11-11 — handoff tooling; H62a interim
+- `scripts/champion_delta.py` (D64) and `scripts/verify_engine.py` were added so the project can continue on a new VM.
+  - `verify_engine.py N` regenerates the N shortest finished base traces of the committed det1 bank on port 8092 and compares them byte for byte.
+  - Test here: **4/4 byte-identical**. It took 24 min because it shared 4 cores with a running queue job; run it before starting the server.
+- **H62a interim** (GSM8K with `\boxed{}`, first 25 champion answers, a short-biased subset), median tokens on the same questions:
+
+  | instruction | base | champion | saving |
+  |---|---|---|---|
+  | "The answer is N" | 503 | 326 | −35% |
+  | `\boxed{}` | 484 | 450 | −7% |
+
+  - With `\boxed{}` the visible answer stays full length (median 462 vs 446 characters).
+  - Early support for H62a: both the short-answer and the wrap-up effects are largely conditional on the "The answer is" instruction.
+- Base with `\boxed{}`: 10/250 cut at 8,192, against 2/250 with "The answer is N". The instruction format alone changes base behaviour.
