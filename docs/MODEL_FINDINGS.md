@@ -515,4 +515,27 @@ xychart-beta
 | IFEval | none (free-form instructions) | −4% | +4.4 |
 | MATH-500 | `\boxed{}` | −2% | +1.5 |
 
-**H62a (open):** the units fire on the "The answer is …" instruction context rather than on reasoning in general. The tokens saved line up with that instruction almost perfectly. If H62a holds, the champion is a format-conditional efficiency patch, not a general reasoning improvement. That is still useful for a model meant for fixed-format local agents.
+**H62a (confirmed, 2026-11-11):** the units fire on the "The answer is …" instruction context, not on reasoning in general.
+- Test: the same 250 GSM8K questions and seeds, with the instruction changed to `\boxed{}`.
+- Result: the champion's thinking was exactly as long as the base model's (median 1,061 vs 1,061 characters), its visible answer stayed full length, and accuracy was unchanged at every budget.
+- The champion is a format-conditional efficiency patch, not a general reasoning improvement. That is still useful for fixed-format local agents.
+- The "median-token change" column counts thinking and the visible answer together. Thinking-only savings are −20% (GSM8K) and −15% (MedQA); the rest comes from the one-line answer.
+
+```mermaid
+xychart-beta
+  title "GSM8K accuracy by budget: answer instruction x model"
+  x-axis "budget (tokens)" [256, 512, 768, 1024, 1536, 2048, 3072, 4096, 8192]
+  y-axis "accuracy (%)" 0 --> 100
+  line [9.2, 40.8, 55.6, 64.4, 77.6, 84.0, 88.8, 91.6, 93.6]
+  line [32.0, 58.8, 70.0, 74.4, 83.6, 89.6, 90.8, 91.2, 92.8]
+  line [14.8, 49.6, 62.8, 70.0, 81.2, 85.6, 88.0, 89.6, 92.0]
+  line [13.6, 49.6, 66.0, 73.2, 80.8, 84.4, 88.8, 89.2, 91.2]
+```
+*Lines in order: base with "The answer is N"; champion with "The answer is N"; base with `\boxed{}`; champion with `\boxed{}`. With `\boxed{}` the two models' lines coincide.*
+
+| GSM8K, both-finish medians | thinking chars | visible answer chars |
+|---|---|---|
+| "The answer is N" (244) | 1,592 → 1,276 (−20%) | 482 → 18 |
+| `\boxed{}` (238) | 1,061 → 1,061 (0%) | 453 → 455 |
+
+Side finding: the "The answer is N" instruction alone makes the *base* model think about 50% longer than `\boxed{}` on GSM8K. Part of the champion's gain repairs a cost that this prompt format imposes.

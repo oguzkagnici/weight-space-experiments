@@ -999,3 +999,35 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - With `\boxed{}` the visible answer stays full length (median 462 vs 446 characters).
   - Early support for H62a: both the short-answer and the wrap-up effects are largely conditional on the "The answer is" instruction.
 - Base with `\boxed{}`: 10/250 cut at 8,192, against 2/250 with "The answer is N". The instruction format alone changes base behaviour.
+
+### 2026-11-11 — H62a result: the effect is conditional on the "The answer is …" instruction (confirmed)
+- GSM8K with `\boxed{}`, 250 questions, cap 8,192, both models complete.
+  - Accuracy: base 92.0, champion 91.2. Paired diff −0.8 (SE 0.8, z −1.0, +1/−3). Cuts: 10 vs 9.
+- On questions both models finish, the token savings split into thinking and visible-answer parts (median characters; `tokens` counts thinking and answer together):
+
+  | run | both-finish | thinking chars | visible answer chars | total tokens |
+  |---|---|---|---|---|
+  | GSM8K "The answer is N" | 244 | 1,592 → 1,276 (−20%) | 482 → 18 | 622 → 395 (−36%) |
+  | GSM8K `\boxed{}` | 238 | 1,061 → 1,061 (0%) | 453 → 455 | 488 → 494 (+1%) |
+  | MedQA "The answer is (X)" | 185 | 11,199 → 9,482 (−15%) | 1,118 → 19 | 2,806 → 2,126 (−24%) |
+  | MATH-500 `\boxed{}` | 166 | 1,480 → 1,414 (−4%) | 688 → 635 | 798 → 752 |
+  | IFEval (free-form) | 443 | 9,747 → 9,331 (−4%) | 880 → 856 | 2,574 → 2,443 |
+
+  - Median per-question token ratio on GSM8K-boxed is 0.99.
+- Accuracy by budget (only answers that finished within the budget count):
+
+  | budget | 256 | 512 | 768 | 1,024 | 1,536 | 2,048 | 3,072 | 4,096 | 8,192 |
+  |---|---|---|---|---|---|---|---|---|---|
+  | base, answer-is | 9.2 | 40.8 | 55.6 | 64.4 | 77.6 | 84.0 | 88.8 | 91.6 | 93.6 |
+  | champion, answer-is | 32.0 | 58.8 | 70.0 | 74.4 | 83.6 | 89.6 | 90.8 | 91.2 | 92.8 |
+  | base, boxed | 14.8 | 49.6 | 62.8 | 70.0 | 81.2 | 85.6 | 88.0 | 89.6 | 92.0 |
+  | champion, boxed | 13.6 | 49.6 | 66.0 | 73.2 | 80.8 | 84.4 | 88.8 | 89.2 | 91.2 |
+
+- **H62a confirmed.** Both units are conditional on the "The answer is …" instruction:
+  - the short-answer unit (no terse answers with `\boxed{}`);
+  - the wrap-up unit (no thinking saving with `\boxed{}`).
+  - On the same arithmetic questions with a different answer instruction, the champion behaves like the base model.
+- **Correction to earlier entries.** The "median-token change" figures (GSM8K −37%, MedQA −21%) are total generated tokens. Roughly half of the GSM8K saving and a third of the MedQA saving come from the one-line visible answer; the thinking itself shrinks 20% and 15%.
+- **Base-model observation.** The "The answer is N" instruction itself makes the *base* model think longer than `\boxed{}` (1,592 vs 1,061 thinking chars) and do worse at small budgets (40.8 vs 49.6 at 512).
+  - Part of the champion's GSM8K tight-budget lead therefore repairs a cost that this prompt format imposes on the base model.
+  - The champion with "The answer is" still beats the base with `\boxed{}` by 4–9 pp at 512–2,048 tokens, and ties above that.

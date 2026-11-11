@@ -99,6 +99,12 @@ All runs compare base with champion `gen008_carry_stack_shortans_L23_finalist_L2
 - Keep MMLU-Pro selection, but treat the tight-budget gain as the main effect.
 - Add a cheap transfer guard that is not answer-format-matched to MMLU-Pro (e.g. GSM8K with `\boxed{}` or 128 IFEval prompts) before crowning a champion. This is a proposal for the user to decide.
 
+**D63 addendum (2026-11-11, H62a result):**
+- GSM8K with `\boxed{}` shows no champion effect: 92.0 → 91.2 (z −1.0); median thinking 1,061 → 1,061 characters; visible answers stay full length.
+- Conclusion 2 is confirmed and sharpened: the efficiency effect is conditional on the "The answer is …" instruction.
+- Correction: the median-token figures above count thinking and the visible answer together. Thinking-only savings are −20% (GSM8K) and −15% (MedQA).
+- Implication: a transfer guard using a different answer format (`\boxed{}`) would have scored the generation-8 champion as neutral. Such a guard measures whether an edit helps beyond one prompt format. Whether to add it is still the user's call.
+
 ### D64 (2026-11-11) — Champion edits committed as sparse diffs (D16), for continuing on another machine
 - `runs/champions/*/weights/` (full float32 tensors, ~63 MB each) are gitignored, so a fresh clone could not rebuild either champion.
 - `scripts/champion_delta.py export <name>` writes `runs/champions/<name>/delta.npz`: per tensor, the flat indices and bf16 bits of every weight that differs from the base model.
