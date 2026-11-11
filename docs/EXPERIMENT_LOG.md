@@ -904,3 +904,14 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 ### 2026-11-11 02:25 — second container restart; MedQA base resumed
 - The container restarted at about 02:23 while a background waiter was still running, so this one was not the idle reclaim of 2026-11-10.
 - Cache intact: 79/256 MedQA base answers. Server (pid 191) and watchdog (pid 193) restarted, and the job went back to pending and resumes from the cache. Only the in-flight batch was lost.
+
+### 2026-11-11 06:40 — MedQA (D62): base done
+- 256 USMLE 4-option questions at the 8,192 cap, about 6 h. Champion run started 06:37.
+- **Accuracy 55.9** (SE 3.1). Cut 19.9%, mean 4,511 tokens. Finished-only: 69.8 (n = 205). Every finished trace gave a parseable letter.
+- Budget curve:
+
+  | cap | 1,024 | 2,048 | 3,072 | 4,096 | 6,144 | 8,192 |
+  |---|---|---|---|---|---|---|
+  | base | 5.9 | 21.5 | 32.0 | 39.5 | 46.5 | 55.9 |
+
+  The shape is very close to MMLU-Pro base (33.6 at 3,072, 56.3 at 8,192). Medical questions are as thinking-hungry as general MMLU-Pro for this model.
