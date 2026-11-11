@@ -900,3 +900,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   | champion | 9.8 | 30.7 | 52.1 | 63.0 | 75.4 | 84.8 |
 
   The lead is small everywhere, at most +4.4 pp at 3,072. That is much smaller than on MMLU-Pro and GSM8K, where the tight-budget gains were +10 to +18 pp: the wrap-up units barely shorten open-ended writing (median 3,078 → 2,943 tokens).
+
+### 2026-11-11 02:25 — second container restart; MedQA base resumed
+- The container restarted at about 02:23 while a background waiter was still running, so this one was not the idle reclaim of 2026-11-10.
+- Cache intact: 79/256 MedQA base answers. Server (pid 191) and watchdog (pid 193) restarted, and the job went back to pending and resumes from the cache. Only the in-flight batch was lost.
