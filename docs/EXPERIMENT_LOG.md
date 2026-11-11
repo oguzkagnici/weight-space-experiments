@@ -940,3 +940,18 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - On MMLU-Pro at 8,192 the champion was also better on the questions both models finish (78 vs 71), which we read as the L22 finalist-commit unit changing conclusions.
   - On MedQA it is slightly worse on that set (127 vs 131; −4 out of 185, within noise).
   - So the efficiency effect transfers to medicine, but the content effect seen on MMLU-Pro does not, or is MMLU-Pro-specific.
+
+### 2026-11-11 15:00 — MATH-500 (D62): base done
+- 200 sampled problems at the 8,192 cap, about 2.8 h. Champion run started 14:59.
+- **Accuracy 85.5** (SE 2.5). Cut 14.5% (29), mean 2,533 tokens.
+- **Every one of the 171 finished traces is correct.** All misses are cuts, mostly hard ones (level 5: 16, level 4: 8, level 3: 4, level 2: 1).
+- Grader check:
+  - math-verify accepted none of 60 deliberately wrong boxed answers;
+  - it accepts equivalent forms, e.g. `(3,\frac{\pi}{2})` for `\left( 3, \frac{\pi}{2} \right)`.
+  - The 100% is therefore real. Possible causes are that the model is strong at MATH or that MATH-500 is in its training data; we cannot tell which.
+- So at this budget MATH-500 measures only whether the model *finishes*.
+- Budget curve:
+
+  | cap | 1,024 | 2,048 | 3,072 | 4,096 | 6,144 | 8,192 |
+  |---|---|---|---|---|---|---|
+  | base | 48.5 | 65.5 | 70.5 | 76.5 | 84.0 | 85.5 |
