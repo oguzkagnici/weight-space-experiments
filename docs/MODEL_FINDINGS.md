@@ -474,3 +474,20 @@ xychart-beta
 *Base and champion nearly overlap; the champion is slightly above at every budget.*
 
 **Methodological note:** the official IFEval checker is not deterministic, because of random letter fallbacks and unseeded langdetect. Repeated gradings moved our paired z between 1.96 and 2.07. We seed both per prompt. Anyone comparing IFEval deltas of 1–2 pp should do the same.
+
+## Generalisation: MedQA (D62)
+MedQA (USMLE, 4 options) is a domain the edits never saw, in the same answer format as MMLU-Pro.
+
+- **Same accuracy at 8,192 tokens: 55.9 vs 55.9** (+21/−21).
+- **Clearly better under the selection budget:** +6.6 pp at 3,072 (z 3.2), and ahead at every cap up to 6,144. Median thinking falls from 4,027 to 3,164 tokens (−21%).
+- **Unlike MMLU-Pro, no gain on questions both models finish** (127 vs 131 of 185). The edit's "finish sooner" behaviour transfers. The "conclude better" behaviour seen on MMLU-Pro at 8,192 does not show up in medicine.
+
+```mermaid
+xychart-beta
+  title "MedQA accuracy vs thinking budget (256 questions)"
+  x-axis "cap (tokens)" [1024, 2048, 3072, 4096, 5120, 6144, 8192]
+  y-axis "accuracy %" 0 --> 70
+  line [5.9, 21.5, 32.0, 39.5, 42.6, 46.5, 55.9]
+  line [10.9, 27.7, 38.7, 44.9, 48.4, 53.5, 55.9]
+```
+*Lower line = base; upper = champion. They meet at 8,192.*

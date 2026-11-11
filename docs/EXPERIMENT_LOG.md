@@ -915,3 +915,28 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   | base | 5.9 | 21.5 | 32.0 | 39.5 | 46.5 | 55.9 |
 
   The shape is very close to MMLU-Pro base (33.6 at 3,072, 56.3 at 8,192). Medical questions are as thinking-hungry as general MMLU-Pro for this model.
+
+### 2026-11-11 12:20 — MedQA (D62): result
+- The champion run took about 5.5 h (restart at 06:38). MATH-500 base started at 12:13.
+
+  | 256 questions | accuracy | cut | mean tokens | median tokens | finished-only |
+  |---|---|---|---|---|---|
+  | base | 55.9 | 19.9% | 4,511 | 4,027 | 69.8 (n=205) |
+  | champion | 55.9 | 16.4% | 3,849 | 3,164 | 66.8 (n=214) |
+
+- **Paired at 8,192: 0.0 pp, SE 2.54, +21/−21.** No change.
+  - 16 of the 21 gains are base cuts; 12 of the 21 losses are champion cuts.
+  - On the 185 questions both finish: base 131, champion 127.
+  - Every finished champion trace gave a parseable letter.
+- **Budget curve:**
+
+  | cap | 1,024 | 2,048 | 3,072 | 4,096 | 5,120 | 6,144 | 8,192 |
+  |---|---|---|---|---|---|---|---|
+  | base | 5.9 | 21.5 | 32.0 | 39.5 | 42.6 | 46.5 | 55.9 |
+  | champion | 10.9 | 27.7 | 38.7 | 44.9 | 48.4 | 53.5 | 55.9 |
+
+  At the selection budget, 3,072: **+6.6 pp, z 3.21, +23/−6**. The champion leads at every cap up to 6,144 and ties at 8,192. Median tokens fall 21%.
+- **Contrast with MMLU-Pro:**
+  - On MMLU-Pro at 8,192 the champion was also better on the questions both models finish (78 vs 71), which we read as the L22 finalist-commit unit changing conclusions.
+  - On MedQA it is slightly worse on that set (127 vs 131; −4 out of 185, within noise).
+  - So the efficiency effect transfers to medicine, but the content effect seen on MMLU-Pro does not, or is MMLU-Pro-specific.

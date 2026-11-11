@@ -1,0 +1,3106 @@
+{
+ "bench": "medqa",
+ "cap": 8192,
+ "summary": {
+  "base": {
+   "n": 256,
+   "acc": 55.86,
+   "se": 3.1,
+   "cut": 19.9,
+   "mean_tokens": 4511
+  },
+  "champion": {
+   "n": 256,
+   "acc": 55.86,
+   "se": 3.1,
+   "cut": 16.4,
+   "mean_tokens": 3849
+  }
+ },
+ "paired": {
+  "n": 256,
+  "diff": 0.0,
+  "se": 2.54,
+  "z": 0.0,
+  "plus": 21,
+  "minus": 21
+ },
+ "scores": {
+  "base": {
+   "medqa:0": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4052
+   },
+   "medqa:14": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1221
+   },
+   "medqa:15": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:19": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3291
+   },
+   "medqa:26": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:28": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3398
+   },
+   "medqa:32": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7058
+   },
+   "medqa:36": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:41": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2362
+   },
+   "medqa:44": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:46": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1674
+   },
+   "medqa:48": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5560
+   },
+   "medqa:54": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 577
+   },
+   "medqa:58": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:59": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2081
+   },
+   "medqa:63": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1418
+   },
+   "medqa:64": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5042
+   },
+   "medqa:66": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2656
+   },
+   "medqa:67": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2806
+   },
+   "medqa:78": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 8068
+   },
+   "medqa:81": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:95": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:108": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3598
+   },
+   "medqa:109": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:110": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5016
+   },
+   "medqa:117": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5606
+   },
+   "medqa:130": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:131": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:133": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:141": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:143": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1955
+   },
+   "medqa:144": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:160": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7575
+   },
+   "medqa:161": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2938
+   },
+   "medqa:164": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3941
+   },
+   "medqa:167": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6234
+   },
+   "medqa:178": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3086
+   },
+   "medqa:180": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:185": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3035
+   },
+   "medqa:187": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 556
+   },
+   "medqa:190": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1771
+   },
+   "medqa:196": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4210
+   },
+   "medqa:198": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4303
+   },
+   "medqa:201": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7001
+   },
+   "medqa:202": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1734
+   },
+   "medqa:204": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5492
+   },
+   "medqa:214": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5683
+   },
+   "medqa:218": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1858
+   },
+   "medqa:222": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6592
+   },
+   "medqa:224": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3716
+   },
+   "medqa:225": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 535
+   },
+   "medqa:226": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2474
+   },
+   "medqa:228": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4143
+   },
+   "medqa:233": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1188
+   },
+   "medqa:246": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:253": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5815
+   },
+   "medqa:256": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2505
+   },
+   "medqa:261": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:273": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2227
+   },
+   "medqa:275": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6229
+   },
+   "medqa:279": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:287": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:290": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2139
+   },
+   "medqa:294": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1777
+   },
+   "medqa:302": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2074
+   },
+   "medqa:308": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1014
+   },
+   "medqa:309": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1080
+   },
+   "medqa:319": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2506
+   },
+   "medqa:321": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:332": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2892
+   },
+   "medqa:339": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 882
+   },
+   "medqa:342": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2494
+   },
+   "medqa:347": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1505
+   },
+   "medqa:351": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7493
+   },
+   "medqa:353": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:355": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5750
+   },
+   "medqa:356": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1111
+   },
+   "medqa:360": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6203
+   },
+   "medqa:367": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4143
+   },
+   "medqa:373": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2710
+   },
+   "medqa:377": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3285
+   },
+   "medqa:379": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:385": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3356
+   },
+   "medqa:388": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4344
+   },
+   "medqa:390": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4006
+   },
+   "medqa:395": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1137
+   },
+   "medqa:399": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6017
+   },
+   "medqa:401": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:412": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3501
+   },
+   "medqa:417": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2101
+   },
+   "medqa:418": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5399
+   },
+   "medqa:419": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:427": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 901
+   },
+   "medqa:428": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3509
+   },
+   "medqa:430": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3200
+   },
+   "medqa:431": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1675
+   },
+   "medqa:435": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3673
+   },
+   "medqa:438": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6596
+   },
+   "medqa:442": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1205
+   },
+   "medqa:444": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2356
+   },
+   "medqa:445": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:446": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:447": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:453": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6940
+   },
+   "medqa:455": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2406
+   },
+   "medqa:460": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:465": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2005
+   },
+   "medqa:473": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1296
+   },
+   "medqa:481": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1386
+   },
+   "medqa:485": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1329
+   },
+   "medqa:486": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:487": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1289
+   },
+   "medqa:490": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1733
+   },
+   "medqa:494": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:498": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7103
+   },
+   "medqa:500": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4084
+   },
+   "medqa:512": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5932
+   },
+   "medqa:524": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6810
+   },
+   "medqa:528": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:530": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7174
+   },
+   "medqa:535": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1543
+   },
+   "medqa:548": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:549": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5084
+   },
+   "medqa:552": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3457
+   },
+   "medqa:564": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4997
+   },
+   "medqa:581": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4259
+   },
+   "medqa:588": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:591": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2308
+   },
+   "medqa:592": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1488
+   },
+   "medqa:594": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:608": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4700
+   },
+   "medqa:609": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:614": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:616": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3378
+   },
+   "medqa:622": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:624": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4047
+   },
+   "medqa:627": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2547
+   },
+   "medqa:631": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1416
+   },
+   "medqa:639": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:640": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2970
+   },
+   "medqa:643": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1233
+   },
+   "medqa:656": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1184
+   },
+   "medqa:658": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1935
+   },
+   "medqa:660": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3788
+   },
+   "medqa:661": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:666": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2488
+   },
+   "medqa:667": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1715
+   },
+   "medqa:669": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3172
+   },
+   "medqa:674": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 615
+   },
+   "medqa:676": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7572
+   },
+   "medqa:680": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1065
+   },
+   "medqa:682": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3233
+   },
+   "medqa:690": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7034
+   },
+   "medqa:691": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5524
+   },
+   "medqa:696": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 824
+   },
+   "medqa:704": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1402
+   },
+   "medqa:707": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1298
+   },
+   "medqa:710": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6311
+   },
+   "medqa:711": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3302
+   },
+   "medqa:715": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7061
+   },
+   "medqa:727": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4886
+   },
+   "medqa:730": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:742": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:743": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1849
+   },
+   "medqa:747": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6986
+   },
+   "medqa:748": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 599
+   },
+   "medqa:749": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7125
+   },
+   "medqa:755": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7015
+   },
+   "medqa:756": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1063
+   },
+   "medqa:759": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3828
+   },
+   "medqa:762": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7499
+   },
+   "medqa:763": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6968
+   },
+   "medqa:770": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7667
+   },
+   "medqa:786": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2828
+   },
+   "medqa:795": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4074
+   },
+   "medqa:803": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1863
+   },
+   "medqa:812": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5497
+   },
+   "medqa:815": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2418
+   },
+   "medqa:821": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5068
+   },
+   "medqa:830": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:832": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 8180
+   },
+   "medqa:836": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1246
+   },
+   "medqa:840": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 994
+   },
+   "medqa:842": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2247
+   },
+   "medqa:846": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2844
+   },
+   "medqa:853": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6292
+   },
+   "medqa:855": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:856": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5085
+   },
+   "medqa:859": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3872
+   },
+   "medqa:864": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1612
+   },
+   "medqa:868": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2780
+   },
+   "medqa:869": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6149
+   },
+   "medqa:880": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:884": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 466
+   },
+   "medqa:890": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2605
+   },
+   "medqa:892": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3554
+   },
+   "medqa:894": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 872
+   },
+   "medqa:901": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:903": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2661
+   },
+   "medqa:905": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2783
+   },
+   "medqa:913": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5505
+   },
+   "medqa:926": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2241
+   },
+   "medqa:931": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:934": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5635
+   },
+   "medqa:950": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2558
+   },
+   "medqa:953": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6616
+   },
+   "medqa:955": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1751
+   },
+   "medqa:962": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2281
+   },
+   "medqa:970": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4991
+   },
+   "medqa:982": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2016
+   },
+   "medqa:986": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5568
+   },
+   "medqa:995": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1005": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1006": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1039": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1139
+   },
+   "medqa:1055": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3994
+   },
+   "medqa:1071": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1358
+   },
+   "medqa:1072": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1714
+   },
+   "medqa:1083": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5651
+   },
+   "medqa:1087": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7166
+   },
+   "medqa:1105": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3788
+   },
+   "medqa:1108": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7343
+   },
+   "medqa:1110": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7743
+   },
+   "medqa:1115": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1600
+   },
+   "medqa:1118": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 431
+   },
+   "medqa:1120": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 569
+   },
+   "medqa:1121": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2581
+   },
+   "medqa:1134": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4689
+   },
+   "medqa:1136": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5000
+   },
+   "medqa:1137": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7278
+   },
+   "medqa:1141": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 929
+   },
+   "medqa:1142": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1131
+   },
+   "medqa:1150": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1905
+   },
+   "medqa:1156": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1173": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1323
+   },
+   "medqa:1178": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1465
+   },
+   "medqa:1180": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1204
+   },
+   "medqa:1184": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3360
+   },
+   "medqa:1192": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1266
+   },
+   "medqa:1194": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7808
+   },
+   "medqa:1203": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1651
+   },
+   "medqa:1206": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3497
+   },
+   "medqa:1211": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3263
+   },
+   "medqa:1217": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6985
+   },
+   "medqa:1220": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6562
+   },
+   "medqa:1226": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6230
+   },
+   "medqa:1228": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6683
+   },
+   "medqa:1233": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6774
+   },
+   "medqa:1238": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6582
+   },
+   "medqa:1241": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1247": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 8142
+   },
+   "medqa:1249": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2862
+   },
+   "medqa:1258": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1240
+   },
+   "medqa:1262": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5231
+   },
+   "medqa:1263": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1507
+   },
+   "medqa:1270": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   }
+  },
+  "champion": {
+   "medqa:0": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1608
+   },
+   "medqa:14": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1409
+   },
+   "medqa:15": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:19": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 997
+   },
+   "medqa:26": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5029
+   },
+   "medqa:28": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5332
+   },
+   "medqa:32": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:36": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4465
+   },
+   "medqa:41": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2501
+   },
+   "medqa:44": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:46": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 597
+   },
+   "medqa:48": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4208
+   },
+   "medqa:54": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 761
+   },
+   "medqa:58": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2498
+   },
+   "medqa:59": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2197
+   },
+   "medqa:63": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1719
+   },
+   "medqa:64": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3590
+   },
+   "medqa:66": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3173
+   },
+   "medqa:67": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2994
+   },
+   "medqa:78": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1761
+   },
+   "medqa:81": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:95": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:108": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1517
+   },
+   "medqa:109": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:110": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2126
+   },
+   "medqa:117": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3166
+   },
+   "medqa:130": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7654
+   },
+   "medqa:131": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:133": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3467
+   },
+   "medqa:141": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3338
+   },
+   "medqa:143": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4804
+   },
+   "medqa:144": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6949
+   },
+   "medqa:160": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:161": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1134
+   },
+   "medqa:164": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1028
+   },
+   "medqa:167": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4688
+   },
+   "medqa:178": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1471
+   },
+   "medqa:180": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:185": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3161
+   },
+   "medqa:187": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 258
+   },
+   "medqa:190": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1190
+   },
+   "medqa:196": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2079
+   },
+   "medqa:198": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3238
+   },
+   "medqa:201": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2385
+   },
+   "medqa:202": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 610
+   },
+   "medqa:204": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:214": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5029
+   },
+   "medqa:218": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2104
+   },
+   "medqa:222": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:224": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6882
+   },
+   "medqa:225": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 845
+   },
+   "medqa:226": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2525
+   },
+   "medqa:228": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2894
+   },
+   "medqa:233": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3264
+   },
+   "medqa:246": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6725
+   },
+   "medqa:253": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5971
+   },
+   "medqa:256": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1633
+   },
+   "medqa:261": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3629
+   },
+   "medqa:273": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 778
+   },
+   "medqa:275": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3378
+   },
+   "medqa:279": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:287": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7922
+   },
+   "medqa:290": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1893
+   },
+   "medqa:294": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1953
+   },
+   "medqa:302": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1606
+   },
+   "medqa:308": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 780
+   },
+   "medqa:309": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 994
+   },
+   "medqa:319": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1886
+   },
+   "medqa:321": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:332": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2494
+   },
+   "medqa:339": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 593
+   },
+   "medqa:342": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5532
+   },
+   "medqa:347": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1665
+   },
+   "medqa:351": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:353": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7358
+   },
+   "medqa:355": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2604
+   },
+   "medqa:356": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1095
+   },
+   "medqa:360": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5096
+   },
+   "medqa:367": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2787
+   },
+   "medqa:373": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3046
+   },
+   "medqa:377": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5921
+   },
+   "medqa:379": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5599
+   },
+   "medqa:385": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5392
+   },
+   "medqa:388": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2599
+   },
+   "medqa:390": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1925
+   },
+   "medqa:395": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1005
+   },
+   "medqa:399": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7021
+   },
+   "medqa:401": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:412": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4085
+   },
+   "medqa:417": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2089
+   },
+   "medqa:418": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 887
+   },
+   "medqa:419": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:427": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 400
+   },
+   "medqa:428": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2519
+   },
+   "medqa:430": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2103
+   },
+   "medqa:431": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4178
+   },
+   "medqa:435": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2569
+   },
+   "medqa:438": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:442": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1310
+   },
+   "medqa:444": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1640
+   },
+   "medqa:445": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7178
+   },
+   "medqa:446": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:447": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:453": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2833
+   },
+   "medqa:455": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2024
+   },
+   "medqa:460": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3707
+   },
+   "medqa:465": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1087
+   },
+   "medqa:473": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 760
+   },
+   "medqa:481": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1360
+   },
+   "medqa:485": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1331
+   },
+   "medqa:486": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3272
+   },
+   "medqa:487": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2027
+   },
+   "medqa:490": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2856
+   },
+   "medqa:494": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5218
+   },
+   "medqa:498": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:500": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:512": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2827
+   },
+   "medqa:524": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6297
+   },
+   "medqa:528": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7401
+   },
+   "medqa:530": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6264
+   },
+   "medqa:535": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 421
+   },
+   "medqa:548": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:549": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1866
+   },
+   "medqa:552": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2816
+   },
+   "medqa:564": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7964
+   },
+   "medqa:581": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4779
+   },
+   "medqa:588": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4912
+   },
+   "medqa:591": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1500
+   },
+   "medqa:592": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2238
+   },
+   "medqa:594": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3380
+   },
+   "medqa:608": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2455
+   },
+   "medqa:609": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1537
+   },
+   "medqa:614": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2767
+   },
+   "medqa:616": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7596
+   },
+   "medqa:622": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:624": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3685
+   },
+   "medqa:627": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3423
+   },
+   "medqa:631": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5575
+   },
+   "medqa:639": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7114
+   },
+   "medqa:640": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1160
+   },
+   "medqa:643": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1623
+   },
+   "medqa:656": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 626
+   },
+   "medqa:658": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 952
+   },
+   "medqa:660": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1168
+   },
+   "medqa:661": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:666": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:667": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 588
+   },
+   "medqa:669": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3167
+   },
+   "medqa:674": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 424
+   },
+   "medqa:676": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:680": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 697
+   },
+   "medqa:682": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:690": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3792
+   },
+   "medqa:691": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5294
+   },
+   "medqa:696": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 453
+   },
+   "medqa:704": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2058
+   },
+   "medqa:707": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1675
+   },
+   "medqa:710": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7035
+   },
+   "medqa:711": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3520
+   },
+   "medqa:715": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:727": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1734
+   },
+   "medqa:730": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5415
+   },
+   "medqa:742": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:743": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3331
+   },
+   "medqa:747": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5598
+   },
+   "medqa:748": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 667
+   },
+   "medqa:749": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3831
+   },
+   "medqa:755": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:756": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1781
+   },
+   "medqa:759": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5762
+   },
+   "medqa:762": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4799
+   },
+   "medqa:763": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1288
+   },
+   "medqa:770": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2408
+   },
+   "medqa:786": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1918
+   },
+   "medqa:795": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5775
+   },
+   "medqa:803": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3370
+   },
+   "medqa:812": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4171
+   },
+   "medqa:815": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2278
+   },
+   "medqa:821": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2574
+   },
+   "medqa:830": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:832": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3628
+   },
+   "medqa:836": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 755
+   },
+   "medqa:840": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 943
+   },
+   "medqa:842": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1988
+   },
+   "medqa:846": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2877
+   },
+   "medqa:853": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3168
+   },
+   "medqa:855": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:856": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:859": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:864": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1550
+   },
+   "medqa:868": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2660
+   },
+   "medqa:869": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4331
+   },
+   "medqa:880": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:884": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 307
+   },
+   "medqa:890": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1251
+   },
+   "medqa:892": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 7226
+   },
+   "medqa:894": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 661
+   },
+   "medqa:901": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:903": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 825
+   },
+   "medqa:905": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3467
+   },
+   "medqa:913": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2435
+   },
+   "medqa:926": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1353
+   },
+   "medqa:931": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4017
+   },
+   "medqa:934": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2065
+   },
+   "medqa:950": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2052
+   },
+   "medqa:953": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1910
+   },
+   "medqa:955": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5931
+   },
+   "medqa:962": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2641
+   },
+   "medqa:970": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4268
+   },
+   "medqa:982": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1056
+   },
+   "medqa:986": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 3393
+   },
+   "medqa:995": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1906
+   },
+   "medqa:1005": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2043
+   },
+   "medqa:1006": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 2217
+   },
+   "medqa:1039": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1097
+   },
+   "medqa:1055": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1907
+   },
+   "medqa:1071": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2727
+   },
+   "medqa:1072": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 967
+   },
+   "medqa:1083": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6065
+   },
+   "medqa:1087": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1105": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1620
+   },
+   "medqa:1108": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3452
+   },
+   "medqa:1110": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1115": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1646
+   },
+   "medqa:1118": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 452
+   },
+   "medqa:1120": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 482
+   },
+   "medqa:1121": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2302
+   },
+   "medqa:1134": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 4553
+   },
+   "medqa:1136": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1137": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3617
+   },
+   "medqa:1141": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1299
+   },
+   "medqa:1142": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 889
+   },
+   "medqa:1150": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1334
+   },
+   "medqa:1156": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1173": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1064
+   },
+   "medqa:1178": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 969
+   },
+   "medqa:1180": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1450
+   },
+   "medqa:1184": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1763
+   },
+   "medqa:1192": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1989
+   },
+   "medqa:1194": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 8099
+   },
+   "medqa:1203": {
+    "pred": "C",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1597
+   },
+   "medqa:1206": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1211": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 8028
+   },
+   "medqa:1217": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3496
+   },
+   "medqa:1220": {
+    "pred": "B",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6466
+   },
+   "medqa:1226": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3386
+   },
+   "medqa:1228": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "medqa:1233": {
+    "pred": "C",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5091
+   },
+   "medqa:1238": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5766
+   },
+   "medqa:1241": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3526
+   },
+   "medqa:1247": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 5370
+   },
+   "medqa:1249": {
+    "pred": "D",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6175
+   },
+   "medqa:1258": {
+    "pred": "A",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1121
+   },
+   "medqa:1262": {
+    "pred": "A",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 6345
+   },
+   "medqa:1263": {
+    "pred": "D",
+    "correct": 0,
+    "cut": 0,
+    "tokens": 1347
+   },
+   "medqa:1270": {
+    "pred": "B",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4302
+   }
+  }
+ }
+}
