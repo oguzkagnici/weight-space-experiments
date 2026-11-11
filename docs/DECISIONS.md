@@ -98,3 +98,10 @@ All runs compare base with champion `gen008_carry_stack_shortans_L23_finalist_L2
 **Policy implications for generation 10 onward:**
 - Keep MMLU-Pro selection, but treat the tight-budget gain as the main effect.
 - Add a cheap transfer guard that is not answer-format-matched to MMLU-Pro (e.g. GSM8K with `\boxed{}` or 128 IFEval prompts) before crowning a champion. This is a proposal for the user to decide.
+
+### D64 (2026-11-11) — Champion edits committed as sparse diffs (D16), for continuing on another machine
+- `runs/champions/*/weights/` (full float32 tensors, ~63 MB each) are gitignored, so a fresh clone could not rebuild either champion.
+- `scripts/champion_delta.py export <name>` writes `runs/champions/<name>/delta.npz`: per tensor, the flat indices and bf16 bits of every weight that differs from the base model.
+  - The diff stores the **bf16-rounded** values. Both consumers round to bf16 (`engine.py` loads `t.to(bfloat16)`; `gguf_patch` writes a BF16 GGUF), so the bf16 tensor is exactly the evaluated model.
+  - gen005: 6,139 weights in 3 tensors (22 kB). gen008: 32,735 weights in 9 tensors (106 kB). The earlier count of 32,756 included 21 float32 changes that round back to the base bf16 value, i.e. no-ops.
+- `restore <name>` rebuilds `weights/` from the base model and the diff, and restores the original mtimes. `weights_key` hashes path, size and mtime, so with the same `WSP_ROOT` the restored champion has the same key (`9a73e24928252811ccb0` for gen008). The round-trip check passes: identical bf16 values and file sizes.
