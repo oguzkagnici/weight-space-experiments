@@ -955,3 +955,26 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   | cap | 1,024 | 2,048 | 3,072 | 4,096 | 6,144 | 8,192 |
   |---|---|---|---|---|---|---|
   | base | 48.5 | 65.5 | 70.5 | 76.5 | 84.0 | 85.5 |
+
+### 2026-11-11 17:45 — MATH-500 (D62): result
+- The champion run took about 2.7 h. The queue is now empty.
+
+  | 200 problems | accuracy | cut | mean tokens | median tokens | finished-only |
+  |---|---|---|---|---|---|
+  | base | 85.5 | 14.5% | 2,533 | 1,064 | 100.0 (171/171) |
+  | champion | 87.0 | 12.5% | 2,447 | 1,041 | 99.4 (174/175) |
+
+- Paired at 8,192: **+1.5 pp, SE 1.94, z 0.77, +9/−6**. Not significant.
+  - All 9 gains are base cuts; 5 of the 6 losses are champion cuts.
+- The champion's single "wrong" finished answer is a **grader false negative**: a correct `pmatrix` written with `\\[4pt]` row spacing, which math-verify fails to parse. Counted as correct, the champion would be 87.5 (+2.0 pp). We report the grader's number.
+- Budget curve, paired diff (z):
+
+  | cap | 512 | 1,024 | 2,048 | 3,072 | 4,096 | 6,144 | 8,192 |
+  |---|---|---|---|---|---|---|---|
+  | base | 21.0 | 48.5 | 65.5 | 70.5 | 76.5 | 84.0 | 85.5 |
+  | champion | 25.5 | 48.5 | 67.5 | 72.0 | 76.5 | 82.0 | 87.0 |
+  | diff | +4.5 (2.4) | 0 | +2.0 (1.1) | +1.5 (0.9) | 0 | −2.0 (−1.2) | +1.5 (0.8) |
+
+- **No efficiency effect on MATH-500:** median tokens are 1,064 vs 1,041. This contrasts with GSM8K (−37%), MMLU-Pro and MedQA (−21%).
+  - Hypothesis H62a: the wrap-up and short-answer units key on the answer-format instruction in the prompt ("finish with 'The answer is …'"), which GSM8K, MMLU-Pro and MedQA share and MATH-500 (`\boxed{}`) and IFEval lack. IFEval also showed little token saving (−4%).
+  - A direct test would be MATH-500 with the "The answer is" instruction, or GSM8K with `\boxed{}`. Not run.

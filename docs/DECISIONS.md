@@ -77,3 +77,24 @@ are marked, not deleted. (D = decision; U = the user's choice; C = proposed by C
   - `score_ifeval` sets `NLTK_DATA`.
 - Checker sanity check: on a hand-made `punctuation:no_comma` case, a response without commas passes and one with a comma fails.
 - **Calibration against the model card:** on the first 358 base prompts, prompt-level strict is 84.4% overall, and **96.2% on the 314 that finish within 8,192 tokens**, against the card's 96.66 (no output limit). The gap is the cut traces, which score 0 here as everywhere in this project. Reporting will give both figures (all prompts, and finished only) plus the budget curve.
+
+### D63 (2026-11-11) — Outcome of D62: the champion's gain is mostly efficiency, and it transfers only partly
+All runs compare base with champion `gen008_carry_stack_shortans_L23_finalist_L22`, paired, with the same per-item seeds. Selection set: MMLU-Pro at 3,072.
+
+| benchmark | n | 8,192: base → champ (Δ, z) | tight budget Δ (z) | median tokens | format harm |
+|---|---|---|---|---|---|
+| MMLU-Pro (held-out) | 128 | 56.3 → 64.1 (+7.8, 2.74) | +11.7 at 3,072 (3.83) | −18% (mean) | n/a |
+| GSM8K | 250 | 93.6 → 92.8 (−0.8, −0.82) | +18.0 at 512 | −37% | none |
+| IFEval (prompt strict) | 541 | 81.9 → 84.8 (+3.0, 2.07) | +4.4 at 3,072 | −4% | none |
+| MedQA | 256 | 55.9 → 55.9 (0.0, 0.0) | +6.6 at 3,072 (3.21) | −21% | none |
+| MATH-500 | 200 | 85.5 → 87.0 (+1.5, 0.77) | ±2, none significant | −2% | none |
+
+**Conclusions:**
+1. **No benchmark got worse.** IFEval, the model's stated purpose and the most likely place for answer-format damage, shows identical instruction-following quality on prompts both models finish.
+2. **The robust effect is efficiency, and it is prompt-dependent.** It appears where the prompt ends with a "The answer is …" instruction (MMLU-Pro, GSM8K, MedQA) and mostly vanishes where it does not (MATH-500 with `\boxed{}`, IFEval). See H62a.
+3. **Accuracy beyond efficiency is MMLU-Pro-specific.** Only MMLU-Pro shows the champion better on questions both models finish (78 vs 71). MedQA shows 127 vs 131, and IFEval and MATH-500 show ties.
+4. **At 8,192 tokens, the only significant gains are on the selection benchmark (MMLU-Pro) and, borderline, on IFEval.**
+
+**Policy implications for generation 10 onward:**
+- Keep MMLU-Pro selection, but treat the tight-budget gain as the main effect.
+- Add a cheap transfer guard that is not answer-format-matched to MMLU-Pro (e.g. GSM8K with `\boxed{}` or 128 IFEval prompts) before crowning a champion. This is a proposal for the user to decide.

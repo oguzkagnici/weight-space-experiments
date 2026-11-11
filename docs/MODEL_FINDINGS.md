@@ -491,3 +491,28 @@ xychart-beta
   line [10.9, 27.7, 38.7, 44.9, 48.4, 53.5, 55.9]
 ```
 *Lower line = base; upper = champion. They meet at 8,192.*
+
+## Generalisation: MATH-500 and overall picture (D62/D63)
+**MATH-500.** The base model gets every problem it finishes right (171/171); every miss is a cut, mostly level 4–5. The champion scores 87.0 vs 85.5 (+1.5, z 0.8). Its one "wrong" answer is a grader parse failure on a correct matrix. Median tokens are unchanged (1,064 vs 1,041). **The edits do not shorten MATH-500 reasoning.**
+
+**Overall picture across five benchmarks:**
+
+```mermaid
+xychart-beta
+  title "Champion minus base, percentage points (8,192 budget vs selection budget 3,072)"
+  x-axis ["MMLU-Pro", "GSM8K", "IFEval", "MedQA", "MATH-500"]
+  y-axis "Δ pp" -5 --> 15
+  bar [7.8, -0.8, 3.0, 0.0, 1.5]
+  bar [11.7, 2.0, 4.4, 6.6, 1.5]
+```
+*First bar per benchmark = Δ at 8,192 tokens; second = Δ at 3,072 tokens.*
+
+| | answer-format instruction in prompt | median-token change | 3,072 Δ |
+|---|---|---|---|
+| MMLU-Pro | "The answer is (X)" | −18% (mean) | +11.7 |
+| MedQA | "The answer is (X)" | −21% | +6.6 |
+| GSM8K | "The answer is N" | −37% | +2.0 (+18 at 512) |
+| IFEval | none (free-form instructions) | −4% | +4.4 |
+| MATH-500 | `\boxed{}` | −2% | +1.5 |
+
+**H62a (open):** the units fire on the "The answer is …" instruction context rather than on reasoning in general. The tokens saved line up with that instruction almost perfectly. If H62a holds, the champion is a format-conditional efficiency patch, not a general reasoning improvement. That is still useful for a model meant for fixed-format local agents.
