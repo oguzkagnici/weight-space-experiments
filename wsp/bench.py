@@ -25,6 +25,8 @@ BENCHES = {
     "gsm8k": ("GSM8K test, 250 sampled; last 'answer is N' (else last number) vs gold", 250),
     "medqa": ("MedQA-USMLE 4-option test, 256 sampled; same MC protocol as MMLU-Pro", 256),
     "math500": ("MATH-500, 200 sampled; last \\boxed{} vs gold with math-verify", 200),
+    # H62a: the same 250 GSM8K questions with the \\boxed{} instruction instead of "The answer is N"
+    "gsm8k_boxed": ("GSM8K, same 250 as gsm8k, \\boxed{} instruction; math-verify vs gold (H62a)", 250),
 }
 
 
@@ -54,6 +56,12 @@ def prep(bench):
         for i, r in _sample(d, n, bench):
             gold = r["answer"].split("####")[-1].strip().replace(",", "")
             items.append({"id": f"gsm8k:{i}", "messages": [{"role": "user", "content": f"{r['question']}\n\n{NUM_INSTR}"}],
+                          "meta": {"gold": gold}})
+    elif bench == "gsm8k_boxed":
+        d = load_dataset("openai/gsm8k", "main", split="test", token=tok)
+        for i, r in _sample(d, n, "gsm8k"):                       # same sample as gsm8k
+            gold = r["answer"].split("####")[-1].strip().replace(",", "")
+            items.append({"id": f"gsm8k:{i}", "messages": [{"role": "user", "content": f"{r['question']}\n\n{BOX_INSTR}"}],
                           "meta": {"gold": gold}})
     elif bench == "medqa":
         d = load_dataset("GBaker/MedQA-USMLE-4-options", split="test", token=tok)
@@ -163,7 +171,7 @@ def score_ifeval(rows, items):
 def score(bench, rows, items):
     if bench == "ifeval":
         return score_ifeval(rows, items)
-    f = {"gsm8k": score_gsm8k, "medqa": score_mc, "math500": score_math}[bench]
+    f = {"gsm8k": score_gsm8k, "medqa": score_mc, "math500": score_math, "gsm8k_boxed": score_math}[bench]
     res = {}
     for it in items:
         r = rows[it["id"]]

@@ -978,3 +978,9 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - **No efficiency effect on MATH-500:** median tokens are 1,064 vs 1,041. This contrasts with GSM8K (−37%), MMLU-Pro and MedQA (−21%).
   - Hypothesis H62a: the wrap-up and short-answer units key on the answer-format instruction in the prompt ("finish with 'The answer is …'"), which GSM8K, MMLU-Pro and MedQA share and MATH-500 (`\boxed{}`) and IFEval lack. IFEval also showed little token saving (−4%).
   - A direct test would be MATH-500 with the "The answer is" instruction, or GSM8K with `\boxed{}`. Not run.
+
+### 2026-11-11 17:55 — H62a test queued: GSM8K with `\boxed{}`
+- Same 250 GSM8K questions, ids and seeds as `gsm8k`. The only change is the instruction: "put your final answer within \boxed{}" instead of "finish with 'The answer is N'". Graded with math-verify, unit-checked: `\boxed{1,200}` matches 1200, and 19 does not match 18.
+- Prediction if H62a holds: the champion's token saving (−37% median with the "answer is" instruction) largely disappears, and the 512-token lead (+18 pp) shrinks.
+- If the saving persists, the units respond to the task (short arithmetic) rather than to the instruction format.
+- About 2 h of CPU in total.
