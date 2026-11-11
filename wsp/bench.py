@@ -141,6 +141,7 @@ def score_ifeval(rows, items):
     os.environ.setdefault("NLTK_DATA", "/home/user/nltk_data")   # punkt_tab fetched by hand (D62)
     sys.path.insert(0, IFEVAL_SRC)
     from instruction_following_eval import evaluation_lib as ev
+    from langdetect import DetectorFactory
     out = {}
     for it in items:
         r = rows[it["id"]]; m = it["meta"]
@@ -148,7 +149,12 @@ def score_ifeval(rows, items):
                               prompt=it["messages"][0]["content"], kwargs=m["kwargs"])
         resp = "" if r["cut"] else r["content"].strip()
         p2r = {inp.prompt: resp}
-        s = ev.test_instruction_following_strict(inp, p2r); l = ev.test_instruction_following_loose(inp, p2r)
+        # The official checker draws random letters (letter_frequency with a non-letter target such as '#') and
+        # langdetect is unseeded: seed both per prompt so grading is reproducible and order-independent (D62).
+        random.seed(f"ifeval:{m['key']}"); DetectorFactory.seed = 0
+        s = ev.test_instruction_following_strict(inp, p2r)
+        random.seed(f"ifeval:{m['key']}"); DetectorFactory.seed = 0
+        l = ev.test_instruction_following_loose(inp, p2r)
         out[it["id"]] = {"correct": int(s.follow_all_instructions), "loose": int(l.follow_all_instructions),
                          "inst_strict": s.follow_instruction_list, "inst_loose": l.follow_instruction_list}
     return out

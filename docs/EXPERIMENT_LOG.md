@@ -872,3 +872,31 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - The L23 short-answer unit therefore looks conditional on answer-style prompts and does not fire on open-ended writing.
 - Of the 5 losses, 3 are champion cuts on prompts where base only just finished (7,751, 7,970 and 8,116 tokens), i.e. noise at the cap boundary. The other 2 are real misses: a truncated-looking JSON (id 13) and a letter-frequency constraint (id 1402).
 - Median tokens on this subset are about equal (2,589 vs 2,649). Unlike on MMLU-Pro and GSM8K, the champion does not think less here.
+
+### 2026-11-11 00:50 — IFEval (D62): result
+- The champion run took about 10 h; MedQA base started at 00:40.
+- **Grading fix:** the official checker is not deterministic.
+  - `keywords:letter_frequency` with a non-letter target (e.g. '#', '!', which occurs in the dataset) silently draws a random letter, a known upstream quirk.
+  - `change_case:english_*` and `language:*` call an unseeded `langdetect`.
+  - Repeated gradings flipped 3 base prompts (ids 1122, 1129, 279), moving accuracy by ±0.2 pp and the paired z between 1.96 and 2.07.
+  - `score_ifeval` now seeds `random` per prompt (`ifeval:<key>`) and sets `DetectorFactory.seed = 0`. The checker logic is unchanged; three regrades give identical numbers. The base figure logged at 14:25 (81.7) was an unseeded draw; the seeded figure is 81.9.
+
+  | 541 prompts, 8,192 cap | prompt strict | prompt loose | inst strict | inst loose | cut | mean tokens |
+  |---|---|---|---|---|---|---|
+  | base | 81.9 | 83.6 | 81.7 | 82.7 | 14.4% | 3,846 |
+  | champion | 84.8 | 86.0 | 83.9 | 84.8 | 11.3% | 3,689 |
+
+- Paired, prompt strict: **+2.96 pp, SE 1.43, z 2.07, +38/−22**. Loose: +2.4 pp, z ~1.6. The strict result sits just at the z = 2 line.
+- **The gain is all from finishing more often.**
+  - 33 of the 38 gains are prompts base cuts; 18 of the 22 losses are prompts the champion cuts.
+  - On the 443 prompts both finish, strict is 425 vs 426 and loose 433 vs 430: identical instruction-following quality.
+  - Finished-only strict: base 95.7 (n=463), champion 95.6 (n=480).
+- **No format harm.** Per-category instruction-level passes on the both-finish set are equal within ±1 in every category, including detectable_format at 136/136 for both and length_constraints at 104 vs 103. The visible response stays full length (median 880 vs 856 characters). "answer is" appears in 11 base and 17 champion responses, all natural uses.
+- Budget curve (prompt strict):
+
+  | cap | 1,024 | 2,048 | 3,072 | 4,096 | 6,144 | 8,192 |
+  |---|---|---|---|---|---|---|
+  | base | 9.2 | 29.8 | 47.7 | 61.4 | 73.8 | 81.9 |
+  | champion | 9.8 | 30.7 | 52.1 | 63.0 | 75.4 | 84.8 |
+
+  The lead is small everywhere, at most +4.4 pp at 3,072. That is much smaller than on MMLU-Pro and GSM8K, where the tight-budget gains were +10 to +18 pp: the wrap-up units barely shorten open-ended writing (median 3,078 → 2,943 tokens).

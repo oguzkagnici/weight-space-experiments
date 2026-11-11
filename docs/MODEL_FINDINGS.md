@@ -455,3 +455,22 @@ xychart-beta
   line [58.4, 74.4, 83.6, 89.6, 90.8, 91.2, 92.8]
 ```
 *Lower line at the left = base; upper = champion.*
+
+## Generalisation: IFEval (D62)
+IFEval checks whether the response obeys formatting instructions such as "no commas", "all lowercase", "at least 300 words" or "wrap in JSON". Instruction following is the model's stated purpose, and it is the obvious place for an answer-format edit to do harm.
+
+- **No harm.** On the 443 prompts both models finish, they pass the same number (425 vs 426 strict). Per-category results are equal within ±1. The L23 short-answer unit does not fire on open-ended writing: responses stay full length, and "The answer is" does not leak into them.
+- **Small net gain, from finishing more often:** 81.9 → 84.8 prompt-strict (+3.0 pp, z 2.07, borderline). Base cuts 14.4% of prompts at 8,192 and the champion 11.3%. Both score about 95.7% on the prompts they finish, which matches the model card's 96.66 measured with no output limit.
+- **Much less thinking saved than on reasoning tasks.** Median tokens fall only from 3,078 to 2,943. The wrap-up and finalist units were selected on multiple-choice reasoning, and on open-ended generation they mostly stay quiet.
+
+```mermaid
+xychart-beta
+  title "IFEval prompt-level strict vs thinking budget (541 prompts)"
+  x-axis "cap (tokens)" [1024, 2048, 3072, 4096, 6144, 8192]
+  y-axis "accuracy %" 0 --> 100
+  line [9.2, 29.8, 47.7, 61.4, 73.8, 81.9]
+  line [9.8, 30.7, 52.1, 63.0, 75.4, 84.8]
+```
+*Base and champion nearly overlap; the champion is slightly above at every budget.*
+
+**Methodological note:** the official IFEval checker is not deterministic, because of random letter fallbacks and unseeded langdetect. Repeated gradings moved our paired z between 1.96 and 2.07. We seed both per prompt. Anyone comparing IFEval deltas of 1–2 pp should do the same.
