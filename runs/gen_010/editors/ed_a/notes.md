@@ -31,3 +31,13 @@
 ## Pass 3 result (generate edited v1, cap 8192, 6 q x 4 samples, vs passk parent samples; code/017)
 - 37.5 -> 37.5 (+0.0, SE 13.5, +5/-5); both-finish n20 +5.0 (SE 15.3, +5/-4); cut 3 -> 2; 0/24 identical, median first difference at 4% of the trace.
 - Pure resampling: the edit changes letter logits everywhere letters occur, so traces diverge immediately; swaps are not tied to the decision mechanism (which pass 2 showed is unchanged).
+
+## Pass 4 result (read original, swap test; code/018)
+- 53 pair statements, forced "Thus I'll go with (" right after the pair sentence. Preference logP(X)-logP(Y) with X named first: +2.22; after swapping the names so Y is first: +1.01. Mention order is worth ~1.2 logits (median 0.9) toward the FIRST-NAMED finalist (~2 logits after T=0.6); content still dominates (4/53 picks flip).
+- Gold in pair (n30): P(pick gold) .70 with the trace's order, .77 swapped.
+- Letter-label ramp (pass 2) is not the cause; mention-order primacy is (L20 H13/H15/H9 attend more to the first-named letter, corr .63-.75 with the preference; pass 1).
+
+## Pass 7 (diagnostic, NOT the candidate): read edited = parent with L20 o_proj input columns of heads 9,12,13,15 zeroed (code/019), on the 106 swap probes. v1 is restored afterwards by re-running code/013 (after dropping edits).
+- Pass 5 (holdout48 ids[:24], v1): 62.5 -> 70.8 (+8.3, SE 10.3, +4/-2); both-finish n18 +0.0 (SE 11.4, +2/-2); cut 5 -> 4; 0/24 identical, median first diff 3%.
+- Pass 6 (holdout48 ids[24:], v1): 62.5 -> 58.3 (-4.2, SE 4.2, +0/-1); both-finish n21 +0.0 (0/0); cut 2 -> 3; 1/24 identical.
+- HOLDOUT48 total (v1): 62.5 -> 64.6, +2.1 (SE 5.6, +4/-3); both-finish n39 +0.0 (SE 5.2, +2/-2); cut 7 -> 7; 1/48 identical, median first diff 3% of trace.
