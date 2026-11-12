@@ -25,3 +25,11 @@ top-50 at the last position. Question: does the latent preference pick gold more
   punctuation and hedges ("maybe", "or", "something").
 - => Wrong conclusions are NOT low-probability samples at the decision token. Local sharpening at letter/decision tokens is
   useless. The divergence is spread over the reasoning path.
+
+## Pass 2 result (code/007)
+- Forced answer right after the last finalist statement == realised final pick in 51/58 finished traces; letter mass 0.98,
+  usually p>0.95. Gold in pair (31): probe picks gold 20, realised 21. Over all 58: probe top == gold 23, realised 26.
+- => By the time the model states two finalists, its conclusion is already fixed (latent == final). A commit-at-finalist
+  edit cannot change conclusions. The parent's L22 unit (commit after finalist paragraph) is therefore content-neutral, as observed.
+
+## Pass 3 (read, original): forced-answer probes at 15/40/70% of finished traces (mixed questions first), code/008.
