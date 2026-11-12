@@ -1041,3 +1041,35 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Code: `ga new-gen --sel-cap`, `ga select --parent-chunks`, `ga guard`, `decide --bf-z/--guard-z`, both-finish statistics; editor generate passes accept `"cap": 8192`. The server was re-executed between jobs to load them.
 - Check on old data: generation 9's two candidates had **0 changed answers** on the 71 and 70 selection questions both models finished at 3,072 (+0/−0). Their whole selection effect was finishing, or not finishing, traces.
 - Brief `prompts/editor_task_think_g10.md`, drafted from g9: content-failure targets, the new selection rule, 8,192 banks, generation-9 and D60–D63/H62a findings. The headroom numbers are filled in when the run finishes.
+
+### 2026-11-12 04:20 — Headroom (pass@k) of the gen-8 champion at 8,192; generation 10 launched
+- Run: 64 trace-bank practice ids × 4 samples (seeds `id:0..3`), cap 8,192, 256 answers, about 4.5 h. Output: `runs/shared/passk_gen008champ_cap8192_det1.jsonl`.
+
+  | measure | value |
+  |---|---|
+  | pass@1 (mean over samples) | 55.5% |
+  | maj@4 (finished samples, ties split) | 61.2% (+5.7) |
+  | pass@4 | 67.2% (+11.7) |
+  | cut at 8,192 | 16.4% |
+  | accuracy of finished answers | 66.4% (214) |
+
+- Questions by number of correct samples (of 4): 0 → 21, 1 → 5, 2 → 5, 3 → 5, 4 → 28.
+  - 15 questions are mixed; 21 are never right.
+  - 52 of the 72 finished-wrong answers are on never-right questions: knowledge or reasoning out of reach for edits that add no knowledge.
+- What wrong answers are not (text heuristics):
+  - Abandoning a right answer stated earlier: only 3 of 72 finished-wrong answers had the thinking state the gold letter as its answer first.
+  - A letter mismatch: the final letter equals the last answer stated in the thinking in 212 of 212.
+  - Right answers rarely come from a switch either: 7 of 142.
+- Reading:
+  - The content headroom for edits without new knowledge is about +6 points (the majority-vote gain), with a loose ceiling of +12.
+  - The errors sit in the reasoning path: fact recall, option judgement, picking between finalists.
+  - Expect small effects. D65's 256-question selection (SE about 2) is sized for about +4.
+- Generation 10 created:
+  - Parent: the gen-8 champion. Editors `claude` (a fork of the orchestrating session) and `ed_a` (a fresh sub-agent).
+  - 8 passes each, 1 candidate each.
+  - Selection: 256 questions at 8,192 tokens (seed `selection-gen-10`).
+  - Brief `editor_task_think_g10.md`.
+- Focus:
+  - `claude`: decision points in mixed questions (forced-answer probes along right and wrong samples).
+  - `ed_a`: systematic content slips (NOT/EXCEPT, units, wrong criterion).
+- The parent's 256 selection answers are queued in 8 chunks of 32 at priority 8, behind editor passes (priority 5).

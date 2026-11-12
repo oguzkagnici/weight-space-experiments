@@ -24,7 +24,12 @@ HOW IT WILL BE MEASURED (thinking mode, phase 2 of the experiment). Every candid
 - You never see the selection or held-out questions. The config, tokenizer, chat template, sampling and budget are fixed: only weight values can change.
 
 WHAT IS KNOWN ABOUT THE PARENT AT 8,192 TOKENS (new for this generation):
-{HEADROOM}
+- HEADROOM (`runs/shared/passk_gen008champ_cap8192_det1.jsonl`: 64 trace-bank questions x 4 samples, 8,192 tokens):
+  - single-sample accuracy (pass@1) 55.5%; majority answer of the finished samples (maj@4, ties split) 61.2%; right in at least one of 4 samples (pass@4) 67.2%. 16.4% of answers are cut at 8,192; accuracy among finished answers is 66.4%.
+  - Questions by number of correct samples out of 4: 0 -> 21, 1 -> 5, 2 -> 5, 3 -> 5, 4 -> 28. So 15 questions are MIXED (the model can get them right but does not reliably), 21 are never right (knowledge or reasoning out of reach; 52 of the 72 finished-wrong answers are there), 28 always right.
+  - The majority-vote gain (+5.7 points) is the clearest estimate of what better commitment to the model's own best conclusion could give; pass@4 (+11.7) is a loose ceiling for edits that do not add knowledge.
+  - What wrong answers are NOT: abandoning a right answer stated earlier is rare (in only 3 of 72 finished-wrong answers did the thinking state the gold letter as its answer before switching); the final letter always matched the last answer stated inside the thinking (0 mismatches in 212 finished answers). Right answers rarely come from a switch either (7 of 142 stated another letter first). The errors are in the reasoning path itself: which fact is recalled, how options are judged, which of the finalists is picked.
+  - Mixed questions by subject: health 4, psychology 3, physics 2, economics 2, law, engineering, philosophy, other 1 each.
 
 WHAT IS KNOWN ABOUT THE PARENT AT 3,072 TOKENS (the shared trace bank of generations 8-9: the same 96 practice questions; see item 3 below):
 - Accuracy 39.6% (SE 5.0). 49% of answers (47 of 96) run into the 3,072-token cap. Of the 49 that finished, 38 were correct (78%); finished answers used 1,408 tokens on average (thinking + answer). The visible answer after "</think>" is now about 19 characters ("The answer is (X)"), against ~1,000 before generation 8.
