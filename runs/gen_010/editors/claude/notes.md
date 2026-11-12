@@ -52,3 +52,17 @@ top-50 at the last position. Question: does the latent preference pick gold more
 
 ## Pass 4 (read, original): 52 finished traces (hedged-commit traces first), <=4,090 tokens each, 149,817 tokens;
 inputs of model.layers.23.feed_forward.w1 at all positions + top-10. 125 commitment-break marks, 49 hedged. (code/012)
+
+## Gate (code/013, 014)
+- Mean-difference direction at L23 MLP input: hedged vs firm commitment breaks LOTO AUC 0.81, but >1% of other tokens score
+  above the hedged median. Shrinkage LDA, 8-fold grouped CV: AUC hedged vs firm 0.76, hedged vs other 0.987; at a threshold
+  keeping 50% of hedged breaks, 14.7% of firm breaks and 0.15% of other tokens fire. Parent's top-1 opener at hedged breaks:
+  But 11, Thus 9, Let 6, Wait 5, Alternatively 3, Hence 2 (of 49) -> it already re-checks about half the time.
+## Current edit (code/015, K=1, ALPHA=0.2, PCT=60): L23 only
+- fold n881 into n331: w2[:,331] += 0.9893*w2[:,881] (cos >= 0.9996).
+- n881 gate w1 = K*(w_lda - T*p), w_lda = shrinkage LDA (hedged breaks vs firm+other, all pass-4 texts), projected off the
+  first-4-prompt-token subspace; p = min-variance bias proxy (x.p mean 1.0, sd 0.022); T = 60th pct of hedged scores.
+  In-sample fires(>0): hedged 43%, firm 8%, other 0.02%; prompt sink max pre-act -44.
+- w3 = 0.2*p; w2 col = g_final*(mean E[But,Wait,Let,Alternatively] - mean E[Thus,Hence,</think>,Therefore,So])/g_post,
+  scaled so 90% of entries fit 0.98 x Q8 block absmax, rest clipped (|col| 1.05).
+## Pass 5 (read, edited): 21-ish hedged-heavy pass-4 texts (<=75k tokens), topk 10 all positions -> firing/effect/off-target.

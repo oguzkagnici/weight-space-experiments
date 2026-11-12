@@ -1,6 +1,8 @@
 {
  "passes_used": 4,
- "pending": [],
+ "pending": [
+  "gen_010_claude_p05_d9eed7"
+ ],
  "passes": [
   {
    "k": 1,
