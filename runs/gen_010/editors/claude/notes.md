@@ -13,3 +13,7 @@ token_logprobs + top-10. Goal: probability of the sampled letter/verdict at comm
 - Finalist pairs (code/004): in the second half of finished traces, a two-letter finalist statement ("X or Y", "between X and Y")
   occurs in 20/142 right and 32/72 wrong answers. When gold is in the last stated pair: picked gold 16, picked the other 14
   -> the finalist decision is ~coin-flip (53%). These 14 = 19% of all finished-wrong answers.
+
+## Pass 2 (read, original), queued early: forced-answer probe at the LAST two-finalist statement (after 30% of the trace)
+59 texts (passk + 8192 trace bank, prefix <= 4,080 tokens; 58 finished traces; gold in pair 31); suffix "\n\nSo the answer is (";
+top-50 at the last position. Question: does the latent preference pick gold more often than the realised pick (16/30)?
