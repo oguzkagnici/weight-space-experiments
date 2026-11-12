@@ -78,3 +78,10 @@ commitments x 4 samples at 8,192 (edited only; parent cached).
   not count: budget 5 used of 8. The parent's selection pre-runs gen_010_prerun_parent_00..05 failed the same way.
 - Freed my own activation dump (work/fwd_04/in_model...w1.npy, 600 MB) -> 1.3 GB free; still not enough.
 - The edit (code/015, K=1, ALPHA=0.2) stays staged in edited/. Requests ready: work/req_hold1.json, req_hold2.json, req_dev.json.
+
+## FINAL MEASUREMENT (passes 6-7; holdout48 at 8,192, edited only vs the frozen parent bank; code/017)
+- Overall: 62.5 -> 66.7, +4.17 (SE 4.17), +3/-1; cut 7 -> 5; mean tokens 3,472 -> 3,098.
+- BOTH-FINISH (40 questions): +0.00 (SE 3.58), +1/-1.  -> no content effect; the overall gain = 2 more finished traces.
+- 9/48 traces identical to the parent; median first difference at 12% of the parent trace (resampling, as in gens 6-9).
+- Re-check opener after a hedged commitment (code/018): parent 11/20, edited 8/21 -> the in-sample mechanism (P 0.36 -> 0.57)
+  is not visible in generated traces; resampling dominates.
