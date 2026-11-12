@@ -41,3 +41,5 @@
 - Pass 5 (holdout48 ids[:24], v1): 62.5 -> 70.8 (+8.3, SE 10.3, +4/-2); both-finish n18 +0.0 (SE 11.4, +2/-2); cut 5 -> 4; 0/24 identical, median first diff 3%.
 - Pass 6 (holdout48 ids[24:], v1): 62.5 -> 58.3 (-4.2, SE 4.2, +0/-1); both-finish n21 +0.0 (0/0); cut 2 -> 3; 1/24 identical.
 - HOLDOUT48 total (v1): 62.5 -> 64.6, +2.1 (SE 5.6, +4/-3); both-finish n39 +0.0 (SE 5.2, +2/-2); cut 7 -> 7; 1/48 identical, median first diff 3% of trace.
+- Pass 7 result (diagnostic: L20 heads 9,12,13,15 ablated): order effect 1.20 -> 1.38 logits (median 0.91 -> 1.25). Not reduced, so these heads are NOT the cause; their attention just correlates with the preference.
+- SUBMITTED: ed_a_g10_letter_ramp_removal (v1, code/013 F=0.65; 6 tensors, 19,098 weights). Pass 8 unused.

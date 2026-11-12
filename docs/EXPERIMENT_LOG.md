@@ -1073,3 +1073,29 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - `claude`: decision points in mixed questions (forced-answer probes along right and wrong samples).
   - `ed_a`: systematic content slips (NOT/EXCEPT, units, wrong criterion).
 - The parent's 256 selection answers are queued in 8 chunks of 32 at priority 8, behind editor passes (priority 5).
+
+#### Gen 10: `ed_a` hand-back (2026-11-12)
+
+- Submitted `ed_a_g10_letter_ramp_removal`, using 7 of 8 passes (4 read, 3 generate at 8,192). Report: `runs/gen_010/editors/ed_a/report.md`.
+- What it found:
+  - Wrong finished answers more often name two finalists than right ones do: 42 of 83 against 36 of 180.
+  - When gold and the pick are both in the last stated pair, gold wins 15 of 15 times as the earlier letter but only 14 of 27 times as the later one.
+- The cause is mention order, not the letter label:
+  - The letter logits carry a content-free A→J ramp of about −0.195 logit per letter step.
+  - Removing most of it (down to −0.06) changed the top letter in 0 of 82 forced-answer probes: P(gold) went from .662 to .663.
+  - A swap test on 53 pair statements showed that naming an option first is worth about +1.2 logits for it (median 0.9). Content still decides most picks: 4 of 53 flip.
+  - Four L20 heads (9, 12, 13, 15) look at the first-named letter, but zeroing them does not reduce the effect (1.20 → 1.38). They are not its cause.
+- The edit:
+  - Removes 65% of the ramp from the w2 columns of 11 neurons (L15–L23), along a minimal-norm direction weighted by Q8_0 headroom.
+  - Changes 19,098 weights in 6 tensors.
+- Editor-side evidence at cap 8,192:
+
+  | set | diff (SE) | +/− | both finish |
+  |---|---|---|---|
+  | DEV (6 pick-gone-wrong questions × 4 samples) | +0.0 (13.5) | — | — |
+  | holdout48 | +2.1 (5.6) | +4/−3 | +0.0 (5.2), +2/−2 over 39 |
+
+  - 1 of 48 holdout traces is byte-identical to the parent's, and the median first difference is at 3% of the trace. So the holdout swaps are resampling noise.
+  - The editor's own forecast for selection is about 0.
+- Action: queued the selection runs for the parent (`gen_010_sel_champion`, which reuses the prerun cache) and this candidate at priority 9, behind the remaining `claude` passes.
+- Hypothesis H66a (from ed_a): the remaining lever in the pick between finalists is a mention-order bias of about 1.2 logits. Its circuit is unknown; it is not the L20 heads.
