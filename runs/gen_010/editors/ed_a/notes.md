@@ -20,3 +20,14 @@
 ## Edit v1 (code/013, F=0.65): letter-ramp removal
 - For each of the 11 neurons above: w2[:,j] += -0.65*slope_j*u_j, u_j = headroom-weighted minimal-norm residual direction whose read-out (post_ffn gain x final-norm gain x centred letter embeddings) is the pure ramp (idx-4.5); entries kept within 0.98x Q8 block absmax. Each column's ramp slope reduced to 35%.
 - Pass 2: read edited on the 82 probes (topk, h24). Pass 3: generate edited cap 8192 n=4 on 6110, 5325, 2055, 6941, 2654, 6562 (gold-later finalist losses).
+
+## Pass 2 result (edited v1, probes; code/014)
+- Non-finalist letter slope -0.195 -> -0.060 per letter (ramp mostly removed), but pair decisions unchanged: T0.6 pair-P(gold) .662 -> .663; top letter changed in 0/82 probes; mean |dlogP| .063.
+- => the earlier-finalist preference is NOT the letter-label prior. code/015 (pass-1 attention): preference follows MENTION ORDER: logP(first-mentioned)-logP(second) = +2.40 when first is the earlier letter, +4.17 when the first-mentioned is the later letter (n 18). L20 heads H13/H15/H9 attention(first)-attention(second) correlates .63-.75 with that preference. (Could be the model naming its favourite first; needs a swap test.)
+- Pass 3 (generate, v1) already queued (snapshot taken at queue time).
+- Pass 4 (read, original): 53 pair statements, cut after the pair sentence + "\n\nThus I'll go with (", original vs letter-swapped order (code/016, work/swap_sel.json).
+- Passes 5-6 queued: generate edited (v1, F=0.65 ramp removal) cap 8192 on holdout48 ids[:24] and ids[24:].
+
+## Pass 3 result (generate edited v1, cap 8192, 6 q x 4 samples, vs passk parent samples; code/017)
+- 37.5 -> 37.5 (+0.0, SE 13.5, +5/-5); both-finish n20 +5.0 (SE 15.3, +5/-4); cut 3 -> 2; 0/24 identical, median first difference at 4% of the trace.
+- Pure resampling: the edit changes letter logits everywhere letters occur, so traces diverge immediately; swaps are not tied to the decision mechanism (which pass 2 showed is unchanged).

@@ -33,3 +33,22 @@ top-50 at the last position. Question: does the latent preference pick gold more
   edit cannot change conclusions. The parent's L22 unit (commit after finalist paragraph) is therefore content-neutral, as observed.
 
 ## Pass 3 (read, original): forced-answer probes at 15/40/70% of finished traces (mixed questions first), code/008.
+
+## Pass 3 result (code/009): 43 finished traces (42 from mixed questions), forced answer at 15/40/70%
+- latent==final: 19/43 (15%), 22/43 (40%), 36/43 (70%); latent==gold: 14, 17, 22; final correct 26/43.
+- Wrong traces (17): latent was gold at some checkpoint in 5 (2055 s0/s1, 7456 s0, 5325 s3, 2654 s1), then lost.
+  Right traces (26): latent still wrong at 70% in 4, then fixed.
+- => The conclusion forms gradually and reasoning improves it on average (latent accuracy 33% -> 40% -> 51% -> final 60%).
+  Freezing an earlier belief would lose (-9 at 40%). No single local decision event to repair.
+
+## Hedged commitments (code/010, 011; all finished 8,192 traces, passk + bank, 239 with a commitment)
+- FIRST commitment hedged (hedge word within the paragraph/250 chars before it): 66, first letter right 20 (30%), final right 30
+  (45%), switched 19; mean 6,259 chars after it. Firm: 173, first right 128 (74%), final 132, switched 8, 1,288 chars after.
+- SETTLING (last-letter) commitment hedged: 47, acc 44.7%, median 3,742 chars after; closes within 600 chars in only 9 (44%).
+  Firm settling: 192, acc 73.4%; 126 close within 600 chars (81.7%).
+- Interpretation: re-checking after a hedged first commitment nets +10/66; the model already re-checks after hedged commits.
+  Candidate lever (weak, the only content-directed one left): make the model re-check after a HEDGED commitment instead of
+  wrapping up (the parent's L20 unit pushes wrap-up after any stated answer). Expected effect small; test it causally.
+
+## Pass 4 (read, original): 52 finished traces (hedged-commit traces first), <=4,090 tokens each, 149,817 tokens;
+inputs of model.layers.23.feed_forward.w1 at all positions + top-10. 125 commitment-break marks, 49 hedged. (code/012)
