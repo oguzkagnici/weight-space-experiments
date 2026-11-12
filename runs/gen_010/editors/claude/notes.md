@@ -17,3 +17,11 @@ token_logprobs + top-10. Goal: probability of the sampled letter/verdict at comm
 ## Pass 2 (read, original), queued early: forced-answer probe at the LAST two-finalist statement (after 30% of the trace)
 59 texts (passk + 8192 trace bank, prefix <= 4,080 tokens; 58 finished traces; gold in pair 31); suffix "\n\nSo the answer is (";
 top-50 at the last position. Question: does the latent preference pick gold more often than the realised pick (16/30)?
+
+## Pass 1 result (code/006)
+- Letters at in-thinking commitment phrases ("answer is (", "go with (", ...) are near-deterministic: median p 1.00 in right
+  (75) and wrong (44) traces; p<0.9 in 11% / 2%. First commitment letter of wrong traces: p >= 0.97 in 11/12.
+- Low-probability sampled tokens (p<0.05): 30.1 per 1k generated tokens in right traces vs 31.0 in wrong ones; mostly
+  punctuation and hedges ("maybe", "or", "something").
+- => Wrong conclusions are NOT low-probability samples at the decision token. Local sharpening at letter/decision tokens is
+  useless. The divergence is spread over the reasoning path.
