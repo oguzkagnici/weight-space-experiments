@@ -1099,3 +1099,56 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - The editor's own forecast for selection is about 0.
 - Action: queued the selection runs for the parent (`gen_010_sel_champion`, which reuses the prerun cache) and this candidate at priority 9, behind the remaining `claude` passes.
 - Hypothesis H66a (from ed_a): the remaining lever in the pick between finalists is a mention-order bias of about 1.2 logits. Its circuit is unknown; it is not the L20 heads.
+
+#### Gen 10: `claude` hand-back (2026-11-12)
+
+- Submitted `claude_g10_hedged_recheck_L23`, using 8 of 8 passes. Three earlier attempts failed on the full disk (D66) and did not count.
+- Its report is recorded here because sub-agents can't write `report.md`. Working files: `runs/gen_010/editors/claude/`.
+
+**Diagnosis (8,192-token traces, practice questions):**
+- **Not bad luck at the decision token** (pass 1). The letter at a commitment phrase in the thinking has median probability 1.00 in both right and wrong traces. Low-probability sampled tokens are as common in one as the other: 30 vs 31 per 1,000.
+- **The conclusion is fixed before the two finalists are named** (pass 2).
+  - A forced "So the answer is (" right after the last two-finalist statement equals the final pick in 51 of 58 traces.
+  - When the right answer is one of the two finalists, the forced answer picks it in 20 of 31 traces and the real pick in 21 of 31.
+  - So edits that make the model commit at the finalist statement cannot change conclusions. This includes the parent's L22 unit.
+- **The answer forms gradually** (pass 3).
+  - Forced answers at 15%, 40% and 70% of the thinking are right in 14, 17 and 22 of 43 traces, against 26 for the final answer.
+  - Drift goes both ways: in 5 of 17 wrong traces the answer was right mid-trace and then lost; in 4 of 26 right traces it was fixed after 70%.
+  - Freezing the belief at 40% would lose about 9 of 43.
+- **Hedged first commitments are the one strong sign of a likely-wrong answer:**
+
+  | first commitment | count | right at first | right at the end |
+  |---|---|---|---|
+  | hedged ("I'd guess", "likely") | 66 | 30% | 30 (45%) |
+  | firm | 173 | 74% | 132 (76%) |
+
+  The model already re-checks after most hedged commitments.
+
+**The edit (layer 23):**
+- Neuron 881 is folded into its near-duplicate 331 to free a slot.
+- The new gate fires at the paragraph break right after a hedged commitment. It is a shrinkage-LDA direction; held-out AUC is 0.76 against firm breaks and 0.987 against all other tokens.
+- It writes re-check openers (But, Wait, Let, Alternatively) minus wrap-up openers (Thus, Hence, `</think>`, Therefore, So). In effect it is the parent's L20 wrap-up unit reversed, for hedged conclusions only.
+- In-sample, at hedged breaks the median probability of a re-check opener goes 0.36 → 0.57 and of a wrap-up opener 0.04 → 0.006.
+
+**Editor-side evidence:**
+
+| set | overall | both finish |
+|---|---|---|
+| holdout48 at 8,192 (measured once) | +4.17 (SE 4.17), +3/−1; cut 7 → 5 | **+0.00 (SE 3.58), +1/−1** |
+| dev: 6 hedge-heavy questions × 4 samples | +20.8 (SE 8.5), +5/−0 | +4/−0 |
+
+- The dev numbers are inflated: the questions were chosen from the parent's own samples, and some were used to fit the gate.
+- In the generated holdout traces, re-checking after a hedged commitment did not rise: parent 11/20, edit 8/21. The overall gain comes from finishing two more traces.
+
+**Its suggestions:**
+1. Measure a resampling-noise baseline with a null edit (the fold only).
+2. Target how options are judged early in the trace, where the conclusion is set.
+3. Treat the majority-vote headroom (+5.7) as variance across sampled traces, which a single local unit cannot reach.
+
+**Action:** queued the selection runs for the parent (`gen_010_sel_champion`) and this candidate at priority 9. The parent's re-queued prerun chunks fill its cache first. The GSM8K guard is deferred until a candidate clears selection (z ≥ 2 and both-finish z ≥ 1).
+
+**Combined reading of gen 10's diagnosis (both editors):**
+- Wrong answers to multiple-choice questions are settled gradually, before the finalists are named.
+- The final pick is not where accuracy is lost: the letter shows no close calls, and mention order is a weak bias that content overrides.
+- Most remaining errors are on questions the model never gets right (missing knowledge).
+- No local unit tried so far changes conclusions.

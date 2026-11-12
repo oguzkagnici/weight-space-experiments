@@ -1,0 +1,26 @@
+{
+ "label": "claude_g10_hedged_recheck_L23",
+ "editor": "claude",
+ "gen": 10,
+ "time": 1794511664.34652,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.5199043154716492,
+   "sha_bf16": "3bb73cc9d9551c34"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 4090,
+   "numel": 15728640,
+   "rel_change": 0.01709763891994953,
+   "sha_bf16": "af00bcf2580b271b"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.013217313215136528,
+   "sha_bf16": "438f8a731ef6b067"
+  }
+ }
+}
