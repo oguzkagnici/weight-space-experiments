@@ -155,3 +155,25 @@ The user's direction (2026-11-11): "Continue aiming for intelligence". The selec
 | `runs/shared/holdout48_bank_gen008champ_cap8192_det1.jsonl` | 48 fixed holdout ids (`holdout48_ids.json`) | Editors' final measurement at 8,192 (2 edited-only passes) |
 
 **Cost:** about 9 h of machine time per model for selection plus 1 h for the guard. A generation with two candidates takes about 1.5–2 days. Accepted for this direction.
+
+### D66 (2026-11-12): GGUF cache capped at 2 files after the disk allowance ran out
+
+**What happened:** the session's writable disk allowance (about 39 GB, although `df` reports 252 GB) ran out at 0.7 GB free. Every GGUF build needs about 5.3 GB of scratch (the bf16 GGUF plus Q8_0), so these failed at the quantize step:
+- the parent's prerun chunks 00–07;
+- `gen_010_sel_champion`;
+- the `claude` editor's three final passes. Failed passes don't count against its budget.
+
+**What filled it:**
+- the cache's 3 Q8_0 files (5.5 GB) next to an in-progress build;
+- per-pass edit snapshots in the editors' `work/` directories (361 MB each);
+- activation dumps.
+
+**Fix:**
+- Deleted two stale cached Q8 files. They are rebuilt on demand.
+- Deleted `ed_a`'s 4 finished-pass snapshots (1.4 GB) and the pip/uv caches.
+- `MAX_GGUF_CACHE` 3 → 2 (`wsp/gen.py`). The cost is an occasional rebuild of a few minutes.
+- Free space went from 0.7 GB to 8.2 GB.
+- Re-queued the prerun chunks. `gen_010_sel_champion` is re-queued when `ga select` runs for the `claude` candidate.
+- Told the editors to delete activation dumps once analysed.
+
+**Check from now on:** `df -h /` "Avail" should stay ≥ 6 GB before a build. Below that, prune `runs/gen_*/editors/*/work/fwd_*_snapshot`.

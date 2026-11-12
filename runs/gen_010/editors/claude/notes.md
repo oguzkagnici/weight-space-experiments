@@ -66,3 +66,15 @@ inputs of model.layers.23.feed_forward.w1 at all positions + top-10. 125 commitm
 - w3 = 0.2*p; w2 col = g_final*(mean E[But,Wait,Let,Alternatively] - mean E[Thus,Hence,</think>,Therefore,So])/g_post,
   scaled so 90% of entries fit 0.98 x Q8 block absmax, rest clipped (|col| 1.05).
 ## Pass 5 (read, edited): 21-ish hedged-heavy pass-4 texts (<=75k tokens), topk 10 all positions -> firing/effect/off-target.
+
+## Pass 5 result (code/016; in-sample texts): hedged breaks (39) median P(reopen openers) 0.359 -> 0.566, P(wrap) 0.039 -> 0.006,
+reopen +0.2 in 10/39; firm breaks (35) unchanged (0.271/0.348); off-target top-1 changed at 0.042% of 69,425 positions,
+mean |d top-1 logprob| 0.00038 (p99 0.0015). Mechanism acts as designed; off-target change is small but will still resample traces.
+## Final measurement: passes 6-7 = holdout48 at 8,192 (edited only, 24+24); pass 8 = DEV, 6 passk questions with most hedged
+commitments x 4 samples at 8,192 (edited only; parent cached).
+
+## BLOCKED (2026-11-12 ~12:20 UTC): disk full
+- Passes 6 (holdout48 x2) and DEV failed at llama-quantize (disk: 719 MB free; a GGUF build needs ~5.3 GB). Failed passes do
+  not count: budget 5 used of 8. The parent's selection pre-runs gen_010_prerun_parent_00..05 failed the same way.
+- Freed my own activation dump (work/fwd_04/in_model...w1.npy, 600 MB) -> 1.3 GB free; still not enough.
+- The edit (code/015, K=1, ALPHA=0.2) stays staged in edited/. Requests ready: work/req_hold1.json, req_hold2.json, req_dev.json.
