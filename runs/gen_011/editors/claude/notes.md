@@ -17,3 +17,14 @@
 71 finished traces (36 wrong, 35 right; 40 questions), 3 probes each: p0 before the preceding paragraph, p1 before the meta paragraph,
 p2 after it; suffix "\n\nSo far, the most likely answer is ("; top-50 at last position. 213 texts, 196k tokens.
 Question: does the meta paragraph move P(gold) (and P(final pick)) more than the preceding ordinary paragraph does?
+
+## Pass 1 result (code/012, 013): the exam-meta paragraph is a COMMITMENT step, not a harmful one
+- dP(final pick) across the meta paragraph +0.099 vs -0.017 across the preceding ordinary paragraph (all 71). Right traces: dP(gold) meta +0.072
+  (SE .054); wrong traces: dP(gold) -0.068 (SE .039) = toward their (wrong) final. Symmetric -> it commits to the current leader.
+- EARLY ANCHORING: at ~24% of the trace (p0) the forced answer already equals the final pick in 25/36 wrong (P(gold) 0.08) and 20/35 right.
+  Forced probes are always sharp (median P(top) 0.90 right / 0.96 wrong), so confidence does not separate them.
+- => Exam-meta suppression has no lever (dropped). Wrong conclusions are fixed in the first ~20% of the thinking.
+
+## Pass 2 (read, original; code/014): WHERE do samples of the same mixed question split?
+50 finished samples of the 15 mixed questions; forced answer after 25/50/100/200/400/800 generated tokens + one probe right after "<think>"
+per question (315 texts, 148k tokens); token_logprobs + top-10 at ALL positions (gives the parent's alternatives along the first 800 tokens).
