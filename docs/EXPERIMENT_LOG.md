@@ -1163,3 +1163,13 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Lost time:
   - Three container restarts during selection. Each needed a server and watchdog restart; the per-item cache kept all finished answers.
   - The disk incident (D66) delayed the `claude` editor by about 10 h.
+
+### Generation 11 (D68): launched 2026-11-13
+
+- Parent: the gen-8 champion. Editors `claude` (fork) and `ed_a` (fresh), 8 passes and 1 candidate each.
+- Brief: `editor_task_think_g11.md`.
+- Selection: gen 10's 256 questions at 8,192 tokens (reused via `--sel-from 10`).
+- Focus:
+  - `claude`: early option judgement on mixed questions.
+  - `ed_a`: the causal circuit of the mention-order bias (~+1.2 logits).
+- Queued the resampling control `gen_011_control_parent_s1` (parent, sample 1, same 256 questions, priority 9).

@@ -85,12 +85,16 @@ def cmd_new_gen(a):
     if os.path.exists(gd):
         sys.exit(f"{gd} exists")
     sel_pool = data.splits()["selection"]
-    sel = sorted(random.Random(f"selection-gen-{g}").sample(sel_pool, a.sel_n))
+    if a.sel_from:   # D68: reuse an earlier generation's selection questions (same parent -> its cached answers are reused)
+        sel = json.load(open(os.path.join(gen_dir(a.sel_from), "gen.json")))["selection_questions"]
+        a.sel_n = len(sel)
+    else:
+        sel = sorted(random.Random(f"selection-gen-{g}").sample(sel_pool, a.sel_n))
     os.makedirs(os.path.join(gd, "editors")); os.makedirs(os.path.join(gd, "selection"))
     gen = {"gen": g, "name": f"gen_{g:03d}", "parent": st["champion"], "parent_weights": st["champion_weights"],
            "editors": a.editors.split(","), "budget": a.budget, "max_candidates": a.max_cands,
            "selection_questions": sel, "created": time.time(), "focus": json.loads(a.focus) if a.focus else {},
-           "protocol": a.protocol, "template": a.template, "sel_cap": a.sel_cap}
+           "protocol": a.protocol, "template": a.template, "sel_cap": a.sel_cap, "sel_from": a.sel_from}
     if a.trace_bank:
         tb = os.path.abspath(a.trace_bank)
         gen["trace_bank"] = tb; gen["trace_n"] = sum(1 for _ in open(tb))
@@ -507,6 +511,7 @@ def main():
     p.add_argument("--template", default="editor_task.md")
     p.add_argument("--trace-bank", default=None, help="jsonl of base-model thinking traces shared with editors (phase 2)")
     p.add_argument("--sel-cap", type=int, default=None, help="thinking budget of the selection runs (D65: 8192)")
+    p.add_argument("--sel-from", type=int, default=None, help="D68: reuse this generation's selection questions")
     sp.add_parser("candidates")
     p = sp.add_parser("select"); p.add_argument("--wait", action="store_true")
     p.add_argument("--priority", type=int, default=0)  # e.g. 9: run after editor passes

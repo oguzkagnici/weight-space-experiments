@@ -1,0 +1,2 @@
+#!/bin/bash
+cd "/home/user/weight-space-experiments/runs/gen_011/editors/ed_a" && WSP_EDITOR_DIR="/home/user/weight-space-experiments/runs/gen_011/editors/ed_a" PYTHONPATH="/home/user/weight-space-experiments" exec /home/user/venv/bin/python  "$@"

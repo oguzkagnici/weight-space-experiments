@@ -199,3 +199,23 @@ The user's direction (2026-11-11): "Continue aiming for intelligence". The selec
 **Reading:**
 - Both results match the editors' own holdout forecasts of about 0.
 - `ed_a`'s +3.1 is at the size of resampling noise: its read pass showed the targeted decisions do not change (0 of 82 top-letter flips).
+
+### D68 (2026-11-13): Generation 11 — the editors' new content targets, the same selection set, and a resampling control
+
+The user asked to run generation 11 with the targets the gen-10 editors recommended. The setup is the same as D65 (8 passes and 1 candidate per editor; 8,192-token selection; both-finish z ≥ 1; GSM8K-boxed guard z ≥ −2), with these changes:
+
+- **Targets:**
+  - `claude` (fork): **early option judgement**, i.e. per-option verdicts during the sweep on mixed questions, comparing right and wrong samples. The aim is a systematic bias that makes wrong samples reject the right option.
+  - `ed_a` (fresh sub-agent): **mention-order bias**. Find the causal circuit behind the ~+1.2 logits the first-named finalist gets, remove it, and check whether the bias also acts earlier in the sweep.
+- **Brief:** `prompts/editor_task_think_g11.md`. It is the g10 brief plus:
+  - a gen-10 summary;
+  - the diagnosis to build on: the letter is never the problem, the conclusion is fixed before the finalists are named, the answer forms gradually, errors are mostly missing knowledge, and the mention-order effect;
+  - the two new targets;
+  - the read limit and disk notes.
+- **Selection set:** `ga new-gen --sel-from 10` reuses gen 10's 256 hidden questions.
+  - The parent is unchanged, so its cached answers cost nothing, saving about 9 h of machine time.
+  - The paired comparison stays unbiased because candidates resample their own traces.
+  - The two gen-10 losers were compared on the same set; that adds no selection bias towards a gen-11 candidate.
+- **Resampling control:** `gen_011_control_parent_s1` runs the parent on the same 256 questions with sample index 1 (different seeds), at priority 9.
+  - This is one draw of the paired diff under pure resampling, with no mechanism.
+  - It checks that the paired SE is calibrated, and puts gen 10's +3.1 (z 1.49) in context.
