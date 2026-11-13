@@ -10,7 +10,7 @@ LI = list(LETTER_IDS); LET = "ABCDEFGHIJ"
 E = load("model.embed_tokens.weight")[LI].numpy()            # 10 x 2048
 Ec = E - E.mean(0, keepdims=True)
 gf = load("model.embedding_norm.weight").numpy()
-H24 = find("*hidden*24*.npy") if glob.glob(D + "*hidden*24*") else find("*hidden*.npy")
+H24 = np.load(D + "h24.npy")
 # which convention: is H24 pre-norm?
 tk = np.load(D + "topk_ids.npy"); tl = np.load(D + "topk_logprobs.npy")
 def sel_from_topk(t):
@@ -27,7 +27,7 @@ target = np.array([sel[t] if ix[t]["kind"] == "prior" else LET.index(ix[t]["pred
 kind = np.array([i["kind"] for i in ix])
 res = []
 for l in range(24):
-    h = find(f"*mlp*_{l}.npy") if glob.glob(D + f"*mlp*_{l}.npy") else find(f"*mlp*{l:02d}*.npy")
+    h = np.load(D + f"mlp{l}.npy")
     W2 = load(f"model.layers.{l}.feed_forward.w2.weight").numpy(); gp = load(f"model.layers.{l}.post_ffn_norm.weight").numpy()
     y = h @ W2.T; ry = rms(y)                                   # MLP output per text
     # per-neuron centered letter-logit contribution to target: h_j * (Ec[target] . (scale*gp/ry * W2[:,j]))

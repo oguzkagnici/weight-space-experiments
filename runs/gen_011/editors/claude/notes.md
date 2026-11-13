@@ -43,3 +43,18 @@ per question (315 texts, 148k tokens); token_logprobs + top-10 at ALL positions 
 ## Pass 3 (read, original; code/018): components writing the PRIOR vs COPYING the concluded letter
 64 prior probes (render_think(q) + "So far, the most likely answer is (") + 130 copy positions (finished traces cut after the last
 "answer is (" after </think>, <= 4,000 tokens); w2 inputs all 24 layers, o_proj inputs of the 11 attention layers, hidden_states[24], last position.
+
+## Pass 3 result (code/019): the prior and the final copy share one head -> no separable "prior" circuit (H18 dropped)
+- Centered letter DLA: L22 H12 writes the prior letter (+4.63) AND copies the concluded letter at the final answer (+6.76); next L22 H15 (+0.73/+0.89).
+- MLP neurons are small (<= 0.15 each); the prior-specific ones (L17 n616, L15 n4408, L19 n6621, L20 n3964, n6101) are the content-free
+  A->J ramp writers that ed_a showed do not change decisions. => anchoring is belief carried in content, not a separate letter carrier.
+
+## Test-gaming heuristic (code/020, 021) - the best-supported content lever found
+- G = "typical exam/test/MCQ ...", "in such questions", "test maker", "exam style ... usually", "(exam|question) likely expects".
+- Finished 8,192 traces: with G 95, acc 44.2%; without 144, acc 83.3%. WITHIN the same question (29 q): -10.9 pts (SE 6.5, z -1.7).
+  First G at ~61-66% of the trace; in 31/49 cut traces. ("they want ..." and the opening "multiple choice question" are neutral; excluded.)
+- H21: when the model falls back on guessing what the exam expects instead of content, its conclusions get worse; suppressing the onset
+  of the gaming phrase should keep it on content reasoning.
+
+## Pass 4 (read, original; code/022): L23 w1 inputs at all positions + top-10, 40 traces (<= 4,090 tokens), 139k tokens
+129 gaming-onset positions (the token before the gaming noun), 80 content positions before " exam"/" test" (negatives).

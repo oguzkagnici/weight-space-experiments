@@ -19,3 +19,13 @@
 - Path 2 (query letter identity -> prompt option line of the first-named letter): syn H12 attention to option-end tokens 0.167 (first-named line) vs 0.092; real only .043 vs .038. Upstream writers of letter identity into H12's query are diffuse (L14H15, L14 mix, L16H10 ... each <= .03 real).
 ## Edit E1 (code/015): L22 q_proj rows of heads 12 and 15: W_h -= alpha * u u^T W_h, u = normalise(q_norm.weight * delta_unrotated), alpha 1. 155k entries change (3.7% rel).
 - Pass 3 (read, EDITED E1, same 262 texts): last-position writes, L22 o_proj input, attn_last L22.
+
+## Pass 3 results (code/017): E1 vs original on the same 262 swap texts
+- Total first-named advantage: real +0.846 -> +0.617 (d -0.229, SE .033); syn +3.139 -> +2.947 (d -0.191, SE .018).
+- H12 direct: real +1.244 -> +0.726 (d -0.52, SE .08); syn +3.32 -> +2.76. L22 attention total real +1.15 -> +0.58. The L22 MLP (leader suppression) compensates less: -0.73 -> -0.48; L23 MLP -0.15 -> -0.07. So only ~45% of the direct reduction reaches the output.
+- H12 attention to the pair letter windows: real first .042 -> .039, second .028 -> .041 (now symmetric); syn .103/.069 -> .087/.078.
+- P(gold | pair, T 0.6): real .5066 -> .5060 (d -.0006, SE .004); syn .665 -> .670 (d +.005, SE .004). Gold top letter 24 -> 24 / 56 real, 119 -> 121 / 178 syn. Top letter changed in 9 of 262 texts. Real pick flips under swap 6 -> 5 of 42.
+- The remaining order effect is query-side (letter identity of the first-named option written into the commit residual) and diffuse: almost every head that reads the pair letters prefers the first-named one (L12 H0 ratio 3.0, H8 2.8, H2 2.5; L16 H10 2.1; L20 H13 1.9 ...), each contributing <= .03 to H12's query preference. No small set of heads to edit.
+## Final measurement: passes 4-5 = holdout48 at 8,192 (edited E1 only, 24 + 24), paired against the parent bank.
+- Pass 6 (generate, edited E1, cap 8,192, n 4): DEV = 6 mixed passk questions with many pair statements (6562, 1171, 6143, 10964, 2055, 6110), paired vs the passk bank.
+- Pass 7 (generate, edited E1, cap 3,072): 3,072 holdout bank ids[:48] (optional comparison).

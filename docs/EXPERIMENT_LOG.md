@@ -1173,3 +1173,8 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - `claude`: early option judgement on mixed questions.
   - `ed_a`: the causal circuit of the mention-order bias (~+1.2 logits).
 - Queued the resampling control `gen_011_control_parent_s1` (parent, sample 1, same 256 questions, priority 9).
+- 2026-11-13: the container was down from about 10:20 to 22:55 UTC.
+  - No file anywhere changed in that window, including the agents' transcripts. So it was a container outage, not a server hang.
+  - Recovery: restarted the server and watchdog (`ed_a`'s pass 4 was re-queued) and told both editors to re-arm their waits.
+  - Nothing was charged or lost, but about 12.5 h of wall time went.
+  - Progress by then: `claude` 3/8 passes (reads); `ed_a` 3/8 reads plus 4 generate passes queued (its final measurement).
