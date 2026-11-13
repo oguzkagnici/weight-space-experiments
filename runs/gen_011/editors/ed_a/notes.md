@@ -11,3 +11,11 @@
 - DLA: L22 attention carries it (+1.15 real / +3.05 syn), almost all from **L22.H12** (+1.24 / +3.32). L22 MLP counteracts (-0.73 / -1.58, leader suppression). L20.mix +0.24, L14.mix +0.19. Other heads small (L20H13 +.19, L22H15 +.16, L22H13 -.18).
 - H12 attention at commit: real: prompt .45 / thinking .55; first-named letter window .058 vs second .029; syn: .169 vs .070. Most attention goes to prompt option lines and other letter mentions.
 - Pass 2 (read, ORIGINAL, same 262 texts, positions all): L22 v_proj and k_norm outputs, to decompose H12's output by source position and find the key direction of "first-named".
+
+## Pass 2 results (code/010-014)
+- H12 order effect by source (real / syn, logits): first-named pair window +1.45/+2.62, second-named window -0.85/-1.84 (net pair +0.59/+0.78), prompt +0.25/+2.59, rest of thinking +0.40/0.00.
+- Query recovered exactly from attention + keys (lstsq on log attention, r 1.000). Key difference first-named minus second-named letter token (kv head 3) is CONSISTENT: |mean| 2.67 vs mean |dK| 6.08; 95% of it in unrotated dims. H12 mean query . delta = +0.39 = nearly all of the observed score gap +0.45 (H15 +0.25 of 0.38, H14 .19/.27, H13 .04/.17).
+- delta is partly the option-primacy slot direction of direct mode (cos .41 with key(A)-key(J) of prompt option letters); prompt option-letter keys project on delta-hat: A 5.1, B 2.7, C 1.6 ... J 1.3; pair first 3.5 vs second 0.9. => a generic "first in a list" key feature.
+- Path 2 (query letter identity -> prompt option line of the first-named letter): syn H12 attention to option-end tokens 0.167 (first-named line) vs 0.092; real only .043 vs .038. Upstream writers of letter identity into H12's query are diffuse (L14H15, L14 mix, L16H10 ... each <= .03 real).
+## Edit E1 (code/015): L22 q_proj rows of heads 12 and 15: W_h -= alpha * u u^T W_h, u = normalise(q_norm.weight * delta_unrotated), alpha 1. 155k entries change (3.7% rel).
+- Pass 3 (read, EDITED E1, same 262 texts): last-position writes, L22 o_proj input, attn_last L22.

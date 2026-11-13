@@ -28,3 +28,18 @@ Question: does the meta paragraph move P(gold) (and P(final pick)) more than the
 ## Pass 2 (read, original; code/014): WHERE do samples of the same mixed question split?
 50 finished samples of the 15 mixed questions; forced answer after 25/50/100/200/400/800 generated tokens + one probe right after "<think>"
 per question (315 texts, 148k tokens); token_logprobs + top-10 at ALL positions (gives the parent's alternatives along the first 800 tokens).
+
+## Pass 2 result (code/015-017): wrong samples stay ANCHORED on the no-thinking prior
+- Prior = forced answer right after "<think>" (one per question): == gold in 2/15 mixed questions (max P 0.39-0.99).
+- prior == final pick: wrong 8/20, right 3/30. Latent == final at 25/50/100/200/400/800 tokens: right [6,6,3,5,13,13]/30, wrong [8,7,6,11,11,14]/20.
+  Lock (latent == final from then on) within 800 tokens: wrong 14/20, right 13/30.
+- Latent == prior at 25..800 tokens: right [19,21,21,21,15,11]/30, wrong [18,16,13,13,12,11]/20; mean P(prior letter) right .55->.33, wrong .72->.43.
+- Within-question (12 q): right samples lock later by 1.13 log2-units (SE .75) - suggestive, not significant. Text marker "early hypothesis
+  before a sweep" is NOT worse within question (+9.8 pts, SE 8.3).
+- Locking windows: no telltale low-probability token (low-p tokens are fillers; top-1 alternatives are function words).
+- Reading: thinking escapes a mostly-wrong prior stochastically; wrong samples escape less. Hypothesis H18: weakening the components that
+  write the prior letter (not those that copy the concluded letter at the end) lets reasoning escape the prior more often.
+
+## Pass 3 (read, original; code/018): components writing the PRIOR vs COPYING the concluded letter
+64 prior probes (render_think(q) + "So far, the most likely answer is (") + 130 copy positions (finished traces cut after the last
+"answer is (" after </think>, <= 4,000 tokens); w2 inputs all 24 layers, o_proj inputs of the 11 attention layers, hidden_states[24], last position.
