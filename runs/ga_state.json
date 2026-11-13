@@ -435,6 +435,57 @@
      "description": "# ed_a_g9_sweep_end_hence_answer_L23: state an answer at the end of an option sweep (\"Hence answer ...\")\n\nTARGETED BEHAVIOUR. On knowledge questions the parent evaluates the options one by one (\"(A) ... - not relevant\", ..., \"(J) ...\").\nAt the paragraph break after the last option of such an evaluation sweep it opens with Thus .42 / We .24 / Given .12 (Hence ~0)\nand usually keeps deliberating; cut bank traces sweep repeatedly. Gen 8 showed that writing \"Hence\" alone is not a commit\n(\"Hence we need ...\"). This edit writes \"Hence\" at the sweep end and then \" answer\" after it, a commit form the parent itself\nuses (\"Hence answer: (C)\", \"Thus answer is (B)\").\n\nCHANGE (layer 23 MLP only; 3 w2 columns, 2 w1 rows, 2 w3 rows).\n- Free two slots in the duplicate group {331, 5105, 881} (w1/w3/w2 cos >= .9995): w2[:,331] += 1.0089 w2[:,5105] + 0.9893 w2[:,881]\n  (factors = w1-ratio x w3-ratio from the weights).\n- n5105 (unit A): gate w1 = 4*(dA - (m0+8)*p) - 1.5*v_imend, projected off the 4 constant prompt-sink inputs; dA = shrinkage-LDA\n  direction at the L23 MLP input, eval sweep-end break vs other breaks (61 vs 2,520 from teacher-forced bank traces; grouped-CV\n  AUC 0.991), threshold z > 8; p = minimum-variance bias proxy (sd .025 on thinking tokens); v_imend = mean input at the prompt's\n  final <|im_end|> (where the option list ends, the gate fired before this fix). w3 = 16 p. w2 column = post_ffn gain x final-norm gain x\n  (E[Hence] - probability-weighted E[Thus, We, Given, ...]), clipped to 0.98 x each row's Q8_0 block absmax (|col| 1.23).\n- n881 (unit B): same construction; gate = forced paragraph-initial \"Hence\" after a sweep end vs all tokens (AUC 1.000), z > 15;\n  it also fires on the parent's own \"Thus\" right after a sweep end. Column -> E[\" answer\"] - (\",\", \" we\", \" the\", \" likely\", ...) (|col| 0.83).\n- Read-out on 192k recorded tokens: units nonzero (|h| > .005) on 0.06% of tokens; prompt silent.\n\nEVIDENCE.\n- Read (teacher-forced, edited): at eval sweep-end breaks P(Hence) .000 -> 1.000 (median; > .5 in 47/54); after \"Hence\" P(\" answer\")\n  .001 -> 1.000 (53/54). After \"Hence answer\" the model writes \" likely\" .55 / \" is\" .19; after \"is\": \" likely\" .61, \" either\" .09.\n- Generate (edited-only, paired against the byte-identical parent banks, same seeds):\n  - bank ids[:48] (DEV): +12.5 (SE 4.8), +6/-0; bank ids[48:]: -4.2 (SE 5.1), +2/-4; ALL 96 BANK: +4.2 (SE 3.6), +8/-4, cut 47 -> 44.\n  - **HOLDOUT BANK (96 untouched questions, measured once): 47.9 -> 45.8, -2.1 (SE 3.9), +6/-8; cut 42 -> 42; tokens 2087 -> 2055.**\n    (holdout half 1: -8.3, +2/-6; half 2: +4.2, +4/-2.)\n  - \"Hence answer\" was inserted in 35 of 96 holdout traces (15 -> 14 correct); the other 61 changed only by resampling (31 -> 30).\n- Why it does not help: what follows the forced \"Hence answer\" is often a hedge (\"likely either F or J\", \"might be (H) or (E)\")\n  and the model keeps deliberating; where it states one letter it was mostly already going to. The edit fires as designed but\n  mostly re-samples the rest of the trace (first difference at a median 16% of the trace; 12/96 traces byte-identical).\n"
     }
    ]
+  },
+  {
+   "gen": 10,
+   "parent": "gen008_carry_stack_shortans_L23_finalist_L22",
+   "winner": null,
+   "rule": "z >= 2.0; both-finish z >= 1.0; gsm8k_boxed guard z > -2.0",
+   "champion_acc": 60.55,
+   "candidates": [
+    {
+     "name": "claude/claude_g10_hedged_recheck_L23",
+     "acc": 59.38,
+     "acc_diff": -1.17,
+     "acc_diff_se": 1.8,
+     "z": -0.65,
+     "wrong_to_right": 9,
+     "right_to_wrong": 12,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 8186,
+     "description": "# claude_g10_hedged_recheck_L23: re-check after a HEDGED commitment instead of wrapping up (content-directed, L23 n881)\n\nTARGETED BEHAVIOUR. When the parent's first commitment inside the thinking is hedged (\"I'd guess (X)\", \"likely (X)\", \"seems (X)\"),\nit is right only 30% of the time (20/66 finished 8,192 traces), against 74% for firm commitments (128/173). Re-checking after a\nhedged first commitment raises it to 30/66 (the model switches 19 times). The parent's L20 wrap-up unit pushes wrap-up words after\nANY stated answer. This unit pushes re-check openers only after hedged commitments, leaving firm ones alone.\n\nWHY THIS AND NOT A DECISION-POINT EDIT (diagnosis, passes 1-3, practice questions only):\n- The letters at in-thinking commitments are near-deterministic (median p 1.00 in right and wrong traces), and low-probability\n  sampled tokens are equally frequent in right and wrong traces (30 vs 31 per 1k): wrong answers are not unlucky samples.\n- A forced answer right after a two-finalist statement equals the final pick in 51/58 traces (gold-in-pair: probe 20/31,\n  realised 21/31): the conclusion is fixed before the finalists are named, so committing there changes nothing.\n- Forced answers at 15/40/70% of the thinking are right in 14/17/22 of 43 traces vs 26 final: the reasoning improves the answer\n  gradually; freezing an earlier belief loses.\n\nCHANGE (layer 23 MLP only; 3 tensors):\n- Freed n881 by folding it into its near-duplicate n331 (w1/w3/w2 cos >= 0.9996): w2[:,331] += 0.9893*w2[:,881].\n- n881 gate (w1 row) = K*(w_lda - T*p), K=1: w_lda = shrinkage-LDA direction at the L23 MLP input, paragraph breaks right\n  after a hedged commitment (49) vs breaks after firm commitments (75) + other generated tokens (~19k), from teacher-forced\n  passk/trace-bank traces; projected off the first-4-prompt-token subspace (sink pre-activation <= -44). p = minimum-variance bias\n  proxy (x.p mean 1.00, sd 0.022). T = 60th percentile of hedged-break scores. 8-fold grouped CV of the direction: AUC hedged vs\n  firm 0.76, hedged vs other 0.987; in-sample firing: hedged 43%, firm 8%, other 0.02%.\n- n881 up (w3 row) = 0.2*p. Write (w2 col) = g_final*(mean E[But, Wait, Let, Alternatively] - mean E[Thus, Hence, </think>,\n  Therefore, So])/g_post, scaled so 90% of entries fit 0.98 x their Q8_0 block absmax, the rest clipped (|col| 1.05).\n\nMECHANISM (pass 5, edited read on 24 of the fitting texts, in-sample): at hedged breaks median P(re-check openers) 0.36 -> 0.57,\nP(wrap openers) 0.04 -> 0.006; firm breaks unchanged (0.27 / 0.35); top-1 token changed at 0.042% of 69k other positions\n(mean |d logprob| 0.0004).\n\nMEASURED (generate, cap 8,192, edited only, paired against the parent's byte-identical banks, same seeds):\n- HOLDOUT48 (48 untouched holdout ids, measured once): 62.5 -> 66.7, +4.17 (SE 4.17), +3/-1; cut 7 -> 5; tokens 3,472 -> 3,098.\n  BOTH-FINISH (40 questions): +0.00 (SE 3.58), +1/-1. 9/48 traces identical; median first difference at 12% of the trace.\n  Re-check opener after a hedged commitment in the generated holdout traces: parent 11/20, edited 8/21 (not visible).\n- DEV (6 passk questions whose 4 parent samples all contain hedged commitments, x4 samples; partly in-sample for the gate):\n  29.2 -> 50.0, +20.8 (SE 8.5), +5/-0; both-finish +21.1 (SE 9.6), +4/-0. CAVEAT: questions chosen by a property of the parent's\n  samples (hedged, so mostly wrong) and every edited trace resamples from ~9% on; regression to the mean inflates this.\nVERDICT: the unselected holdout shows NO content effect (both-finish +1/-1). Expected selection outcome: fails the content check.\n",
+     "bf_n": 201,
+     "bf_diff": -1.0,
+     "bf_se": 1.41,
+     "bf_z": -0.71,
+     "bf_plus": 3,
+     "bf_minus": 5,
+     "guard_diff": null,
+     "guard_se": null,
+     "guard_z": null
+    },
+    {
+     "name": "ed_a/ed_a_g10_letter_ramp_removal",
+     "acc": 63.67,
+     "acc_diff": 3.12,
+     "acc_diff_se": 2.1,
+     "z": 1.49,
+     "wrong_to_right": 19,
+     "right_to_wrong": 11,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 19098,
+     "description": "# ed_a_g10_letter_ramp_removal: remove the content-free early-letter prior from 11 prior-writer neurons\n\nTARGETED BEHAVIOUR. Wrong finished answers name two finalists more often than right ones (42/83 vs 36/180, passk 8,192 bank + 3,072 bank).\nWhen gold and the pick are both in the last stated pair, the model is right 15/15 when gold is the EARLIER letter and 14/27 when it is the LATER one\n(wrong in 9 questions). Hypothesis: the early-letter prior known from direct mode (near-constant writers L20 n1000, L17 n616/n2401, L23 n4597 ...)\ntilts the finalist choice.\n\nCHANGE (w2 columns only, 6 tensors): L15 n4408, L17 n616, n2401, L19 n6621, n6612, L20 n1000, n3964, n3142, L22 n2820, n2389, L23 n4597.\nThey were picked by direct logit attribution at 82 forced-commit probes (\"Thus I'll go with (\" after a two-finalist statement) as consistent writers\nof a linear A->J ramp in the letter logits. For each column: w2[:,j] -= 0.65 * slope_j * u_j, where u_j is the minimal-norm residual direction\n(weighted by Q8_0 block headroom, entries kept under 0.98x block absmax) whose read-out through post_ffn_norm gain, final-norm gain and the centred\nletter embeddings is the pure ramp. Each column keeps 35% of its ramp; nothing else in its letter read-out changes. No training, no fitting.\n\nMECHANISM CHECK (read pass, 82 probes): ramp in non-finalist letter logits -0.195 -> -0.060 per letter step, BUT pair decisions are unchanged\n(T0.6 P(gold within pair) .662 -> .663; top letter changed in 0/82). The finalist preference is not the letter-label prior. A swap test\n(original model, 53 pair statements) shows it is MENTION ORDER: naming a finalist first is worth ~1.2 logits toward it.\n\nMEASURED (generate, edited only, cap 8,192, paired against the parent banks):\n- DEV, 6 mixed/finalist-loss passk questions x 4 samples: 37.5 -> 37.5 (+0.0, SE 13.5, +5/-5); both-finish +5.0 (SE 15.3, +5/-4).\n- HOLDOUT48 bank: 62.5 -> 64.6, +2.1 (SE 5.6, +4/-3); both-finish n39 +0.0 (SE 5.2, +2/-2); cut 7 -> 7.\n- 1/48 holdout traces byte-identical; median first difference at 3% of the trace: the swaps are resampling, not the mechanism.\nExpect about 0 in selection. Submitted because it is the only edit measured on the holdout bank.",
+     "bf_n": 205,
+     "bf_diff": 1.46,
+     "bf_se": 2.13,
+     "bf_z": 0.69,
+     "bf_plus": 11,
+     "bf_minus": 8,
+     "guard_diff": null,
+     "guard_se": null,
+     "guard_z": null
+    }
+   ]
   }
  ]
 }

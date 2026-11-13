@@ -177,3 +177,25 @@ The user's direction (2026-11-11): "Continue aiming for intelligence". The selec
 - Told the editors to delete activation dumps once analysed.
 
 **Check from now on:** `df -h /` "Avail" should stay ≥ 6 GB before a build. Below that, prune `runs/gen_*/editors/*/work/fwd_*_snapshot`.
+
+### D67 (2026-11-13): Generation 10 — no winner; the gen-8 champion survives
+
+**Rule (D65):** a candidate wins only if all three hold:
+- overall z ≥ 2;
+- the both-finish check reaches z ≥ 1 with a positive diff;
+- the GSM8K-boxed guard z ≥ −2.
+
+**Selection:** 256 hidden questions at 8,192 tokens. The parent scored 60.55% (SE 3.05), with 16.4% of answers cut.
+
+| candidate | weights changed | diff (SE) | z | +/− | both finish: n, diff (SE), z | +/− |
+|---|---|---|---|---|---|---|
+| `ed_a_g10_letter_ramp_removal` | 19,098 | +3.12 (2.1) | 1.49 | +19/−11 | 205, +1.46 (2.13), 0.69 | +11/−8 |
+| `claude_g10_hedged_recheck_L23` | 8,186 | −1.17 (1.8) | −0.65 | +9/−12 | 201, −1.00 (1.41), −0.71 | +3/−5 |
+
+**Decision:** neither candidate reaches z 2 overall or z 1 on both-finish. The guard was not run, because it only matters for a candidate that passes selection.
+
+**D52 check:** each run has its own weights key. Byte-identical traces against the parent: 4/256 (`ed_a`) and 32/256 (`claude`).
+
+**Reading:**
+- Both results match the editors' own holdout forecasts of about 0.
+- `ed_a`'s +3.1 is at the size of resampling noise: its read pass showed the targeted decisions do not change (0 of 82 top-letter flips).

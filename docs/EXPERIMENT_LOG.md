@@ -1152,3 +1152,14 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - The final pick is not where accuracy is lost: the letter shows no close calls, and mention order is a weak bias that content overrides.
 - Most remaining errors are on questions the model never gets right (missing knowledge).
 - No local unit tried so far changes conclusions.
+
+#### Gen 10: selection and decision (2026-11-13), D67
+
+- The parent's 256 hidden questions at 8,192: 60.55%, with 16.4% cut and 72.4% accuracy on finished answers.
+- `ed_a_g10_letter_ramp_removal`: +3.12 (SE 2.1, z 1.49), +19/−11. Both-finish +1.46 (z 0.69).
+- `claude_g10_hedged_recheck_L23`: −1.17 (SE 1.8, z −0.65), +9/−12. Both-finish −1.00 (z −0.71).
+- No candidate passed. The gen-8 champion survives, and the guard was not run.
+- D52 check: byte-identical traces against the parent were 4/256 and 32/256. The keys are distinct.
+- Lost time:
+  - Three container restarts during selection. Each needed a server and watchdog restart; the per-item cache kept all finished answers.
+  - The disk incident (D66) delayed the `claude` editor by about 10 h.
