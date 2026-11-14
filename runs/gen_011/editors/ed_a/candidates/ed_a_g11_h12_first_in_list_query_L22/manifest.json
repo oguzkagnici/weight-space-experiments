@@ -1,0 +1,14 @@
+{
+ "label": "ed_a_g11_h12_first_in_list_query_L22",
+ "editor": "ed_a",
+ "gen": 11,
+ "time": 1794621799.9677444,
+ "tensors": {
+  "model.layers.22.self_attn.q_proj.weight": {
+   "changed_bf16": 155202,
+   "numel": 4194304,
+   "rel_change": 0.036946337670087814,
+   "sha_bf16": "bb9d5e963788374c"
+  }
+ }
+}

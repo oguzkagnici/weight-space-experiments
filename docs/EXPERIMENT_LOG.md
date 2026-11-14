@@ -1178,3 +1178,18 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - Recovery: restarted the server and watchdog (`ed_a`'s pass 4 was re-queued) and told both editors to re-arm their waits.
   - Nothing was charged or lost, but about 12.5 h of wall time went.
   - Progress by then: `claude` 3/8 passes (reads); `ed_a` 3/8 reads plus 4 generate passes queued (its final measurement).
+
+#### Gen 11: `ed_a` hand-back (2026-11-14, 02:03 UTC)
+
+- Candidate `ed_a_g11_h12_first_in_list_query_L22`: L22 `q_proj`, rows of heads 12 and 15 only (155,202 weights, relative change 3.7%). Used 8/8 passes (3 read, 5 generate). Full report in `runs/gen_011/editors/ed_a/notes.md` under `## REPORT` (the tool refused to let the subagent write `report.md`).
+- **The mechanism.**
+  - In finished bank traces, when the last "either X or Y" pair contains both gold and the pick, the pick is the first-named letter in 25 of 29.
+  - Swap test: being named first is worth +0.85 logits (SE .14) on 42 real pair statements and +3.1 on synthetic probes.
+  - Direct logit attribution puts it almost entirely in L22.H12, the answer-router head (+1.24). The L22 MLP cancels −0.73. The L20 heads zeroed in gen 10 contribute 0.2 or less, which explains gen 10's null result.
+  - Inside H12 there are two paths:
+    1. a key-side "first item of a list" feature, which lives in the unrotated dimensions of kv-head 3 and has cosine .41 with the direct-mode option-primacy direction;
+    2. letter identity already in the query, built up diffusely by upstream heads.
+- **The edit.** Project the first-in-list direction out of the H12 and H15 query weights. This cuts H12's order effect by 42% and the total order effect by 27%, but P(gold | pair) is unchanged (.507 → .506).
+- **Results.** Holdout48 at 8,192: +2.1 (SE 6.3), +5/−4. Both-finish +0.0 (SE 6.4), n 39. The 3,072 holdout bank: +1.0 (SE 4.3). DEV +25 (SE 13.8), likely resampling luck. The editor expects about 0 at selection.
+- **Conclusion.** The mention-order bias is real and causal, but accuracy is not lost there.
+- **Selection.** This candidate's selection runs early, in 8 chunks of 32 at priority 8, so the `claude` editor's remaining passes (priority 5) can run in between. The final `ga select` will then read cached answers.
