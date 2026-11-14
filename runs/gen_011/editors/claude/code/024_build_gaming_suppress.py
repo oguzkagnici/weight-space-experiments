@@ -26,7 +26,7 @@ sh = A[lab == 2] @ w; T = np.percentile(sh, PCT)
 pre = lambda Z: K * (Z @ w - T * (Z @ p))
 print("bias proxy sd", round(float((G @ p).std()), 3), "| fires(>0): gaming", round(float((pre(A[lab == 2]) > 0).mean()), 2),
       "content", round(float((pre(A[lab == 1]) > 0).mean()), 3), "other", round(float((pre(A[lab == 0]) > 0).mean()), 4), "sink max", round(float(pre(S).max()), 2))
-w1 = load("model.layers.23.feed_forward.w1.weight"); w3 = load("model.layers.23.feed_forward.w3.weight"); w2 = load("model.layers.23.feed_forward.w2.weight")
+w1 = load_original("model.layers.23.feed_forward.w1.weight"); w3 = load_original("model.layers.23.feed_forward.w3.weight"); w2 = load_original("model.layers.23.feed_forward.w2.weight")
 r = float(w1[881] @ w1[331] / (w1[331] @ w1[331])) * float(w3[881] @ w3[331] / (w3[331] @ w3[331]))
 w2[:, 331] += r * w2[:, 881]
 w1[881] = torch.tensor(K * (w - T * p), dtype=torch.float32); w3[881] = torch.tensor(ALPHA * p, dtype=torch.float32)

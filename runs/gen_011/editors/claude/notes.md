@@ -62,3 +62,14 @@ per question (315 texts, 148k tokens); token_logprobs + top-10 at ALL positions 
 - Pass 4 data: next tokens at the 129 gaming onsets: " exam" 66, " multiple" 36, " question" 14, " test" 5, " questions" 5, " makers" 2.
 ## Budget plan (4 used): pass 5 = read (edited) on pass-4 texts to verify firing/effect/off-target; pass 6 = generate DEV
 (edited, cap 8,192, passk questions with gaming in parent samples, 24 answers, parent cached); passes 7-8 = holdout48 (24+24).
+
+## Gate (code/023): shrinkage LDA at L23 w1 input, gaming onsets (token before the gaming noun) vs content " exam"/" test" + other
+- 8-fold grouped CV: AUC 0.962 vs content, 0.996 vs other; threshold keeping 70% of onsets -> content 0%, other 0.02%.
+## Current edit (code/024 args K=1 ALPHA=0.08 PCT=40), L23 only:
+- fold n881 into n331: w2[:,331] += 0.9893*w2[:,881].
+- n881 w1 = K*(w_lda - T*p) (LDA on all pass-4 rows, projected off prompt-sink inputs; p = min-variance bias proxy; T = 40th pct of onset scores)
+  -> in-sample fires: onsets 61%, content 0/80, other 0.014% (all unlabelled firings are gaming-adjacent: "Given typical ||> bar exam").
+- w3 = 0.08*p; w2 col = -(count-weighted E[next tokens at onsets: exam .51, multiple .28, question .11, test, questions, MC, makers] - mean E)*gf/gp,
+  scaled to 0.98 x Q8 block absmax (90%), rest clipped.
+- Estimated centered logit shift on " exam" at firing onsets (code/025): p25/50/75 about -6/-11/-14; max boost to any token ~+2.3 (junk French subwords).
+## Pass 5 (read, edited): the 40 pass-4 texts, topk 10 + token_logprobs, all positions -> P(gaming nouns) at onsets, what replaces them, off-target.
