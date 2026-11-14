@@ -68,3 +68,8 @@
   but small; the carriers are active at most positions.
 ## Pass 4 (generate DEV, edited, cap 8,192, n 4; parent cached): 10194 (A), 1171 (C), 6143 (E), 7261 (D), 2731 (I), 6110 (F) - mixed
   questions with spread gold letters. Purpose: sanity (letter/content mismatch, cuts, tokens) and the effect on conclusions.
+## Pass 4 result (DEV, code/017): +20.8 pts (SE 13.4; 45.8 -> 66.7%, +8/-3); both-finish n 15 +20.0 (SE 14.5, +4/-1); cut 7 -> 5;
+  tokens 5322 -> 5209; 0/24 identical (first difference at 0-5% of the trace). 6110: B->F in 3 samples (gold F). Changed answers are
+  letter-consistent with their reasoning (checked 4: the conclusion text names the option of the final letter). Noisy, but no breakage.
+## Final edit = current edit (code/013 S=1.0). Passes 5-6: holdout48 ids[:24], ids[24:], edited, cap 8,192. Passes 7-8: 3,072 holdout bank
+  (96 ids, 48 per pass), edited, cap 3,072 (parent bank reproduces byte-identically -> free paired test).

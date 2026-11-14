@@ -84,3 +84,13 @@ k_proj reads these two directions 1.5-2x more strongly than a random direction (
 - predicted A 44 -> 18 (gold A: 7); top letter changed in 40 of 160; mean centred letter logit A +1.84 -> +0.23, B +1.31 -> +0.25, G -1.47 -> -0.46, J -1.46 -> -0.34.
 - bank40 (<=40% of the trace): +4/-1; pk1_15 (<=15%): +6/-2.
 ## Pass 4 (score, both, v1 staged): direct-answer mode, 256 practice questions (sample seed 12) -> does the edit also raise direct accuracy / gold rank?
+
+## Pass 4 result (score both, v1, direct mode, 256 questions seed 12)
+- accuracy 39.1 -> 38.3 (-0.78, SE 2.6; +21/-23), 96 predictions changed; log P(gold) +0.12 (SE .09); gold rank +0.02 (SE .10).
+- by gold position: A 38.1 -> 26.2 (n 42), B-E 45.6 -> 36.9 (n 103), F-J 33.3 -> 44.1 (n 111). Predicted letters: orig A 46 B 45 C 37 D 33 E 18 F 30 G 20 H 12 I 9 J 6;
+  edited A 16 B 24 C 29 D 31 E 13 F 33 G 37 H 33 I 25 J 15 (gold A 42 ... J 15).
+- So in DIRECT mode the edit is redistributive and overshoots at A: non-gold centred letter logit slope -0.357 -> -0.024 per step (flat), but A minus rest
+  +1.21 -> -0.87. At thinking probes (pass 3) A stayed at +0.23 and early-gold picks were kept. Lesson: the ordinal slope is removed correctly; the extra
+  "first item" direction over-corrects option A in the prompt-only context.
+## Edit v2 (code/016 `10,12,14,16,18,20,22 1`): same layers, rank 1 = slope direction only (cos with first-item direction ~ -.8, so most of it goes too).
+## Pass 5 (read, edited = v2): same 160 probes as passes 1/3 (work/req_p3.json) -> gate for v2, compare with v1.
