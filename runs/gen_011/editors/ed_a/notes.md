@@ -34,3 +34,4 @@
 ## HOLDOUT48 (8,192) TOTAL: 62.5 -> 64.6, +2.08 (SE 6.31), +5/-4; both-finish (n 39) 74.4 -> 74.4, +0.00 (SE 6.36), +3/-3; cut 7 -> 5; 0/48 identical traces, first difference median 3.1% of trace.
 - Pass 8 (generate, E1, cap 3,072): 3,072 holdout bank ids[48:96].
 ## Pass 6 DEV (6 mixed passk questions x 4, 8,192; in-sample for delta): 50.0 -> 75.0 (+25.0, SE 13.8, +9/-3); both-finish n 18 +22.2 (SE 15.2, +6/-2). 2055 CEGG->GGGG, 10964 HHHB->HHHH, 1171 CC-A->ACCC, 6110 BBBF->FBFJ, 6562 -B-G->--G-, 6143 E-EE->EEEE.
+## Pass 7 (3,072 holdout bank ids[:48]): 60.4 -> 56.2 (-4.17, SE 5.9, +3/-5); both-finish n 27 +0.0 (+1/-1); cut 16 -> 18.

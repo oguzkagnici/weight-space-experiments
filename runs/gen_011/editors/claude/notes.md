@@ -58,3 +58,7 @@ per question (315 texts, 148k tokens); token_logprobs + top-10 at ALL positions 
 
 ## Pass 4 (read, original; code/022): L23 w1 inputs at all positions + top-10, 40 traces (<= 4,090 tokens), 139k tokens
 129 gaming-onset positions (the token before the gaming noun), 80 content positions before " exam"/" test" (negatives).
+- (Container restarts at ~10:20-22:55 UTC 11-13 and ~01:24 UTC 11-14 killed waits/analysis; nothing charged. Pass 4 completed.)
+- Pass 4 data: next tokens at the 129 gaming onsets: " exam" 66, " multiple" 36, " question" 14, " test" 5, " questions" 5, " makers" 2.
+## Budget plan (4 used): pass 5 = read (edited) on pass-4 texts to verify firing/effect/off-target; pass 6 = generate DEV
+(edited, cap 8,192, passk questions with gaming in parent samples, 24 answers, parent cached); passes 7-8 = holdout48 (24+24).
