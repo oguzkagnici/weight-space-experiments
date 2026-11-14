@@ -250,4 +250,10 @@ No candidate passed. The guard was not run.
 - Each did what it was meant to inside the model (verified in read passes), and none changed accuracy (all |z| < 1.5).
 - This agrees with the gen-10 diagnosis: remaining errors are mostly missing knowledge, which local edits cannot add.
 
-The resampling control (`gen_011_control_parent_s1`, 6 of 8 chunks still queued) will calibrate the paired SE when it finishes.
+**Resampling control (`gen_011_control_parent_s1`, finished 2026-11-14 ~18:40 UTC):**
+- Setup: the unchanged parent on the same 256 questions, sample index 1 (different seeds) against sample 0. Sample 0 reproduced the selection answers byte for byte (256/256), which confirms the engine is deterministic.
+- Accuracy 60.55 → 60.94: diff +0.39 (SE 1.96, z 0.20), +13/−12. Both-finish n 201: −1.00 (SE 1.58, z −0.63). Cut answers 42 → 38. Byte-identical traces: 0/256.
+- Pure resampling flips 25 answers. The candidates flip 22 (`claude`) and 30 (`ed_a`), and gen 10's `ed_a` flipped 30.
+- So every candidate's effect on answers is the same size as a seed change. The paired SE (~2 points at n = 256) matches the spread seen under no mechanism.
+- Gen 10's +3.12 (z 1.49) is a plausible noise draw. The z ≥ 2 bar is calibrated, not too strict.
+- The noise floor is about ±4 points (2 SE). Only an edit that moves about 10+ net answers out of 256 can be detected at this budget.

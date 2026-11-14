@@ -1220,3 +1220,4 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - No candidate passed, and the gen-8 champion survives.
 - `claude`'s edit cut gaming phrases by 36% in the selection traces, but on the questions that had them, accuracy went from 39 to 35. The phrase is a symptom, not a cause.
 - The resampling control is still running (6/8 chunks left).
+- **Resampling control result (D69):** parent sample 1 vs sample 0: +0.39 (SE 1.96, z 0.20), +13/−12, both-finish −1.00 (z −0.63). There were 25 discordant answers; the candidates had 22 and 30. The candidates are indistinguishable from a seed change, and the paired SE is calibrated.
