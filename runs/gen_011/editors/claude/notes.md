@@ -73,3 +73,12 @@ per question (315 texts, 148k tokens); token_logprobs + top-10 at ALL positions 
   scaled to 0.98 x Q8 block absmax (90%), rest clipped.
 - Estimated centered logit shift on " exam" at firing onsets (code/025): p25/50/75 about -6/-11/-14; max boost to any token ~+2.3 (junk French subwords).
 ## Pass 5 (read, edited): the 40 pass-4 texts, topk 10 + token_logprobs, all positions -> P(gaming nouns) at onsets, what replaces them, off-target.
+## Pass 5 result (code/027; same 40 texts, edited vs pass-4 parent)
+- 129 onsets: P(gaming nouns) median 0.663 -> 0.153 (mean .613 -> .271); dropped by >0.3 in 64.
+- Edited top-1 where suppressed: law 11, definitions 7, MC 6, nursing 5, bar 4, classification 4, lists 3, phrasing 3, naming 3 -> ~1/3 still gaming via another noun.
+- Off-target: top-1 changed at 23/131,750 positions (0.017%), mean |d top-1 logprob| 0.0002, p99 0.0015.
+## Final edit (code/029 + code/024 args 1 0.08 40): as above, write targets extended with law 11, MC +6, nursing 5, bar 4 (count weights;
+gate unchanged). Estimated " exam" shift at firing onsets p25/50/75 -6/-10/-13; new nouns ~-4; max vocab boost ~+2.5.
+## Pass 6 (generate DEV, edited, cap 8,192, n 4): mmlupro_6562, 2055, 1171, 10964 (mixed, gaming in all 4 parent samples), 5603, 1375 (0/4, no cuts).
+- Passes 7-8 queued right after pass 6 (same edit): holdout48 ids[:24] and ids[24:], edited only, cap 8,192.
+- Deleted work/fwd_04 w1 dump (1.1 GB) after building the edit; gate stats are recorded above.

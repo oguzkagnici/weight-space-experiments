@@ -20,7 +20,7 @@ h23 = np.load("work/fwd_03/mlp23.npy").astype(np.float64); W2 = load_original("m
 y = h23 @ W2.T; ry = np.sqrt((y ** 2).mean(1)); H = np.load("work/fwd_03/h24.npy").astype(np.float64); rh = np.sqrt((H ** 2).mean(1))
 gp = load("model.layers.23.post_ffn_norm.weight").double().numpy(); gf = load("model.embedding_norm.weight").double().numpy()
 E = load("model.embed_tokens.weight").double().numpy()
-nxt = {int(k): v for k, v in json.load(open("work/gaming_next.json")).items()}
+nxt = {int(k): v for k, v in json.load(open("work/gaming_next_ext.json")).items()}
 d = (E @ (col * gp * gf))      # logit change per unit activation, before dividing by rms(y)*rms(h)
 d = d - d.mean()
 print("median rms L23 MLP out", round(float(np.median(ry)), 3), " median rms final resid", round(float(np.median(rh)), 2))

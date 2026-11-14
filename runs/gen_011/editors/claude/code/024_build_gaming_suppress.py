@@ -31,7 +31,7 @@ r = float(w1[881] @ w1[331] / (w1[331] @ w1[331])) * float(w3[881] @ w3[331] / (
 w2[:, 331] += r * w2[:, 881]
 w1[881] = torch.tensor(K * (w - T * p), dtype=torch.float32); w3[881] = torch.tensor(ALPHA * p, dtype=torch.float32)
 E = load("model.embed_tokens.weight").double()
-nxt = {int(k): v for k, v in json.load(open("work/gaming_next.json")).items()}
+nxt = {int(k): v for k, v in json.load(open("work/gaming_next_ext.json")).items()}
 ids = list(nxt); wts = torch.tensor([nxt[i] for i in ids], dtype=torch.float64); wts /= wts.sum()
 tgt = (E[ids] * wts[:, None]).sum(0)
 gf = load("model.embedding_norm.weight").double(); gp = load("model.layers.23.post_ffn_norm.weight").double()
