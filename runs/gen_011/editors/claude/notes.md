@@ -82,3 +82,10 @@ gate unchanged). Estimated " exam" shift at firing onsets p25/50/75 -6/-10/-13; 
 ## Pass 6 (generate DEV, edited, cap 8,192, n 4): mmlupro_6562, 2055, 1171, 10964 (mixed, gaming in all 4 parent samples), 5603, 1375 (0/4, no cuts).
 - Passes 7-8 queued right after pass 6 (same edit): holdout48 ids[:24] and ids[24:], edited only, cap 8,192.
 - Deleted work/fwd_04 w1 dump (1.1 GB) after building the edit; gate stats are recorded above.
+
+## Results passes 6-8 (code/030)
+- DEV (6 passk q x 4): overall +8.33 (SE 10.28, +4/-2); both-finish n 18 +11.11 (SE 7.62, +2/-0); gaming 53 -> 31; cut 3 -> 4.
+- HOLDOUT48: overall 62.5 -> 66.7, +4.17 (SE 4.17, +3/-1); both-finish n 41 73.2 -> 73.2, +0.00 (SE 3.49, +1/-1); cut 7 -> 4; tokens 3472 -> 3114;
+  gaming 47 -> 28. 39/48 traces differ, first difference often in the first 5% even without gaming -> the tiny global perturbation
+  (fold + Q8 block rescale) resamples traces. Gaming questions (19): net 0 (+1/-1); no-gaming questions (29): net +2 (cut -> right), not mechanism.
+## Submitted: gaming_suppress_L23 (code/031).

@@ -6,7 +6,7 @@ G = re.compile(r"(typical (exam|test|mcq|multiple)|in such (questions|exams)|tes
 mode, ks = sys.argv[1], sys.argv[2:]
 bank = {"dev": "passk_gen008champ_cap8192_det1.jsonl", "hold": "holdout48_bank_gen008champ_cap8192_det1.jsonl"}[mode]
 P = {(r["id"], r.get("sample", 0)): r for r in map(json.loads, open("/home/user/weight-space-experiments/runs/shared/" + bank))}
-E = [json.loads(l) for k in ks for l in open(f"work/fwd_{k}/gen_{k}_edited.jsonl")]
+E = [json.loads(l) for k in ks for l in open(f"work/fwd_{k}/gen_{int(k)}_edited.jsonl")]
 rows = []
 for e in E:
     p = P[(e["id"], e.get("sample", 0))]

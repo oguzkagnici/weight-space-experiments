@@ -1193,3 +1193,23 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - **Results.** Holdout48 at 8,192: +2.1 (SE 6.3), +5/−4. Both-finish +0.0 (SE 6.4), n 39. The 3,072 holdout bank: +1.0 (SE 4.3). DEV +25 (SE 13.8), likely resampling luck. The editor expects about 0 at selection.
 - **Conclusion.** The mention-order bias is real and causal, but accuracy is not lost there.
 - **Selection.** This candidate's selection runs early, in 8 chunks of 32 at priority 8, so the `claude` editor's remaining passes (priority 5) can run in between. The final `ga select` will then read cached answers.
+
+#### Gen 11: `claude` hand-back (2026-11-14, 03:33 UTC)
+
+- **Candidate** `gaming_suppress_L23`: L23 MLP neuron 881, repurposed as a gated unit; its old output is folded into near-duplicate neuron 331. It changes 2,048 + 4,095 + 2,047 weights across w1, w2 and w3. Used 8/8 passes (5 read, 3 generate). Report: `runs/gen_011/editors/claude/report.md`.
+- **Diagnosis.**
+  - Wrong conclusions are not sampling accidents at the decision tokens.
+  - Wrong samples stay anchored to the model's answer before thinking. But L22.H12 writes both that prior and the final answer, so there is no separate prior circuit to weaken.
+  - The strongest marker is exam-gaming reasoning ("typical exam…", "the question likely expects"):
+    - Finished traces with it are 44% correct vs 83% without; within the same question the gap is −10.9 points (SE 6.5).
+    - In probes, a gaming paragraph locks in the current front-runner (+0.10 on P(final pick)).
+- **Edit.**
+  - The gate is a direction at the L23 MLP input that fires on the token before a gaming word. Held-out AUC: 0.996 against other tokens, 0.962 against ordinary " exam"/" test".
+  - The output pushes the gaming words down (about −10 logits on " exam").
+  - Read check: at gaming onsets, the probability of the gaming word fell from a median .66 to .15. Elsewhere the top-1 token changed at only 0.017% of positions.
+- **Results.**
+  - DEV: +8.3 (SE 10.3).
+  - Holdout48 at 8,192: +4.17 (SE 4.17, +3/−1). Both-finish +0.00 (SE 3.49), n 41.
+  - Gaming phrases fell from 47 to 28; truncated answers from 7 to 4.
+  - Both net wins are on questions with no gaming phrase, so the editor attributes the gain to resampling, not to the mechanism.
+- **Selection.** Queued at 04:15 at priority 8, ahead of the control chunks. The champion's side and `ed_a`'s chunks are served from the cache. `claude`'s candidate is one ~5 h job.

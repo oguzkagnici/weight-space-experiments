@@ -1,0 +1,26 @@
+{
+ "label": "gaming_suppress_L23",
+ "editor": "claude",
+ "gen": 11,
+ "time": 1794629620.626979,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 1.044346809387207,
+   "sha_bf16": "9f245912a05ad7c0"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 4095,
+   "numel": 15728640,
+   "rel_change": 0.01701664738357067,
+   "sha_bf16": "40a3ef2feb5fc3c0"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2047,
+   "numel": 15728640,
+   "rel_change": 0.013467865064740181,
+   "sha_bf16": "b75f87b0a65ec2ae"
+  }
+ }
+}
