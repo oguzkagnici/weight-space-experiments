@@ -58,3 +58,13 @@
 ## Pass 3 (read, EDITED; code/014): gate. 64 passk prior probes (held out from the fit; parent = gen-11 pass 3), gen-11 pass-2 texts
   (315: forced probes after 25..800 tokens of 50 mixed samples + 15 priors; parent = gen-11 pass 2, all positions -> off-target),
   25 pass-1 35% probes. positions all, topk 10, token_logprobs.
+## Pass 3 result (code/015-016): GATE PASSED at the readouts
+- (A) 64 passk PRIOR probes, held out from the fit: P(gold) .282 -> .313 (paired +.031, SE .012); acc 26.6 -> 32.8% (+5/-1); gold rank 2.56 -> 2.48.
+- (B) gen-11 pass-2 forced probes after 0..800 tokens, mixed questions (315): P(gold) .227 -> .295 (+.068, SE .006), acc +25/-4.
+  NOTE: mixed-question golds skew late (11/15 in F-J) and the correction favours late letters, so (B) overstates; (A) is the fair number.
+- (C) pass-1 35% probes (25): P(gold) .385 -> .455 (+.070, SE .026), acc 40 -> 52% (+3/-0).
+- Off-target (B, teacher-forced parent traces): top-1 changed at 1.85% of positions (counts repeat across nested prefixes); actual next-token
+  log-prob at non-letter positions -0.001 on average (4% of positions < -0.1): "A" (article/letter) down, " a" -> " an", "I" up. Broad
+  but small; the carriers are active at most positions.
+## Pass 4 (generate DEV, edited, cap 8,192, n 4; parent cached): 10194 (A), 1171 (C), 6143 (E), 7261 (D), 2731 (I), 6110 (F) - mixed
+  questions with spread gold letters. Purpose: sanity (letter/content mismatch, cuts, tokens) and the effect on conclusions.

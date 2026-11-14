@@ -76,3 +76,11 @@ k_proj reads these two directions 1.5-2x more strongly than a random direction (
 ## Edit v1 (code/016 `10,12,14,16,18,20,22 2`): k_proj of layers 10,12,14,16,18,20,22: W_k <- W_k (I - U U^T), U = orthonormal basis of
 {slope direction, first-item direction} of that layer's slot means (rank 2 of 2048). 7 tensors, ~6.4M weights, relative change 4.2-6.0%.
 ## Pass 3 (read, edited = v1): the 160 pass-1 probes (work/req_p3.json), h24 + top-20 at the last token -> GATE: P(gold), accuracy, gold rank vs pass 1.
+
+## Pass 3 result = GATE for v1 (code/017; 160 held-out probes, edited vs pass 1)
+- all 160: forced-answer accuracy 31.9 -> 36.2% (+10/-3); P(gold) .317 -> .338 (+.021, SE .013); log P(gold) -4.13 -> -3.58 (+.55, SE .11); gold rank 2.94 -> 2.81.
+- gold F-J (77): accuracy 24.7 -> 33.8% (+8/-1), P(gold) +.066 (SE .019), rank 3.27 -> 2.58. gold A-E (83): accuracy 38.6 -> 38.6% (+2/-2), P(gold) -.021 (SE .016).
+  -> late-gold probes gain, early-gold probes do not lose picks: NOT the redistribution a constant letter offset gives (that gave -3/+3 probes, code/010).
+- predicted A 44 -> 18 (gold A: 7); top letter changed in 40 of 160; mean centred letter logit A +1.84 -> +0.23, B +1.31 -> +0.25, G -1.47 -> -0.46, J -1.46 -> -0.34.
+- bank40 (<=40% of the trace): +4/-1; pk1_15 (<=15%): +6/-2.
+## Pass 4 (score, both, v1 staged): direct-answer mode, 256 practice questions (sample seed 12) -> does the edit also raise direct accuracy / gold rank?
