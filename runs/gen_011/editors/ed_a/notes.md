@@ -29,3 +29,8 @@
 ## Final measurement: passes 4-5 = holdout48 at 8,192 (edited E1 only, 24 + 24), paired against the parent bank.
 - Pass 6 (generate, edited E1, cap 8,192, n 4): DEV = 6 mixed passk questions with many pair statements (6562, 1171, 6143, 10964, 2055, 6110), paired vs the passk bank.
 - Pass 7 (generate, edited E1, cap 3,072): 3,072 holdout bank ids[:48] (optional comparison).
+## Pass 4 (holdout48 ids[:24], 8,192): parent 62.5 -> 66.7 (+4.17, SE 9.5, +3/-2); both-finish 18: +0.0 (+2/-2); cut 5 -> 4; 0/24 identical, first difference median 4.8% of trace.
+## Pass 5 (holdout48 ids[24:]): 62.5 -> 62.5 (+0, +2/-2); both-finish 21: +0 (+1/-1); cut 2 -> 1.
+## HOLDOUT48 (8,192) TOTAL: 62.5 -> 64.6, +2.08 (SE 6.31), +5/-4; both-finish (n 39) 74.4 -> 74.4, +0.00 (SE 6.36), +3/-3; cut 7 -> 5; 0/48 identical traces, first difference median 3.1% of trace.
+- Pass 8 (generate, E1, cap 3,072): 3,072 holdout bank ids[48:96].
+## Pass 6 DEV (6 mixed passk questions x 4, 8,192; in-sample for delta): 50.0 -> 75.0 (+25.0, SE 13.8, +9/-3); both-finish n 18 +22.2 (SE 15.2, +6/-2). 2055 CEGG->GGGG, 10964 HHHB->HHHH, 1171 CC-A->ACCC, 6110 BBBF->FBFJ, 6562 -B-G->--G-, 6143 E-EE->EEEE.

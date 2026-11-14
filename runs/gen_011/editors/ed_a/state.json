@@ -1,10 +1,8 @@
 {
- "passes_used": 3,
+ "passes_used": 6,
  "pending": [
-  "gen_011_ed_a_p04_485b67",
-  "gen_011_ed_a_p05_8d22c9",
-  "gen_011_ed_a_p06_c65cdb",
-  "gen_011_ed_a_p07_34da59"
+  "gen_011_ed_a_p07_34da59",
+  "gen_011_ed_a_p08_542f6c"
  ],
  "passes": [
   {
@@ -24,6 +22,24 @@
    "id": "gen_011_ed_a_p03_311919",
    "type": "read",
    "seconds": 1260.1
+  },
+  {
+   "k": 4,
+   "id": "gen_011_ed_a_p04_485b67",
+   "type": "generate",
+   "seconds": 1952.8
+  },
+  {
+   "k": 5,
+   "id": "gen_011_ed_a_p05_8d22c9",
+   "type": "generate",
+   "seconds": 2101.6
+  },
+  {
+   "k": 6,
+   "id": "gen_011_ed_a_p06_c65cdb",
+   "type": "generate",
+   "seconds": 2014.1
   }
  ]
 }
