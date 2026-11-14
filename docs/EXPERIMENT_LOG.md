@@ -1213,3 +1213,10 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - Gaming phrases fell from 47 to 28; truncated answers from 7 to 4.
   - Both net wins are on questions with no gaming phrase, so the editor attributes the gain to resampling, not to the mechanism.
 - **Selection.** Queued at 04:15 at priority 8, ahead of the control chunks. The champion's side and `ed_a`'s chunks are served from the cache. `claude`'s candidate is one ~5 h job.
+
+#### Gen 11: selection and decision (2026-11-14), D69
+
+- Parent 60.55%. `claude/gaming_suppress_L23` −0.78 (SE 1.8, z −0.43); both-finish +0.00 (z 0). `ed_a` H12 query edit −0.78 (SE 2.1, z −0.37); both-finish +0.00 (z 0).
+- No candidate passed, and the gen-8 champion survives.
+- `claude`'s edit cut gaming phrases by 36% in the selection traces, but on the questions that had them, accuracy went from 39 to 35. The phrase is a symptom, not a cause.
+- The resampling control is still running (6/8 chunks left).

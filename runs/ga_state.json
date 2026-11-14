@@ -486,6 +486,57 @@
      "guard_z": null
     }
    ]
+  },
+  {
+   "gen": 11,
+   "parent": "gen008_carry_stack_shortans_L23_finalist_L22",
+   "winner": null,
+   "rule": "z >= 2.0; both-finish z >= 1.0; gsm8k_boxed guard z > -2.0",
+   "champion_acc": 60.55,
+   "candidates": [
+    {
+     "name": "claude/gaming_suppress_L23",
+     "acc": 59.77,
+     "acc_diff": -0.78,
+     "acc_diff_se": 1.8,
+     "z": -0.43,
+     "wrong_to_right": 10,
+     "right_to_wrong": 12,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 8190,
+     "description": "# gaming_suppress_L23: suppress the onset of exam-gaming reasoning (\"typical exam/test/MCQ ...\", \"in such questions\", \"the question likely expects\")\n\nTARGET BEHAVIOUR (content): when unsure, the model falls back on guessing what the exam/test-maker expects instead of reasoning about content.\nEvidence (free, parent 8,192 traces): finished answers with such a phrase 95, acc 44.2%; without 144, acc 83.3%; WITHIN the same question\n(29 passk questions with both kinds of samples) -10.9 pts (SE 6.5). Pass-1 forced-answer probes: a meta paragraph commits the model to its\ncurrent leader (dP(final) +0.10 vs -0.02 for an ordinary paragraph), toward gold in right traces and away from it in wrong ones.\n\nEDIT (model.layers.23.feed_forward; ~8k weights):\n- n881 freed by folding into its near-duplicate n331: w2[:,331] += 0.9893*w2[:,881].\n- n881 gate (w1 row) = w_lda - T*p: w_lda = shrinkage-LDA direction at the L23 MLP input separating gaming onsets (the token before the gaming\n  noun; 129 positions in 40 parent traces) from content uses of \" exam\"/\" test\" (80) and other tokens; projected off the prompt-sink inputs;\n  p = minimum-variance bias proxy (x.p ~ 1); T = 40th percentile of onset scores. Grouped 8-fold CV: AUC 0.996 vs other tokens, 0.962 vs\n  content \" exam\"/\" test\"; in-sample fires on 61% of onsets, 0/80 content uses, 0.014% of other positions (all gaming-adjacent).\n- n881 up (w3 row) = 0.08*p. Down (w2 col) = -(count-weighted mean embedding of the gaming nouns: exam, multiple, question, test, questions,\n  MC, makers, law, nursing, bar) - mean embedding), through final norm / post-ffn norm, scaled to 0.98 x Q8 block absmax.\n  Estimated \" exam\" logit shift at firing onsets -6/-10/-13 (p25/50/75). No training or fitting beyond means/LDA/percentiles of recorded activations.\n\nMEASURED:\n- Read pass (edited vs parent, same 40 traces): P(gaming noun) at onsets median 0.663 -> 0.153 (dropped >0.3 in 64/129); top-1 changed at\n  0.017% of other positions (mean |d top-1 logprob| 0.0002).\n- DEV generate (cap 8,192, 6 passk questions x 4, all with gaming): overall +8.33 pts (SE 10.28, +4/-2); both-finish (n 18) +11.11 (SE 7.62, +2/-0);\n  gaming phrases 53 -> 31.\n- HOLDOUT48 (8,192, 48 ids, edited vs bank): OVERALL 62.5% -> 66.7%, paired +4.17 pts (SE 4.17, +3/-1); BOTH-FINISH (n 41) 73.2% -> 73.2%,\n  paired +0.00 pts (SE 3.49, +1/-1). Cut 7 -> 4; mean tokens 3,472 -> 3,114; gaming phrases 47 -> 28.\n  Caveat: the two net holdout wins (mmlupro_3242, 4225: cut -> right) are on questions with NO gaming phrase (traces diverge through the tiny\n  global perturbation / resampling); on the 19 holdout questions where the parent used gaming phrases the paired net is 0 (+1/-1).\n  The 3,072 holdout bank was not measured (no passes left).\n",
+     "bf_n": 201,
+     "bf_diff": 0.0,
+     "bf_se": 1.41,
+     "bf_z": 0.0,
+     "bf_plus": 4,
+     "bf_minus": 4,
+     "guard_diff": null,
+     "guard_se": null,
+     "guard_z": null
+    },
+    {
+     "name": "ed_a/ed_a_g11_h12_first_in_list_query_L22",
+     "acc": 59.77,
+     "acc_diff": -0.78,
+     "acc_diff_se": 2.1,
+     "z": -0.37,
+     "wrong_to_right": 14,
+     "right_to_wrong": 16,
+     "logp_correct_diff": 0.0,
+     "weights_changed": 155202,
+     "description": "# ed_a_g11_h12_first_in_list_query_L22: remove the \"first item of a list\" key preference of the L22 answer router (heads 12, 15)\n\nTARGETED BEHAVIOUR (mention-order bias, content-free). When the thinking names two finalists (\"either X or Y\"), the first-named one gets an\nextra +0.85 logits at a forced commit (swap test, 42 real pair statements, both orders; +3.1 on 89 synthetic \"either X or Y\" probes).\nIn finished bank traces the pick is the first-named letter in 25/29 last-pair statements; with gold named second the model is wrong 10/12.\n\nCIRCUIT (read passes 1-2 on the same 262 swap texts). Direct logit attribution puts the order effect in L22.H12 (+1.24 real / +3.3 syn;\nL22 MLP leader-suppression cancels -0.73; every other head <= 0.2). Two paths inside H12: (1) direct copy from the pair statement,\nfirst-named window +1.45 vs second -0.85; (2) query-side letter identity retrieving other mentions / the option line (+0.65 real).\nPath 1: H12's query, recovered exactly from recorded attention + keys (r 1.000), has a constant component along a consistent key\ndirection delta = k(first-named letter) - k(second-named letter) (kv-head 3, 95% in the unrotated dims); q.delta = +0.39 of the\nobserved +0.45 score gap. delta is a generic \"first in a list\" feature (cos .41 with the option-primacy slot direction).\n\nCHANGE: model.layers.22.self_attn.q_proj.weight, rows of heads 12 and 15 only: W_h -= u u^T W_h with u = normalise(q_norm.weight *\ndelta_unrotated) (alpha 1; delta = mean key difference on the probe texts). 155k entries change after bf16 rounding. No other tensor.\n\nMECHANISM MEASURED (read pass 3, same 262 texts): H12 direct order effect 1.24 -> 0.73 (real, SE .08), 3.32 -> 2.76 (syn); H12 attention\nto the two pair-letter windows becomes symmetric (first .042 -> .039, second .028 -> .041); total order effect 0.85 -> 0.62 (d -0.23,\nSE .03; the L22/L23 MLPs compensate less). P(gold|pair) unchanged (.5066 -> .5060 real; .665 -> .670 syn).\n\nRESULTS (generate, edited only, paired vs the parent banks):\n- HOLDOUT48 at 8,192 tokens: 62.5 -> 64.6, +2.08 pp (SE 6.31), +5/-4; BOTH-FINISH (n 39): 74.4 -> 74.4, +0.00 (SE 6.36), +3/-3; cut 7 -> 5.\n  0/48 traces identical, first difference at median 3% of the trace (the edit acts on H12 at every token).\n- 3,072 holdout bank (96): 47.9 -> 49.0, +1.04 (SE 4.32), +9/-8; both-finish (n 45) +2.2 (SE 3.9), +2/-1; cut 42 -> 39.\n- DEV (6 mixed passk questions x 4 at 8,192; in-sample for delta): 50.0 -> 75.0, +25 (SE 13.8), +9/-3; both-finish +22 (SE 15), +6/-2.\nEXPECTATION: about 0. The mechanism is real and removed where targeted, but P(gold|pair) did not move, so accuracy changes are resampling.\n",
+     "bf_n": 203,
+     "bf_diff": 0.0,
+     "bf_se": 2.21,
+     "bf_z": 0.0,
+     "bf_plus": 10,
+     "bf_minus": 10,
+     "guard_diff": null,
+     "guard_se": null,
+     "guard_z": null
+    }
+   ]
   }
  ]
 }

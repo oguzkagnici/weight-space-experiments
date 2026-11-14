@@ -219,3 +219,35 @@ The user asked to run generation 11 with the targets the gen-10 editors recommen
 - **Resampling control:** `gen_011_control_parent_s1` runs the parent on the same 256 questions with sample index 1 (different seeds), at priority 9.
   - This is one draw of the paired diff under pure resampling, with no mechanism.
   - It checks that the paired SE is calibrated, and puts gen 10's +3.1 (z 1.49) in context.
+
+### D69 (2026-11-14): Generation 11 — no winner; the gen-8 champion survives
+
+`ga decide --z 2 --bf-z 1 --guard-z -2` on gen 10's 256 hidden questions at 8,192 tokens (parent 60.55%, 42 answers cut):
+
+| candidate | weights | acc | diff (SE) | z | +/− | both finished |
+|---|---|---|---|---|---|---|
+| `claude/gaming_suppress_L23` | 8,190 | 59.77 | −0.78 (1.8) | −0.43 | +10/−12 | n 201, +0.00 (1.41), +4/−4 |
+| `ed_a/ed_a_g11_h12_first_in_list_query_L22` | 155,202 | 59.77 | −0.78 (2.1) | −0.37 | +14/−16 | n 203, +0.00 (2.21), +10/−10 |
+
+No candidate passed. The guard was not run.
+
+**Speed-up:** `ed_a`'s candidate was pre-run in 8 chunks of 32 at priority 8, so `claude`'s last passes could run in between. The final `ga select` read its answers from the cache.
+
+**D52 check:** each run has its own weights key. Byte-identical traces against the parent: 2/256 (`ed_a`) and 32/256 (`claude`).
+
+**Is the mechanism active?**
+- In `claude`'s selection traces, exam-gaming phrases fell from 264 to 168 (−36%), and traces containing them from 100 to 86.
+- But on the 100 questions whose parent trace used gaming phrases, accuracy went from 39 to 35.
+- So the edit removes the phrase, but not the uncertainty behind it. Gaming reasoning is a symptom of not knowing, not a cause of wrong answers.
+
+**Reading:**
+- Both results match the editors' own holdout forecasts of about 0.
+- Gen 10 and gen 11 together have now tested four mechanism-targeted edits on the thinking-mode answer path:
+  - removing the letter ramp;
+  - a hedged recheck;
+  - mention-order debiasing;
+  - suppressing gaming phrases.
+- Each did what it was meant to inside the model (verified in read passes), and none changed accuracy (all |z| < 1.5).
+- This agrees with the gen-10 diagnosis: remaining errors are mostly missing knowledge, which local edits cannot add.
+
+The resampling control (`gen_011_control_parent_s1`, 6 of 8 chunks still queued) will calibrate the paired SE when it finishes.
