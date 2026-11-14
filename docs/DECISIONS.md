@@ -257,3 +257,26 @@ No candidate passed. The guard was not run.
 - So every candidate's effect on answers is the same size as a seed change. The paired SE (~2 points at n = 256) matches the spread seen under no mechanism.
 - Gen 10's +3.12 (z 1.49) is a plausible noise draw. The z ≥ 2 bar is calibrated, not too strict.
 - The noise floor is about ±4 points (2 SE). Only an edit that moves about 10+ net answers out of 256 can be detected at this budget.
+
+### D70 (2026-11-14): Generation 12 — a Fable 5.2 editor joins; targets latent knowledge and an open choice
+
+The user asked for another generation and for a different model (Fable 5.2) to be one of the editors. Until now both editors ran on the same model as the orchestrating session: the `claude` fork inherits it, and `ed_a` was a fresh general-purpose sub-agent launched with defaults (its metadata shows the same model).
+
+- **Editors** (8 passes, 1 candidate each; 8,192-token selection; both-finish z ≥ 1; GSM8K-boxed guard z ≥ −2, unchanged from D65):
+  - `claude`: a fork of the orchestrating session (same model as before; a fork cannot change model).
+  - `ed_f`: a new, fresh sub-agent running on Fable 5.2, in place of `ed_a`. It gets the same kind of brief `ed_a` got, so the fresh-agent slot changes only in the model. With only one editor per model and different targets, this is not a controlled model comparison; it only adds variety.
+- **Brief:** `prompts/editor_task_think_g12.md`, which is the g11 brief plus:
+  - a generation-11 summary;
+  - "four mechanism edits, four nulls": habits that correlate with wrong answers are symptoms of not knowing;
+  - the measured noise floor (D69);
+  - **a gate rule**: show that P(gold) rises on held-out forced-answer prefixes before spending generate passes, and report that number in the candidate description;
+  - a new target bullet: latent knowledge present inside the network but overridden later.
+- **Focus:**
+  - `claude`: "knows but does not say". Logit-lens and attribution on forced-answer probes through L12–L23 on mixed and wrong traces, looking for a late component that overrides an internally preferred gold option. A clear negative result is also useful.
+  - `ed_f`: open choice, with untested suggestions from the gen-11 editors:
+    - a cause-vs-symptom paragraph-replacement test;
+    - acting at the source of the first-in-list feature;
+    - an uncertainty gate that steers toward re-deriving content;
+    - two-finalist comparison errors.
+- **Selection:** gen 10's 256 questions again (`--sel-from 10`). The parent's answers are cached and the paired comparison stays unbiased. The set has now been used to decide three generations without a winner. A winner would still have to pass the untouched held-out check (8,192 tokens) before being trusted.
+- **Scheduling:** each candidate's selection is pre-run in 8 chunks of 32 at priority 8 as soon as it is submitted (gen 11 practice), so the other editor's passes (priority 5) are not blocked.

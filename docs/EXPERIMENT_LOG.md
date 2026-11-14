@@ -1221,3 +1221,12 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - `claude`'s edit cut gaming phrases by 36% in the selection traces, but on the questions that had them, accuracy went from 39 to 35. The phrase is a symptom, not a cause.
 - The resampling control is still running (6/8 chunks left).
 - **Resampling control result (D69):** parent sample 1 vs sample 0: +0.39 (SE 1.96, z 0.20), +13/−12, both-finish −1.00 (z −0.63). There were 25 discordant answers; the candidates had 22 and 30. The candidates are indistinguishable from a seed change, and the paired SE is calibrated.
+
+### Generation 12 (D70): launched 2026-11-14
+
+- Parent: the gen-8 champion. Editors: `claude` (fork) and `ed_f`, a fresh sub-agent on Fable 5.2 that replaces `ed_a`. Each has 8 passes and 1 candidate.
+- Brief: `editor_task_think_g12.md`. Selection: gen 10's 256 questions at 8,192 tokens.
+- Focus:
+  - `claude`: latent knowledge that is overridden late ("knows but does not say").
+  - `ed_f`: open choice, with the gate rule (P(gold) must rise on held-out prefixes before generating).
+- Before launch, both gen-11 editors were confirmed (from their metadata) to have run on the same model as the orchestrator.
