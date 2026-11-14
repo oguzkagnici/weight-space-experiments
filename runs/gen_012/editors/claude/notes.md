@@ -38,3 +38,23 @@
 - Edit: none. Texts: 55 probes in 28 finished WRONG traces of 13 non-mixed questions (50% and end of thinking), 47 right-trace probes at 50%,
   320 pre-thinking prior probes (render_think + "So far, the most likely answer is (") on practice questions outside banks/holdouts.
   hidden_states 14,15,16,18,20,22,23,24 + topk 20, last position.
+
+## Pass 2 result (code/011)
+- (a) GENERALISED: 55 probes in 28 finished WRONG traces of 13 non-mixed questions (50% and END of thinking): lens argmax==gold at
+  h14-h24 0-.07 (gold = lens top at any single layer in <= 2/55); P10(gold) <= .07; right-trace controls .57-.70 from h15 on.
+  => In wrong conclusions the network never internally prefers gold, mid-trace or at the end, at any layer from 14 to 24.
+- (b) PRE-THINKING PRIOR (320 practice q): acc .297, mean P(gold) .281. Strong letter bias: predicted [87,53,60,37,22,23,12,11,13,2]
+  vs gold [46,33,32,33,12,40,31,37,35,21]. Cross-fitted per-letter correction c_L = log(mean P_L) - log(gold share): held-out
+  +2.5 pts (both halves, S=1), mean dlogP(gold) +0.28-0.30.
+## H9 (the one lever with a read-level P(gold) gain): correct the letter prior of FORCED READOUTS INSIDE REASONING
+- Rationale: wrong samples' early latent belief = the prior (gen 11); the prior over-picks A-E. Expected effect on conclusions small
+  (gen-10 ramp removal: no finalist flips) - this tests the prior/anchoring path with a gate-passing edit.
+- Carriers (code/012): L23 neurons reliably active at prior probes (gen-11 pass 3): n7528 (.50, copy .00), n6877 (.41, copy .00),
+  n4830 (.60/.56), n1228 (.85/.44), n4441 (.45/.42), n2650 (.69/.77); n7528/n6877 also .48/.50 at mid-trace probes (pass 1).
+## Current edit (code/013 arg S=1.0): L23 w2 columns 7528, 6877, 4830, 1228, 4441, 2650 += share_j * v, share ~ act_j,
+  v = minimal-norm pre-norm MLP-output vector with centered letter-logit shift -c at the prior probes' mean norms;
+  c = [.74,.71,.72,.33,.90,-.20,-.43,-.81,-.65,-1.32] (fit on all 320 pass-2 prior probes). 368 entries exceed their Q8_0 row-block
+  absmax (max 1.9x; that block is re-scaled). Predicted shift at mean activation = -c.
+## Pass 3 (read, EDITED; code/014): gate. 64 passk prior probes (held out from the fit; parent = gen-11 pass 3), gen-11 pass-2 texts
+  (315: forced probes after 25..800 tokens of 50 mixed samples + 15 priors; parent = gen-11 pass 2, all positions -> off-target),
+  25 pass-1 35% probes. positions all, topk 10, token_logprobs.
