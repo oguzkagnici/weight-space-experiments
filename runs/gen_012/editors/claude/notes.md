@@ -76,3 +76,6 @@
 ## Passes 5-6 result (HOLDOUT48, 8,192; code/017): overall 62.5 -> 62.5%, +0.00 pts (SE 5.16, +3/-3); both-finish n 39 74.4 -> 74.4%,
   +0.00 (SE 5.20, +2/-2); cut 7 -> 7; tokens 3472 -> 3225; identical 1/48. Pred letters A-E 28 -> 26, F-J 13 -> 15.
 - Container restarts (~20:18 UTC 11-14, ~00:48 UTC 11-15) killed waits; re-armed, nothing lost. Pass 7 re-queued after being cut mid-run.
+## Passes 7-8 result (3,072 HOLDOUT BANK, 96 ids): overall 47.9 -> 47.9%, +0.00 (SE 3.63, +6/-6); both-finish n 45 88.9 -> 91.1%,
+  +2.22 (SE 2.22, +1/-0); cut 42 -> 40; tokens 2087 -> 2088; identical 2/96.
+## Submitted: claude_g12_readout_letter_debias_L23 (code/018).

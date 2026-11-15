@@ -1,0 +1,14 @@
+{
+ "label": "claude_g12_readout_letter_debias_L23",
+ "editor": "claude",
+ "gen": 12,
+ "time": 1794707090.53737,
+ "tensors": {
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 12202,
+   "numel": 15728640,
+   "rel_change": 0.013720590621232986,
+   "sha_bf16": "6efc0b300a4e17c4"
+  }
+ }
+}

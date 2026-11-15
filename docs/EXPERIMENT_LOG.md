@@ -1230,3 +1230,26 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - `claude`: latent knowledge that is overridden late ("knows but does not say").
   - `ed_f`: open choice, with the gate rule (P(gold) must rise on held-out prefixes before generating).
 - Before launch, both gen-11 editors were confirmed (from their metadata) to have run on the same model as the orchestrator.
+
+#### Gen 12: `claude` hand-back (2026-11-15, ~01:45 UTC)
+
+- **Candidate** `claude_g12_readout_letter_debias_L23`: the w2 columns of six L23 neurons (7528, 6877, 4830, 1228, 4441, 2650), 12,202 weights. Used 8/8 passes (3 read, 5 generate). Report: `runs/gen_012/editors/claude/report.md`.
+- **Main finding: a negative result. The model does not "know but not say".**
+  - Forced-answer probes were taken at 35%, 50%, 70% and the end of 20 wrong samples of mixed questions and 28 traces of always-wrong questions, read through a letter lens on L14–L24.
+  - On wrong conclusions, gold is the top letter at no layer (in at most 2 of ~55 probes), and P(gold) stays ≤ .07.
+  - In right traces the lens finds gold 57–80% of the time from L15 on.
+  - The forced answer copies the belief already written in the trace: L22.H12 attends 3–5× more to the wrong pick's option line than to gold's.
+  - So wrong conclusions are wrong all the way through. This agrees with gen 2 and gen 10: the errors are missing knowledge.
+- **Edit.** It corrects a letter-frequency bias in the before-thinking answer. On 320 practice questions that answer is 29.7% accurate and picks A 87 times against 46 golds, J 2 times against 21. The edit shifts each letter's logit by log(pick frequency) − log(gold frequency).
+- **Gate (read pass).**
+  - Held-out before-thinking probes: P(gold) +.031 (SE .012), +5/−1.
+  - Off-target: the top token changed at 1.85% of trace positions.
+- **Results.**
+  - DEV: +20.8 (SE 13.4).
+  - **Holdout48 at 8,192: +0.00 (SE 5.16), both-finish +0.00 (n 39).**
+  - The 3,072 holdout bank: +0.00; both-finish +2.22 (SE 2.22).
+- The editor expects about 0 at selection: conclusions form in the reasoning text, and this edit does not change that text.
+- **Suggested next steps:**
+  - a loop breaker for traces that hit the token cap (needs a selection rule that counts cut answers);
+  - work on sample-to-sample variance (majority vote would be worth +5.7 points).
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued at 01:47 UTC behind `ed_f`'s passes (priority 5).
