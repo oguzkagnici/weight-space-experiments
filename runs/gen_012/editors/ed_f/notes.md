@@ -104,3 +104,9 @@ k_proj reads these two directions 1.5-2x more strongly than a random direction (
 ## Passes 6-7 (generate, edited = v2, cap 8192): holdout48 ids [0:24] and [24:48] (work/req_hold1.json, req_hold2.json) -> final paired measurement.
 ## Pass 8 (generate, edited = v2, cap 8192, n 4): DEV, 6 passk questions (work/req_dev.json): 4 late-gold with wrong/mixed parent samples
    (6110 F 'BBBF', 6800 H 'HDDH', 2055 G 'CEGG', 5510 I 'BDDB') + 2 early-gold always-right controls (4839 B, 6577 A).
+
+## FINAL (passes 6-8, edit v2; code/019, 020)
+- HOLDOUT48 at 8,192: overall 62.5 -> 64.6, +2.08 (SE 6.31), +5/-4. Both-finish (39): 71.8 -> 74.4, +2.56 (SE 5.79), +3/-2; 8 of 39 answers changed.
+  gold F-J (22): 40.9 -> 59.1 (+5/-1); gold A-E (26): 80.8 -> 69.2 (+0/-3). Cuts 7 -> 7; tokens 3,472 -> 3,368; 0/48 traces identical (first diff 0.8%).
+- DEV (6 passk questions x 4, cap 8,192): 54.2 -> 87.5 (+9/-1): 6110 BBBF->BFFF, 6800 HDDH->HDHD, 2055 CEGG->GGGG, 5510 BDDB->IIII; controls 4839 BBBB, 6577 AAAA unchanged.
+- Submitted: ed_f_g12_key_ordinal_slope_removal (7 tensors, 5,410,326 weights). Report in report.md.

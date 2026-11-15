@@ -1253,3 +1253,30 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - a loop breaker for traces that hit the token cap (needs a selection rule that counts cut answers);
   - work on sample-to-sample variance (majority vote would be worth +5.7 points).
 - **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued at 01:47 UTC behind `ed_f`'s passes (priority 5).
+
+#### Gen 12: `ed_f` (Fable 5.2) hand-back (2026-11-15, ~02:30 UTC)
+
+- **Candidate** `ed_f_g12_key_ordinal_slope_removal`: rank-1 projection `W_k ← W_k (I − u uᵀ)` in `k_proj` of the attention layers 10, 12, 14, 16, 18, 20 and 22. It changes 5.4M weights (relative change 2.9–4.4% per tensor). Used 8/8 passes (4 read, 1 score, 3 generate). Report: `runs/gen_012/editors/ed_f/report.md`.
+- **Diagnosis: late gold options lose.**
+  - In 243 ten-option parent traces at 8,192 (85 questions): when gold is A–E, 76% right / 9% wrong / 15% cut; when gold is F–J, 44% / 34% / 22%.
+  - Question-level r = −0.235 (permutation p .017).
+  - On holdout48: gold A–E 80.8% (n 26) vs F–J 40.9% (n 22).
+  - It is not about coverage: gold is discussed in 96–100% of wrong traces. An earlier incumbent beats a late gold.
+- **Mechanism.** The key inputs of option-line tokens carry a generic ordinal direction in every attention layer: slot means fall A > … > J, explaining 34–59% of slot-mean variance (split-half cosine .92–.96). `k_proj` reads this direction 1.5–2× more strongly than a random one.
+- **Gate (160 held-out probes).** Accuracy 31.9 → 40.0% (+14/−1); P(gold) +.027 (SE .013). For gold F–J the gain is +12/−0; for gold A–E P(gold) fell (−.035).
+- **Generated answers.**
+  - Holdout48 at 8,192: +2.08 (SE 6.31, +5/−4); both-finish +2.56 (SE 5.79, +3/−2).
+  - By gold position: F–J 40.9 → 59.1%, A–E 80.8 → 69.2%. The edit partly transfers accuracy from early-gold to late-gold questions.
+  - DEV +33 (picked on parent failures, so inflated).
+- GSM8K and direct mode were not measured; the edit touches attention keys on every token.
+- **Orchestrator check before the selection result (pre-registered here):** on the 256 selection questions the parent shows **no** late-gold penalty.
+
+  | Questions | gold A–E | gold F–J |
+  |---|---|---|
+  | All | 59.2% (n 147; finished 71.3%) | 62.4% (n 109; finished 73.9%) |
+  | Ten-option only | 58.5% (n 118) | 61.2% (n 98) |
+
+  - So the editor's gap, found on 85 + 48 questions, does not replicate on this larger set; it may be partly chance or a property of the subsets it used.
+  - Prediction: on selection the edit's gain on late-gold questions will be offset by losses on early-gold questions, giving net ≤ about 0.
+  - We will report the selection result split by gold position, as the editor suggested.
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8. The full `ga select` jobs for both candidates follow and read cached answers.

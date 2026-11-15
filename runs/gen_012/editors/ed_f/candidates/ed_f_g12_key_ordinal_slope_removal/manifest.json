@@ -1,0 +1,50 @@
+{
+ "label": "ed_f_g12_key_ordinal_slope_removal",
+ "editor": "ed_f",
+ "gen": 12,
+ "time": 1794713397.1169307,
+ "tensors": {
+  "model.layers.10.self_attn.k_proj.weight": {
+   "changed_bf16": 764780,
+   "numel": 1048576,
+   "rel_change": 0.03681827709078789,
+   "sha_bf16": "995d4f62be4954d6"
+  },
+  "model.layers.12.self_attn.k_proj.weight": {
+   "changed_bf16": 802271,
+   "numel": 1048576,
+   "rel_change": 0.03466029465198517,
+   "sha_bf16": "014a501c5d53724d"
+  },
+  "model.layers.14.self_attn.k_proj.weight": {
+   "changed_bf16": 774042,
+   "numel": 1048576,
+   "rel_change": 0.043690189719200134,
+   "sha_bf16": "2db6e4a3049a8141"
+  },
+  "model.layers.16.self_attn.k_proj.weight": {
+   "changed_bf16": 803418,
+   "numel": 1048576,
+   "rel_change": 0.028880057856440544,
+   "sha_bf16": "27a2295632fd9d52"
+  },
+  "model.layers.18.self_attn.k_proj.weight": {
+   "changed_bf16": 814539,
+   "numel": 1048576,
+   "rel_change": 0.037052132189273834,
+   "sha_bf16": "f4a496cb6666cf70"
+  },
+  "model.layers.20.self_attn.k_proj.weight": {
+   "changed_bf16": 774587,
+   "numel": 1048576,
+   "rel_change": 0.02880287915468216,
+   "sha_bf16": "3cbe4ee7f4c239f9"
+  },
+  "model.layers.22.self_attn.k_proj.weight": {
+   "changed_bf16": 676689,
+   "numel": 1048576,
+   "rel_change": 0.03812595456838608,
+   "sha_bf16": "ad74c6f7184a37b2"
+  }
+ }
+}
