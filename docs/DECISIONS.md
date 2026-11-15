@@ -280,3 +280,27 @@ The user asked for another generation and for a different model (Fable 5.2) to b
     - two-finalist comparison errors.
 - **Selection:** gen 10's 256 questions again (`--sel-from 10`). The parent's answers are cached and the paired comparison stays unbiased. The set has now been used to decide three generations without a winner. A winner would still have to pass the untouched held-out check (8,192 tokens) before being trusted.
 - **Scheduling:** each candidate's selection is pre-run in 8 chunks of 32 at priority 8 as soon as it is submitted (gen 11 practice), so the other editor's passes (priority 5) are not blocked.
+
+### D71 (2026-11-15): Generation 12 — no winner; the gen-8 champion survives
+
+`ga decide --z 2 --bf-z 1 --guard-z -2`, 256 selection questions (gen 10's set), 8,192 tokens. The champion reproduced its earlier answers: 155/256 = 60.55%.
+
+| Candidate | Editor | Weights | Acc | Diff (SE) | z | +/− | Both-finish diff (SE), n | Identical raw |
+|---|---|---|---|---|---|---|---|---|
+| `claude_g12_readout_letter_debias_L23` | `claude` | 12,202 | 60.16 | −0.39 (2.1) | −0.19 | +14/−15 | −1.95 (1.95), 205 | 4 |
+| `ed_f_g12_key_ordinal_slope_removal` | `ed_f` (Fable 5.2) | 5.4M | 60.16 | −0.39 (2.3) | −0.17 | +17/−18 | −0.50 (2.08), 199 | 0 |
+
+- Neither candidate passes; the GSM8K guard and held-out check were not needed. D52 check: the two candidates have distinct weights keys and their answers differ from the parent's (4 and 0 byte-identical traces), so the nulls are not caching artifacts.
+- Both flip 29 and 35 answers, against 25 for pure resampling (D69): effects of seed-change size.
+- **Pre-registered gold-position split (D70 / EXPERIMENT_LOG):**
+
+  | Candidate | gold A–E (n 147): parent → cand | gold F–J (n 109): parent → cand | Predictions in F–J: parent → cand |
+  |---|---|---|---|
+  | `claude` | 87 → 89 | 68 → 65 | 94 → 98 |
+  | `ed_f` | 87 → 85 | 68 → 69 | 94 → 108 |
+
+  - The prediction held: the parent has no late-gold penalty on this set, and `ed_f`'s edit nets about zero.
+  - The edit does what it says mechanically: it moves 14 more final answers to F–J letters. But late-gold accuracy rises by only 1 and early-gold falls by 2. It shifts the letter prior rather than repairing reasoning.
+  - The editor's 76% vs 44% gap (85 questions) and its holdout48 gap (81% vs 41%) did not replicate on 256 questions (59% vs 62%). A diagnosis found on ≤ 100 questions needs a check on a larger set before passes are spent on it.
+- **Fable 5.2 as an editor:** it followed the gate rule, picked a concrete, testable mechanism and reported its own transfer from early to late golds honestly. Its outcome is the same as every Opus 5.5 editor's since gen 8. One editor and one generation say nothing about model differences.
+- **Overall (gens 9–12):** eight candidates in a row are within noise. Each passed its own read gate (P(gold) on probes) and none moved generated accuracy. Read gates on forced-answer probes do not predict generated-answer gains in thinking mode: the answer is formed in the reasoning text, which these edits barely change.

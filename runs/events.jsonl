@@ -95,3 +95,5 @@
 {"time": "2026-11-14T20:20:18Z", "cmd": "brief", "args": {"editor": "claude"}}
 {"time": "2026-11-14T20:20:20Z", "cmd": "brief", "args": {"editor": "ed_f"}}
 {"time": "2026-11-15T03:31:28Z", "cmd": "select", "args": {"wait": false, "priority": 8, "parent_chunks": 0}}
+{"time": "2026-11-15T16:00:58Z", "cmd": "decide", "args": {"z": 2.0, "force": null, "bf_z": 1.0, "guard_z": -2.0, "keep": false}}
+{"time": "2026-11-15T16:01:07Z", "cmd": "report", "args": {"gen": null}}
