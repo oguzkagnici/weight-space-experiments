@@ -1283,7 +1283,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 
 #### Gen 12: selection and decision (2026-11-15)
 
-- Pre-run chunks ran from ~01:50 to ~17:00 UTC, about 1 h per chunk of 32. The three `ga select` jobs then read cached answers. No failures, no restarts during selection.
+- Pre-run chunks ran from ~01:50 to ~15:56 UTC, about 1 h per chunk of 32. The three `ga select` jobs then read cached answers. No failures, no restarts during selection.
 - Champion 155/256 (60.55%, reproduced).
 - `claude_g12_readout_letter_debias_L23`: 60.16, −0.39 (SE 2.1, z −0.19), +14/−15; both-finish −1.95 (n 205).
 - `ed_f_g12_key_ordinal_slope_removal`: 60.16, −0.39 (SE 2.3, z −0.17), +17/−18; both-finish −0.50 (n 199).
