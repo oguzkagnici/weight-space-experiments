@@ -94,3 +94,13 @@ k_proj reads these two directions 1.5-2x more strongly than a random direction (
   "first item" direction over-corrects option A in the prompt-only context.
 ## Edit v2 (code/016 `10,12,14,16,18,20,22 1`): same layers, rank 1 = slope direction only (cos with first-item direction ~ -.8, so most of it goes too).
 ## Pass 5 (read, edited = v2): same 160 probes as passes 1/3 (work/req_p3.json) -> gate for v2, compare with v1.
+
+## Pass 5 result = GATE for v2 (160 held-out probes, edited vs pass 1)
+- all: accuracy 31.9 -> 40.0% (+14/-1, sign test p ~ .001); P(gold) .317 -> .345 (+.027, SE .013); log P(gold) +.48 (SE .12); gold rank 2.94 -> 2.79 (SE .13).
+- gold F-J (77): 24.7 -> 40.3% (+12/-0), P(gold) +.095 (SE .021), rank 3.27 -> 2.36. gold A-E (83): 38.6 -> 39.8% (+2/-1), P(gold) -.035 (SE .014), rank 2.64 -> 3.19.
+- bank40 +6/-1, pk1_15 +8/-0. Predicted A 44 -> 17; top letter changed in 43 of 160.
+- v2 beats v1 (+10/-3) with half the change -> v2 is the candidate. CURRENT EDIT = v2 (staged in edited/): k_proj of layers 10,12,14,16,18,20,22,
+  W_k <- W_k (I - u u^T), u = unit ordinal-slope direction of that layer's slot means; relative change 2.9-3.8% per tensor.
+## Passes 6-7 (generate, edited = v2, cap 8192): holdout48 ids [0:24] and [24:48] (work/req_hold1.json, req_hold2.json) -> final paired measurement.
+## Pass 8 (generate, edited = v2, cap 8192, n 4): DEV, 6 passk questions (work/req_dev.json): 4 late-gold with wrong/mixed parent samples
+   (6110 F 'BBBF', 6800 H 'HDDH', 2055 G 'CEGG', 5510 I 'BDDB') + 2 early-gold always-right controls (4839 B, 6577 A).

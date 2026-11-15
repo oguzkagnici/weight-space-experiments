@@ -73,3 +73,6 @@
   letter-consistent with their reasoning (checked 4: the conclusion text names the option of the final letter). Noisy, but no breakage.
 ## Final edit = current edit (code/013 S=1.0). Passes 5-6: holdout48 ids[:24], ids[24:], edited, cap 8,192. Passes 7-8: 3,072 holdout bank
   (96 ids, 48 per pass), edited, cap 3,072 (parent bank reproduces byte-identically -> free paired test).
+## Passes 5-6 result (HOLDOUT48, 8,192; code/017): overall 62.5 -> 62.5%, +0.00 pts (SE 5.16, +3/-3); both-finish n 39 74.4 -> 74.4%,
+  +0.00 (SE 5.20, +2/-2); cut 7 -> 7; tokens 3472 -> 3225; identical 1/48. Pred letters A-E 28 -> 26, F-J 13 -> 15.
+- Container restarts (~20:18 UTC 11-14, ~00:48 UTC 11-15) killed waits; re-armed, nothing lost. Pass 7 re-queued after being cut mid-run.
