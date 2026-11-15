@@ -1295,3 +1295,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Cut-trace check (D72): no verbatim loops in parent traces cut at 8,192; on sometimes-cut pass@4 questions the finished samples are right 12/34.
 - `ga new-gen --editors claude,ed_f --budget 8 --max-cands 1 --protocol think --template editor_task_think_g13.md --trace-bank runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl --sel-cap 8192 --sel-from 10 --focus <json>`. (A first call passed the focus as a file path and failed after creating empty folders; they were removed and the call repeated.)
 - `claude` (fork) on self-correction; `ed_f` (Fable 5.2) on step-level reasoning errors. Both may read their own earlier generations' work.
+
+#### Separate deliverable: brief for a follow-up experiment (2026-11-15)
+
+- At the user's request, wrote `docs/NEW_EXPERIMENT_weight_assembly_from_donors.md`: a self-contained brief for a new environment. An LLM runner assembles a ≤ 2B model by writing weights from several open donor models (no training, no training data), in the same genetic loop, judged on hidden MMLU-Pro / GPQA selection sets with a sealed final set (MMLU-Pro final + GPQA Diamond). The bar is the best eligible donor. It includes this experiment's lessons (§11).
