@@ -304,3 +304,15 @@ The user asked for another generation and for a different model (Fable 5.2) to b
   - The editor's 76% vs 44% gap (85 questions) and its holdout48 gap (81% vs 41%) did not replicate on 256 questions (59% vs 62%). A diagnosis found on ≤ 100 questions needs a check on a larger set before passes are spent on it.
 - **Fable 5.2 as an editor:** it followed the gate rule, picked a concrete, testable mechanism and reported its own transfer from early to late golds honestly. Its outcome is the same as every Opus 5.5 editor's since gen 8. One editor and one generation say nothing about model differences.
 - **Overall (gens 9–12):** eight candidates in a row are within noise. Each passed its own read gate (P(gold) on probes) and none moved generated accuracy. Read gates on forced-answer probes do not predict generated-answer gains in thinking mode: the answer is formed in the reasoning text, which these edits barely change.
+
+### D72 (2026-11-15): Generation 13 — target the reasoning itself
+
+The user chose to target the model's reasoning and continue the loop.
+
+- **Why not the cut traces.** I checked the parent's traces that are cut at 8,192 tokens (selection: 42/256; pass@4 bank: 42/256) before choosing a target. They are not loops: no 200-character window of the last 40% repeats verbatim; 6-gram overlap with the earlier text is the same as in long finished traces (median .06); "Wait" is as frequent (0.8 vs 0.7 per 1,000 tokens). On pass@4 questions cut in some samples, the finished samples are right only 12/34 times. Letting these traces finish would add little accuracy, so they are not the target.
+- **Target:** the reasoning steps (`prompts/editor_task_think_g13.md` = g12 brief + generation-12 summary + "THIS GENERATION'S TARGET"):
+  - find the first wrong step in wrong samples of mixed pass@4 questions and compare with right samples;
+  - in scope: a recurring kind of step error with a findable cause; self-correction (an internal error signal and its link to re-checking, strengthened only where it fires); other reasoning mechanisms acting on many questions.
+- **Gate rule replaced.** Forced-answer P(gold) failed as a predictor eight times (gens 9–12). The new gate is a read-pass effect on the targeted reasoning step on held-out texts (P(correct step) vs P(wrong step), or detection of corrupted vs clean steps), then "both" generate passes at 8,192 on pass@4 questions, reporting wrong→right / right→wrong conclusions on both-finished questions and whether traces differ at the targeted step.
+- **Editors:** `claude` (fork, Opus 5.5): SELF-CORRECTION. `ed_f` (fresh sub-agent, Fable 5.2): STEP-LEVEL REASONING ERRORS, checked on a larger set before passes are spent (its gen-12 diagnosis did not replicate).
+- **Unchanged:** 8 passes, 1 candidate each; gen 10's 256 selection questions at 8,192 (`--sel-from 10`); rule z ≥ 2, both-finish z ≥ 1, GSM8K-boxed guard z ≥ −2; chunked pre-run at priority 8.

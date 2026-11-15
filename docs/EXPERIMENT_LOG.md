@@ -1289,3 +1289,9 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - `ed_f_g12_key_ordinal_slope_removal`: 60.16, −0.39 (SE 2.3, z −0.17), +17/−18; both-finish −0.50 (n 199).
 - Gold-position split (pre-registered): `ed_f` A–E 87 → 85, F–J 68 → 69; final answers in F–J 94 → 108. `claude` A–E 87 → 89, F–J 68 → 65.
 - Decision: no winner; the gen-8 champion survives (D71). Report: `runs/gen_012/REPORT.md`.
+
+#### Gen 13 launch (2026-11-15, ~23:00 UTC)
+
+- Cut-trace check (D72): no verbatim loops in parent traces cut at 8,192; on sometimes-cut pass@4 questions the finished samples are right 12/34.
+- `ga new-gen --editors claude,ed_f --budget 8 --max-cands 1 --protocol think --template editor_task_think_g13.md --trace-bank runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl --sel-cap 8192 --sel-from 10 --focus <json>`. (A first call passed the focus as a file path and failed after creating empty folders; they were removed and the call repeated.)
+- `claude` (fork) on self-correction; `ed_f` (Fable 5.2) on step-level reasoning errors. Both may read their own earlier generations' work.
