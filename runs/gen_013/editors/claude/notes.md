@@ -17,3 +17,13 @@
 - 2654 s1 (psych): picks sleep paralysis though the stem lacks immobility; right samples check that cue.
 - 5325, 2055, 10964, 1171, 2731: KNOWLEDGE GUESSES among plausible options (right samples also guess: "my best guess: H").
 - So of 10 mixed questions, ~4 have an identifiable wrong step, and in all of them the wrong step is a confident, high-probability belief or an unchecked cue, not a slip the model wrote against its own prediction.
+
+## Pass 1 results (read, original; code/003, 006)
+- Corrupted token is very surprising: median logprob clean -0.58 vs corrupt -13.3 (swaps), -0.00 vs -20.8 (arith); corrupt lower in 100%.
+- Next-token re-check openers (Wait/Actually/Hmm/Hold/No/Let/Check/Double): swaps 0.049 -> 0.077 (x1.6, up in 69% of pairs); arith 0.001 -> 0.065 (mean; up in only 40% of pairs: a few strong).
+- Corrupt-vs-clean direction (diff of means, fit on half the questions): held-out PAIRED accuracy 0.83-0.90 at h8-h24 (h14 swap .90). Transfers across kinds (arith->swap .84 at h14/h24, swap->arith .70-.82). UNPAIRED AUC only 0.63-0.71 (direction small vs context variance; a gate on it would be leaky). Correlates with surprisal (r -0.2..-0.36 with logprob diff): partly a surprise signal.
+- So: the network registers a step that is improbable under its own prediction, and re-checking rises somewhat.
+
+## Pass 2 plan (read, original) — code/008
+- Own-pick statement vs substituted letter at the first sentence where a pass@4 sample states its pick (25 wrong samples: substitute gold; 25 right samples: substitute the common wrong pick), + hand pair 9251 s0 (model's false lens-sign step vs corrected step).
+- Prediction if detector = self-consistency: in wrong samples the GOLD substitution looks MORE error-like than the model's own wrong pick (no truth signal). Edit: none.

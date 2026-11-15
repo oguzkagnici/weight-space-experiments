@@ -19,14 +19,17 @@ for nm, S in (("narrow re-check", NARROW), ("broad (+But/However)", BROAD)):
 # surprisal of the first differing token
 tlp = np.load(D + "token_logprobs.npy") if "token_logprobs" in str(meta.get("files")) else None
 if tlp is not None:
-    off = np.array(json.loads(meta["offsets_tok"]) if isinstance(meta.get("offsets_tok"), str) else meta["offsets_tok"])
+    nt = json.loads(meta["n_tokens"]) if isinstance(meta["n_tokens"], str) else meta["n_tokens"]
+    off = np.concatenate([[0], np.cumsum(np.array(nt) - 1)])
+    print("server tokens vs local (first text):", nt[0], len(tok(P[0]["clean"], add_special_tokens=False).input_ids))
     s_c, s_x = [], []
     for i, p in enumerate(P):
         a = tok(p["clean"], add_special_tokens=False).input_ids; b = tok(p["corrupt"], add_special_tokens=False).input_ids
         j = next(k for k in range(min(len(a), len(b))) if a[k] != b[k])
         A = tlp[off[2 * i]: off[2 * i + 1]]; B = tlp[off[2 * i + 1]: off[2 * i + 2]]
         # token_logprobs[k] = logprob of token k given prefix (assume aligned so that index k is token k; check len)
-        s_c.append(A[j] if len(A) == len(a) else A[j - 1]); s_x.append(B[j] if len(B) == len(b) else B[j - 1])
+        sh = len(A) - (len(a) - 1)  # extra leading tokens on the server side (e.g. BOS)
+        s_c.append(A[j - 1 + sh]); s_x.append(B[j - 1 + sh])
     s_c, s_x = np.array(s_c), np.array(s_x)
     for k in ("swap", "arith"):
         m = kinds == k
