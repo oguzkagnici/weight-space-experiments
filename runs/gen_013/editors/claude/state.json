@@ -1,7 +1,9 @@
 {
  "passes_used": 4,
  "pending": [
-  "gen_013_claude_p05_4fedff"
+  "gen_013_claude_p05_4fedff",
+  "gen_013_claude_p06_8c8059",
+  "gen_013_claude_p07_234f61"
  ],
  "passes": [
   {
