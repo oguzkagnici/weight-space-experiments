@@ -1,1 +1,7 @@
-{"passes_used": 0, "pending": []}
+{
+ "passes_used": 0,
+ "pending": [
+  "gen_014_claude_p01_4e0f92",
+  "gen_014_claude_p02_b3a559"
+ ]
+}
