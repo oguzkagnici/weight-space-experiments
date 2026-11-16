@@ -146,3 +146,5 @@ The text-level check is already negative, but it has little power (10 questions)
 ## Pass 5 (read, edited = v1) = READ GATE: work/req_p5.json: the 129 pass-3 judging / background texts (57 judging + 19 background from questions
    NOT used to fit d and t) and the late-cut BASE texts of pass 2 that fit under the token limit; attn_last L22, top-50, token log-probs; compared
    with the parent's passes 2-3 on the same texts.
+## Pass 6 (generate, edited = v1, cap 8192): work/req_hold1.json = HOLDOUT48 ids 0-23 (queued before the gate result to keep the place in the
+   queue; if the gate asks for another dose, the two remaining passes re-measure the whole holdout with it).
