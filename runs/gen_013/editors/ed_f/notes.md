@@ -102,3 +102,16 @@ more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will 
   F2 +1.15 vs 0, controls -0.002 (v1 +0.013).
 ## Pass 5 = DEV (v1, already running when v2 was staged). Passes 6-8 (edited = v2): 6 = gate read (the 306 pass-1 texts, as pass 3);
    7-8 = HOLDOUT48 (ids 0-23, 24-47), queued in one chain to fit the remaining budget; v1's holdout stays at the 24 questions of pass 4.
+
+## Pass 5 result (DEV, v1; 6 passk questions x 4 at 8,192, parent cached)
+- overall 58.3 -> 75.0 (+16.7, SE 10.5 clustered by question, +5/-1); both-finish (20) 70.0 -> 80.0 (+9.7, SE 10.6; +3/-1, 6 answers changed);
+  cuts 2 -> 2 (2 cut -> finished right, 2 finished-wrong -> cut); tokens 3,966 -> 4,380; re-check openers per 1,000 tokens 3.39 -> 5.92.
+  9251 BIII -> IIII, 7456 AF-C -> FFFA, 11805 BJJD -> HDJ-, 7261 -DDD -> DDDD, 6110 BBBF -> F-BF, control 8198 CCCC -> CCCC.
+- Caveat: 5 of the 6 questions were chosen because the parent has wrong samples on them; every edited trace differs from the parent's within
+  the first 0-17% (median 6.7%), so wrong samples of mixed questions are simply re-drawn (regression to the mean). Not evidence by itself.
+  Wrong -> right on both-finish: 9251 s0, 7456 s0, 6110 s0; right -> wrong: 11805 s1.
+## Pass 6 result = GATE for v2 (edited vs pass 1, same 306 texts)
+- HELD-OUT questions: P(re-check opener) F1 clean .217 -> .226 (+.009, SE .008); big .327 -> .368 (+.041, SE .018); small .266 -> .310
+  (+.045, SE .018); F2 clean .002 -> .002; F2 big .129 -> .218 (+.088, SE .038). Corrupted-minus-clean gap: big +.032 (SE .016), small +.036
+  (SE .016), F2 +.088 (SE .038). Top-1 opener changed in 6/41, 1/41, 1/15 corrupted texts, 0 clean.
+- Off-target: mean |dlogp| .0020 (v1 .0038), 1.1% of tokens > .01 (2.0%), 0.32% > .1 (0.55%).
