@@ -27,3 +27,17 @@
 ## Pass 2 plan (read, original) — code/008
 - Own-pick statement vs substituted letter at the first sentence where a pass@4 sample states its pick (25 wrong samples: substitute gold; 25 right samples: substitute the common wrong pick), + hand pair 9251 s0 (model's false lens-sign step vs corrected step).
 - Prediction if detector = self-consistency: in wrong samples the GOLD substitution looks MORE error-like than the model's own wrong pick (no truth signal). Edit: none.
+
+## Pass 2 results (read, original; code/009) — THE DETECTOR IS A SELF-CONSISTENCY SIGNAL, NOT A TRUTH SIGNAL
+- Detector = pass-1 corrupt-minus-clean mean direction. Score(substituted) - score(own) at the pick sentence:
+  - RIGHT samples, own correct letter replaced by the common wrong letter: h18 +0.58, h20 +0.84, h24 +5.62 (>0 in 25/25).
+  - WRONG samples, own wrong letter replaced by GOLD: h18 +0.43, h20 +0.66, h24 +3.79 (>0 in 25/25). The network flags the TRUE answer as the deviation.
+  - 9251 s0 hand pair (model's own false lens-sign step vs the corrected step): corrected scores MORE error-like (h18 +0.33, h24 +3.91 ~ 2 sd of synthetic corrupt-clean).
+- P(re-check opener next): right samples own 0.50 -> sub 0.79; wrong samples own 0.76 -> gold-sub 0.85; 9251 own false 0.20 -> corrected 0.58.
+- Side finding: after the model's own pick statement, P(re-check next) is higher in WRONG samples (0.76) than RIGHT ones (0.50): the model is less sure of its wrong picks, but its re-checks re-derive the same belief (9251).
+- Conclusion: the network detects steps that deviate from ITS OWN prediction (surprise / self-consistency), and that already raises re-checking. It has no signal that a confident wrong belief is false. Strengthening detector->re-check should make the model doubt deviations from its beliefs, including correct ones; it cannot catch the errors that make answers wrong (confident beliefs, unchecked cues, knowledge guesses).
+
+## Edit E1 (code/011, args K 4 ALPHA 1 PCT 85): L23 n881 detector -> re-check unit
+- n881 folded into near-duplicate n331 (cos .9996; ratio .989); n881 gate = K*(w - T*p)/g_ffn with w = corrupt-minus-clean mean of normalised h22 on TRAIN questions (work/train_qs.json), p = bias proxy, T = 85th pct of train corrupt scores; up = p/g_ffn; w2 col = mean E[Wait, " Wait", Actually, " Actually"] - mean E, Q8-safe (norm 1.10).
+- Gate at sentence ends (pass-1 vectors): TEST questions fire corrupt 19% vs clean 4% (train 16% / 1%); AUC .67.
+## Pass 3 plan (read, EDITED): held-out (test-question) pass-1 pairs + natural own/sub pairs (pass 2 texts, incl. 9251): P(re-check) and token-logprob off-target changes vs pass 1/2 (parent).
