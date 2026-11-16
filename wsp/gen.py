@@ -24,7 +24,7 @@ PARALLEL = 16
 THINK_CAP = 3072
 THINK_INSTR = 'Think step by step, then finish with "The answer is (X)" where X is the letter of the correct option.'
 SAMPLING = {"temperature": 0.6, "top_p": 0.95, "top_k": 20}
-MAX_GGUF_CACHE = 2            # keep at most this many edited Q8_0 files (2: the disk allowance is ~39 GB, D66)
+MAX_GGUF_CACHE = 1            # keep at most this many edited Q8_0 files (D66: 2; D73: 1, the free disk fell below 2 builds)
 EXTRA_ARGS = ["-no-kvu", "-fa", "off", "-cram", "0"]   # extra llama-server arguments; -cram 0 (D44): no host prompt cache (OOM)
 CACHE_PROMPT = False          # llama-server prompt-prefix reuse across requests
 
@@ -69,7 +69,8 @@ def build_gguf(weight_dirs, key):
     # evict before building (a build needs ~5.3 GB of scratch: bf16 GGUF + Q8_0) so a full disk cannot fail it
     files = sorted((f for f in os.listdir(GGUF_CACHE) if f.endswith(".q8_0.gguf")),
                    key=lambda f: os.path.getmtime(os.path.join(GGUF_CACHE, f)))
-    for f in files[:-(MAX_GGUF_CACHE - 1)]:
+    keep = MAX_GGUF_CACHE - 1
+    for f in (files[:-keep] if keep else files):
         os.remove(os.path.join(GGUF_CACHE, f))
     tmp = os.path.join(GGUF_CACHE, f"{key}.bf16.gguf")
     try:

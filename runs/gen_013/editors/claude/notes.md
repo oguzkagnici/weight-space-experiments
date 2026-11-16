@@ -48,3 +48,15 @@
 - => exactly as pass 2 predicts: strengthening the network's own error signal makes it re-check the TRUE step that deviates from its belief, not its own wrong belief.
 - Off-target: per-token |dlogprob| mean 0.039, changes from the first tokens of every text (0/212 unchanged), median max |d| 5.6: the gate fires off-target (prompt/sink positions likely).
 ## Pass 4 plan (read, ORIGINAL): w1 inputs of L23 MLP at ALL positions on held-out pairs + practice traces -> refit gate offline against real background positions (sink projection, threshold for silence), simulate n881 activation exactly.
+
+## Pass 4 results (read, original; L23 w1 inputs, all positions; code/015, 016)
+- Calibrated on 14,795 background positions of 8 practice traces, a gate silent on 99.9% of background (T = 99.9th pct) fires on 0 of 12 held-out corrupted sentence ends (and 0 clean). The detector score is high at ALL sentence ends (clean ends at the 71st-99.7th background percentile, corrupt ends a few points higher; mean corrupt-minus-clean after the corruption +0.2 to +5.6 in score units). The corrupt-vs-clean signal is a small paired shift on top of a large "end of sentence" component: there is no distinct, gateable "this step is false" state in the residual stream at L23 input.
+- Sink tokens (first 4) projected off: simulated n881 |act| 0 there.
+## DECISION
+- Self-correction route = NEGATIVE: (1) the error signal is self-consistency (flags deviations from the model's own prediction, incl. true steps), (2) it is too weak to gate (paired only), (3) strengthening it (E1) raises doubt about true steps and leaks.
+- Candidate E2 (for the required measurement): refit strict gate (Q .999, K 4; fires on ~0.1% of tokens, the most self-inconsistent points) writing re-check openers. Expected: no change in conclusions.
+## Pass 5 plan (generate, EDITED E2, cap 8192, n 4): 6 mixed pass@4 questions with the most finished-wrong samples (6110, 6800, 2731, 5325, 2055, 11805) = 24 answers, paired with the passk bank (parent cached).
+## Passes 6-7 queued (generate, EDITED E2, cap 8192): holdout48 ids 0-23 and 24-47 (final measurement).
+
+## BLOCKED (2026-11-16 ~02:10 UTC): passes 5, 6, 7 FAILED (not charged) — llama-quantize Q8_0 failed for lack of disk (free 0.9-1.2 GB during the builds; 4.2 GB after). A gguf build needs ~5.3 GB free (bf16 ~3.5 GB + q8 ~1.85 GB). Budget: 4 used of 8.
+- To resume: re-submit work/req_gen5.json (pass@4 mixed, 24 answers), work/req_hold6.json and work/req_hold7.json (holdout48), edit E2 already saved in edited/. Then code/018_paired.py dev 05 ; hold 06 07 (check numbering of the new passes).

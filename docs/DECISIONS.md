@@ -316,3 +316,10 @@ The user chose to target the model's reasoning and continue the loop.
 - **Gate rule replaced.** Forced-answer P(gold) failed as a predictor eight times (gens 9–12). The new gate is a read-pass effect on the targeted reasoning step on held-out texts (P(correct step) vs P(wrong step), or detection of corrupted vs clean steps), then "both" generate passes at 8,192 on pass@4 questions, reporting wrong→right / right→wrong conclusions on both-finished questions and whether traces differ at the targeted step.
 - **Editors:** `claude` (fork, Opus 5.5): SELF-CORRECTION. `ed_f` (fresh sub-agent, Fable 5.2): STEP-LEVEL REASONING ERRORS, checked on a larger set before passes are spent (its gen-12 diagnosis did not replicate).
 - **Unchanged:** 8 passes, 1 candidate each; gen 10's 256 selection questions at 8,192 (`--sel-from 10`); rule z ≥ 2, both-finish z ≥ 1, GSM8K-boxed guard z ≥ −2; chunked pre-run at priority 8.
+
+### D73 (2026-11-16): Disk full during gen 13 — evict every cached GGUF before a build
+
+- About 02:06–02:10 UTC three of `claude`'s generate passes (and repeated `ed_f` p04 attempts) failed in `llama-quantize`: free disk had fallen to 0.9–1.5 GB. Failed passes are not charged.
+- Freed space: a stale gen-12 candidate Q8_0 file (1.8 GB) and the gitignored scratch `work/` folders of finished generations 1–11 (~1.5 GB; activation dumps only, notes/code/reports are kept).
+- `MAX_GGUF_CACHE` 2 → 1 in `wsp/gen.py`: every older Q8_0 file is evicted before a new build (a build needs ~5.3 GB of scratch). The slice was rewritten because `files[:-0]` would have evicted nothing. Cost: a rebuild (a few minutes) whenever consecutive passes use different weights. The server picks the change up through the `queue/RESTART` flag between jobs.
+- Each pass builds its own GGUF even for an identical edit because `weights_key` hashes the per-job snapshot folder path; this is by design (the snapshot freezes the edit at submission time) and is harmless with eviction.

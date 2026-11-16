@@ -73,3 +73,17 @@ more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will 
 - Predicted on the held-out half (recorded inputs): shift after corrupted F1 +1.52 logits vs clean +0.43; F2 +2.58 vs 0.00; controls +0.01.
 ## Pass 3 (read, edited = v1): the 306 pass-1 texts, top-50 at the last token + token log-probs -> GATE on held-out questions:
    P(re-check opener) after corrupted vs clean steps (big, small, F2), and off-target |dlogp| over all 184k tokens vs pass 1.
+
+## Pass 3 result = GATE for v1 (code/016; edited vs pass 1 on the same 306 texts)
+- HELD-OUT questions (not used to fit the gate): P(re-check opener) F1 clean .217 -> .242 (+.025, SE .013); F1 big .327 -> .396 (+.069, SE .025);
+  F1 small (never used anywhere) .266 -> .359 (+.093, SE .031); F2 clean .002 -> .002; F2 big .129 -> .317 (+.187, SE .071).
+  Corrupted-minus-clean gap: big .110 -> .154 (+.045, SE .020), small .049 -> .117 (+.068, SE .025), F2 .127 -> .314 (+.187, SE .071).
+  Top-1 opener changed in 7/41, 7/41, 4/15 corrupted texts vs 2/41, 0/15 clean. -> the edit strengthens the error -> re-check response
+  specifically (2-3x the existing gap), on held-out texts. Fit questions: smaller (+.017 / +.007 / +.075).
+- Off-target (184k teacher-forced tokens): mean |dlogp| .0038, median .00006, 2.0% of tokens > .01, 0.55% > .1. The 131 distinct positions with
+  |d| > .3 are paragraph/sentence openers after a doubtful statement ending in "?" (raises Actually/Wait, lowers Let/Or/Usually): the direction
+  also reads generic doubt, not only numeric errors.
+## Passes 4-6 (generate, edited = v1, cap 8192), queued together (one edit only, to save queue time):
+- Pass 4 DEV: work/req_dev.json, 6 passk questions x 4 samples (parent cached): quantitative mixed 9251 (BIII), 7456 (AF-C), 11805 (BJJD),
+  7261 (-DDD); verbal mixed 6110 (BBBF); always-right control with many equations 8198 (CCCC).
+- Passes 5-6 HOLDOUT48: work/req_hold1.json (ids 0-23), work/req_hold2.json (ids 24-47).
