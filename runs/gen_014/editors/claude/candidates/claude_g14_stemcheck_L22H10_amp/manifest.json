@@ -1,0 +1,14 @@
+{
+ "label": "claude_g14_stemcheck_L22H10_amp",
+ "editor": "claude",
+ "gen": 14,
+ "time": 1794862825.7915683,
+ "tensors": {
+  "model.layers.22.self_attn.o_proj.weight": {
+   "changed_bf16": 262144,
+   "numel": 4194304,
+   "rel_change": 0.1279720664024353,
+   "sha_bf16": "34ac2be83a1ef8a9"
+  }
+ }
+}

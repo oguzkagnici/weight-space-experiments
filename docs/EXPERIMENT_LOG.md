@@ -1347,3 +1347,16 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 
 - At the user's request, the brief now centres on **writing** an LLM's weights, not on assembling donors. Renamed to `docs/NEW_EXPERIMENT_writing_an_llm.md` (was `NEW_EXPERIMENT_weight_assembly_from_donors.md`).
 - Changes: existing open models are "reference models" to study and, optionally, take parts from; recipes are built from tensor groups whose reference reads are counted, giving each candidate an **authored share** (designed / random vs verbatim / derived) with an audit against hidden copying and stored benchmark answers; two lineages: W (≥ 90% authored) and M (any share, promoted by an intelligence move or an "authoring move" that writes ≥ 2 more points of the model at no significant loss); B-random floor and a letter-prior baseline for near-chance written models; the final report plots accuracy against authored share and answers three questions (how intelligent a written model can be, how much of a strong model can be written, whether writing adds intelligence). Lessons updated with generations 13–14.
+
+#### Gen 14: `claude` hand-back (2026-11-16, ~20:55 UTC)
+
+- **Result: the stem check is not the bottleneck (negative).** Report under `## REPORT` in `runs/gen_014/editors/claude/notes.md` (writing `report.md` was refused).
+- Material: only 10 mixed verbal pass@4 questions exist (not 40); plus all 31 verbal questions with a finished-wrong sample (72 samples). 15/31 have a decisive stem cue; 16 are pure recall.
+- **Text level:** every wrong sample uses the decisive cue while judging options, often many times (e.g. "informed" 18–50×); right samples mention it only ~20–30% more. Wrong samples see the cue and do not know what it implies.
+- **Attention:** stem attention from 98 option-judging positions is ~1% and slightly higher in wrong samples (.0113 vs .0096); no head of 176 differs within question at |z| > 3; head differences do not replicate across question halves (r −0.07 / +0.06).
+- **Causal insertion gate (32 wrong samples):** quoting the cue vs a non-decisive stem quote moves P(gold) +0.041 (SE 0.039) early, +0.085 (SE 0.066, n 12) late; top-1 becomes gold 2/32 and 1/12. Closed the line; no stem-check edit was built.
+- **Candidate `claude_g14_stemcheck_L22H10_amp`** (submitted as required): L22 head 10 output ×1.5 (`o_proj` columns 1280:1408); the only head whose direction replicated in both halves (z 2.75 / 1.31). On the insertion texts it changes P(gold) ≤ 0.0033. Holdout48 at 8,192: −2.08 (SE 6.31, +4/−5); both-finish (38) −2.63 (SE 5.95, +2/−3); cuts 7 → 8; 0/48 identical traces, first difference at ~2%.
+- **Suggested next:** stop targeting how the stem is read. Test whether supplying the cue's *implication* (the missing knowledge) moves P(gold); if yes, the bottleneck is recall, a fact-by-fact problem unlikely to move many questions per edit.
+- Passes: 5/8 (3 read, 2 generate); 3 left unused because the gate closed the line.
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued ~21:00 UTC.
+- **Prediction (pre-registered):** net ≈ 0 (|z| < 1), with the 1.5× head producing seed-like flips (~25 changed answers, as the resampling control); identical traces ≤ 10 of 256.

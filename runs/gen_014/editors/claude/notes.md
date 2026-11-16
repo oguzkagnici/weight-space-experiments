@@ -64,3 +64,30 @@ Target: STEM-CHECK CIRCUIT. Material: pass@4 bank at 8,192 (64 q x 4) + 32 bank-
 - dP(gold) at the probe, edited - original, all |dP| <= .0033 (SE .0015-.0035) for none/ctrl/cue at both cuts, also on the 10 cue questions not used
   to pick the head; top-1 = gold unchanged (5->4, 1->1, 3->3, 0->0, 1->1); the cue effect is not enlarged. Letter mass unchanged (+.01).
 - The edit is the submitted candidate only because a measured candidate is required; passes 4-5 (holdout48) are already queued.
+
+## Passes 4-5 result (HOLDOUT48 at 8,192, edited = L22.H10 x1.5; code/015)
+- overall 62.5 -> 60.4 (-2.08, SE 6.31, W->R 4 / R->W 5); both-finish (38) 73.7 -> 71.1 (-2.63, SE 5.95, +2/-3); cuts 7 -> 8; 0/48 identical,
+  first difference at a median ~2% of the trace (resampling).
+- SUBMITTED claude_g14_stemcheck_L22H10_amp (code/017). Report: report.md. Passes used 5/8 (3 left unused: the line is closed).
+
+## REPORT
+(report.md could not be written by this agent; this is the report.)
+Editor `claude`, generation 14 -- THE STEM CHECK IS NOT THE BOTTLENECK (negative result).
+Candidate `claude_g14_stemcheck_L22H10_amp` (minimal, submitted because a measured candidate is required): L22 head 10 output x1.5
+(model.layers.22.self_attn.o_proj.weight cols 1280:1408). HOLDOUT48 at 8,192: overall -2.08 (SE 6.31, +4/-5); both-finish (38) -2.63 (SE 5.95,
++2/-3); 0/48 traces identical (resampling). Passes 5/8 (3 read, 2 generate); 3 left unused because the read gate closed the line.
+Material: only 10 mixed verbal questions exist in the pass@4 bank (>= 40 not available without generate passes); I also used all 31 finished-wrong
+verbal questions (72 samples). Hand-labelled decisive stem cues: 15 of 31 have one; the other ~16 are pure recall (no stem check can help them).
+1. TEXT: wrong samples do NOT skip the cue. Every wrong sample uses the decisive cue during judging, usually many times (6110 "informed" 18-50x,
+   1409 "WEAKEST" 20x, 6614 "weight/BMI" 37-62x, 1643 "after judgment" 5-9x in all 4); right samples mention it only ~20-30% more. They draw the
+   wrong inference from a cue they see: a knowledge gap (informed -> open-label; newly discovered evidence must exist at trial).
+2. NETWORK: stem attention from judging positions is ~1% of the mass and slightly HIGHER in wrong samples (.0113 vs .0096 at the gold option);
+   no head |z| > 3 of 176 within question; split-half correlation of head differences -0.07 / +0.06.
+3. CAUSAL GATE: quoting the cue right before "The answer is (" vs quoting a non-decisive stem sentence: P(gold) +0.041 (SE .039) early,
+   +0.085 (SE .066) late; vs no insertion -0.001 (SE .066); top-1 -> gold +2/32, +1/12. The conclusion does not move.
+Edit read gate (pass 3, paired): |dP(gold)| <= .0033 everywhere, top-1 unchanged.
+NEXT: stop targeting how the model reads the question. Gens 13-14 show steps are locally right, the error signal tracks the model's beliefs, the
+stem cues are seen and used, and re-stating them does not help. Wrong verbal answers are missing/wrong domain knowledge. A next test: teacher-force
+the cue's IMPLICATION (e.g. "everyone knows they get the drug, so it is not blinded") and measure P(gold): if the model follows supplied knowledge,
+the bottleneck is recall (MLP memories), which is a per-fact knowledge-editing problem that is unlikely to move many questions at once.
+Do not use dev sets picked from parent failures.
