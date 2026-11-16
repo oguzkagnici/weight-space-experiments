@@ -89,3 +89,16 @@ more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will 
 - Passes 5-6 HOLDOUT48: work/req_hold1.json (ids 0-23), work/req_hold2.json (ids 24-47).
 
 ## Pass 4 = HOLDOUT48 second half (ids 24-47), edited v1 (the first submissions of dev/hold1 failed on a full disk, not charged; re-queued as passes 5 (DEV) and 6 (hold1))
+
+## Pass 4 result (HOLDOUT48 ids 24-47, v1; code/017, 018)
+- overall 62.5 -> 50.0 (-12.5, SE 6.9, +0/-3); both-finish (19) 63.2 -> 63.2 (+0/-0; 4 answers changed, all wrong->other wrong);
+  cuts 2 -> 5: all three losses are finished-right -> cut. Re-check openers (Wait/Actually/Hmm/However at sentence starts) per 1,000 tokens
+  4.35 -> 6.74 (+55%), per trace 15.7 -> 26.5. First difference at a median 5.8% of the trace.
+- Reading: v1 is too broad. Its direction also reads generic doubt (statements ending in "?"), so in generation it acts as a re-check booster in
+  verbal traces, which costs finished answers (the opposite of what generation 5 gained). The three losses are 2 "other" + 1 chemistry.
+## EDIT v2 (staged; code/014 `0.01 3.0 save`): same unit, same direction, threshold raised to the 99th percentile of out-of-fold negatives
+  (theta 1.41 -> 1.70). Predicted from recorded inputs on held-out questions: fires on 24% of corrupted F1 steps (v1 32%), 10% of clean ones (15%),
+  0% of paragraph-break controls (3%), 4% of random-token controls (8%); mean shift corrupted F1 +0.61 logits (v1 +1.52), clean +0.11 (+0.43),
+  F2 +1.15 vs 0, controls -0.002 (v1 +0.013).
+## Pass 5 = DEV (v1, already running when v2 was staged). Passes 6-8 (edited = v2): 6 = gate read (the 306 pass-1 texts, as pass 3);
+   7-8 = HOLDOUT48 (ids 0-23, 24-47), queued in one chain to fit the remaining budget; v1's holdout stays at the 24 questions of pass 4.
