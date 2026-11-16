@@ -323,3 +323,23 @@ The user chose to target the model's reasoning and continue the loop.
 - Freed space: a stale gen-12 candidate Q8_0 file (1.8 GB) and the gitignored scratch `work/` folders of finished generations 1–11 (~1.5 GB; activation dumps only, notes/code/reports are kept).
 - `MAX_GGUF_CACHE` 2 → 1 in `wsp/gen.py`: every older Q8_0 file is evicted before a new build (a build needs ~5.3 GB of scratch). The slice was rewritten because `files[:-0]` would have evicted nothing. Cost: a rebuild (a few minutes) whenever consecutive passes use different weights. The server picks the change up through the `queue/RESTART` flag between jobs.
 - Each pass builds its own GGUF even for an identical edit because `weights_key` hashes the per-job snapshot folder path; this is by design (the snapshot freezes the edit at submission time) and is harmless with eviction.
+
+### D74 (2026-11-16): Generation 13 — no winner; the gen-8 champion survives
+
+`ga decide --z 2 --bf-z 1 --guard-z -2`, 256 selection questions (gen 10's set), 8,192 tokens. The champion reproduced: 155/256 = 60.55%.
+
+| Candidate | Editor | Weights | Acc | Diff (SE) | z | +/− | Both-finish diff (SE), n | Identical raw |
+|---|---|---|---|---|---|---|---|---|
+| `ed_f_g13_error_recheck_gate_L23` | `ed_f` (Fable 5.2) | 8,188 | 60.16 | −0.39 (1.7) | −0.23 | +9/−10 | +0.50 (1.5), 201 | 17 |
+| `claude_g13_selfcheck_recheck_L23` | `claude` | 8,191 | 59.77 | −0.78 (1.8) | −0.43 | +10/−12 | +0.00 (1.23), 200 | 27 |
+
+- Neither passes; the GSM8K guard and held-out check were not needed. D52 check: distinct weights keys, 17 and 27 byte-identical traces of 256 (the gated units fire rarely, so many traces are unchanged).
+- **Pre-registered checks held.**
+  - `claude`: net ≈ 0 (z −0.43); re-check openers per 1,000 tokens 3.53 → 3.73 (+6%, essentially unchanged).
+  - `ed_f`: net ≈ 0 (z −0.23); re-check openers 3.53 → 4.64 (+31%, predicted ~+25%); cuts 42 → 42 (predicted: do not fall).
+  - Cut ↔ right exchanges: `claude` 7 cut→right, 9 right→cut; `ed_f` 4 and 6.
+- **What gen 13 established (both editors independently):**
+  - Local step slips are not why the model fails. Arithmetic slips are ~0.25–0.6% of checkable statements and no more frequent in failed traces; copying from the stem is near-perfect; negation questions are rare.
+  - Finished-wrong answers are mostly verbal (72 of 77 in `ed_f`'s count); quantitative failures are mostly cuts. Wrong conclusions come from guesses between finalists, unchecked stem cues and misapplied models of the problem.
+  - The internal error signal exists (the model assigns near-zero probability to corrupted steps; a corrupt−clean direction separates pairs) but it tracks consistency with the model's own beliefs, not truth: gold substituted for the model's own wrong pick looks error-like in 25/25 cases. Boosting it adds re-checks that re-confirm the same belief.
+- **Overall (gens 9–13):** ten candidates in a row within noise. Gen 13 moved the target from forced-answer probes to the reasoning steps and the result is the same. The two editors' shared suggestion for a next target is the stem-check: whether the model tests options against the decisive cue in the question, measured by attention from judging positions to the stem in right vs wrong samples of the same question, on many questions before any edit.

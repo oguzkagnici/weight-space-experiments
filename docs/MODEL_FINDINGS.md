@@ -539,3 +539,13 @@ xychart-beta
 | `\boxed{}` (238) | 1,061 → 1,061 (0%) | 453 → 455 |
 
 Side finding: the "The answer is N" instruction alone makes the *base* model think about 50% longer than `\boxed{}` on GSM8K. Part of the champion's gain repairs a cost that this prompt format imposes.
+
+## Generation 13: where the reasoning fails (D74)
+
+Two editors (Opus 5.5 fork, Fable 5.2) independently examined the parent's thinking traces at 8,192 tokens.
+
+- **Step slips are rare and do not explain failure.** `ed_f` auto-checked 2,021 "a op b = c" statements in 288 traces: ~5 real consequential slips (0.25%), the same deviation rate in right (4.6%) and cut (3.9%) traces. `claude`: ~7 of 1,134, most already re-checked by the model. Numbers copied from the question have median probability 1.00. Negation questions (NOT/EXCEPT/LEAST) are 2.2% of the practice set.
+- **Failure type depends on the subject.** Quantitative subjects (business, chemistry, physics, math, engineering): 75 right / 5 finished-wrong / 27 cut. Others: 87 / 72 / 22. Quantitative cuts are often a computed value that matches no option exactly (73.15 vs gold 73.40), after which the model re-interprets the problem until the cap.
+- **First wrong steps (hand-read, 18 samples across both editors):** about half are guesses between plausible finalists without the knowledge to decide; the rest are confident false beliefs, an unchecked decisive cue in the stem, or a misapplied formula/model. None is an arithmetic, copying or negation slip.
+- **The model knows a corrupted step is wrong but barely acts on it.** Corrupted arithmetic results get logprob −19 to −24 vs ~0 for the true one, yet P(next paragraph opens with a re-check word) rises only +.04 to +.13. The signal builds gradually from about L14 to L24.
+- **The error signal is self-consistency, not truth.** A corrupt−clean direction separates held-out pairs (pair-wise 0.83–0.90; step-wise AUC 0.63–0.79). But substituting the gold answer for the model's own wrong pick looks more error-like in 25/25 cases, and re-checks after wrong picks re-derive the same belief. Strengthening the signal (two independent L23 gated units) raised re-check frequency by up to 55% in generation without changing accuracy (selection: −0.39 and −0.78, both within noise); the broader variant cost finished answers by pushing them past the cap.

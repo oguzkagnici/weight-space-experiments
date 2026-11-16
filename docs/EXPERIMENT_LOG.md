@@ -1329,3 +1329,11 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Passes: 8/8 (4 read, 4 generate); 3 generate attempts failed on the full disk (D73), uncharged.
 - **Selection.** Pre-run in 8 chunks of 32 at priority 8 and `ga select --priority 8` (champion + both candidates), queued ~08:33 UTC.
 - **Prediction (pre-registered):** net ≈ 0 (|z| < 1), with a small risk of a loss through extra cuts. Check: re-check openers per 1,000 tokens rise ~+25% on selection traces (as on holdout), and cuts do not fall.
+
+#### Gen 13 selection and decision (2026-11-16, 16:47 UTC)
+
+- Champion 155/256 (60.55%, reproduced).
+- `ed_f_g13_error_recheck_gate_L23`: 60.16, −0.39 (SE 1.7, z −0.23), +9/−10; both-finish +0.50 (n 201).
+- `claude_g13_selfcheck_recheck_L23`: 59.77, −0.78 (SE 1.8, z −0.43), +10/−12; both-finish +0.00 (n 200).
+- Pre-registered checks held: re-check openers per 1,000 tokens 3.53 → 3.73 (`claude`), → 4.64 (`ed_f`, +31%); `ed_f` cuts 42 → 42.
+- Decision: no winner; the gen-8 champion survives (D74). Report: `runs/gen_013/REPORT.md`.
