@@ -44,3 +44,56 @@ The text-level check is already negative, but it has little power (10 questions)
 - CUE KEY WORDS (code/009): on the 4 cue questions that have right samples, the decisive cue's key words appear as often in wrong as in right
   samples (per 1,000 words; wrong | right): 6110 "informed/open-label/blind" 27.5, 17.7, 20.2 | 23.4; 6800 "transillumination/sinusitis/maxillary"
   20.8, 22.3 | 24.6, 27.7; 2654 "falling/dream.." 13.1 | 13.6, 27.3, 20.5; 6562 "smok/COPD" 8.8 | 7.9. The cue is on the page in wrong samples too.
+
+## Pass 1 result (code/008, 010, 011): CUE vs NON insertion, 30 wrong samples of 13 cue questions (forced "So the answer is (" after the insertion)
+- LATE cut, CUE minus NON, clustered by question (13): margin log P(gold)-log P(wrong pick) -0.14 (SE 0.81, z -0.2; up in 5/13 questions);
+  P(gold | letters) .072 -> .157 (+.096, SE .070, z 1.4); top letter = gold 2/30 -> 5/30. EARLY cut (25 samples, 11 q): margin +0.50 (SE 0.77).
+- The mean hides a SPLIT BY QUESTION (late margin NON -> CUE): the cue helps where the model has the knowledge: 2654 -3.1 -> +1.2, 6110 -4.6 -> -0.6,
+  6614 -1.4 -> +1.5, 6800 -4.3 -> -2.0 (health/psychology; 3 of them mixed questions; P(gold) .02->.59, .01->.42, .06->.54, .42->.94, .04->.47, .17->.59);
+  it makes the WRONG pick firmer where the model reads the cue the wrong way: 1275 -2.7 -> -8.1 ("without permission of the mayor" => the union broke
+  the ordinance), 1643 -7.0 -> -9.8, 1705 +0.7 -> -2.9, 1196, 4811, 6562 unchanged/worse (law, history: never-right questions).
+  -> quoting the cue moves the conclusion toward whatever the model infers from the cue; it supplies salience, not the inference.
+- Probe caveat: the letter mass after "So the answer is (" is only .56 on average (the model often continues "(the", "(X"); margins are within letters.
+- Attention from the conclusion position (layer/head mean, late cut): trace .47, probe .19, options .07, inserted quote .04, STEM .02 (cue source in the
+  stem .002). The inserted quote is read by the sliding-window layer 8 (H7 .30, H1 .27, H6 .25, H8 .24), L12.H13 .19, L16.H1 .16, L20.H2/H1 .14; the
+  stem is read almost only by L22 (H1 .15, H8/H10/H0/H11 .11) and L14.H4 .12. Five of the 11 attention layers have a 256-token window and cannot see
+  the stem at all once the thinking is longer than that.
+- RECENCY CHECK (code/011, free): the cue key words are inside the last 256 tokens before the first commitment in wrong and right samples alike
+  (6110: wrong 7, 1, 7 mentions in the window vs right 6); stem 3-grams in that window: right 11.5 vs WRONG 40.5 per 1,000 words (within-question
+  -29.0, SE 10.6, right > wrong in 1/10 questions). Wrong samples re-state the stem MORE right before they commit. What my insertion adds is not
+  the stem text but the annotator's knowledge of WHICH detail decides.
+
+## Pass 3 (read, parent, no edit): work/req_p3.json (code/012), 474 texts, 173k tokens; top-50, token log-probs, attn_last (11 layers) and the INPUT of
+   self_attn.q_proj (= operator_norm output, shared by q/k/v/gate) of layers 10, 14, 18, 22 at the last token.
+   - 64 judging-position texts (prefix ends at the label [+ option text + colon] of the gold option's / the wrong pick's first judging paragraph) from
+     all finished samples of the 10 mixed verbal questions (34 right / 30 wrong) -> STEP 1(b);
+   - 25 judging positions from other verbal questions, 40 random trace positions (background);
+   - 303 prompt prefixes ending at stem tokens (158), cue tokens (55), option tokens (90): key-side inputs for layer 22 (no positional rotation);
+   - early-cut NON/CUE on cut (9), right (7) and the 5 remaining wrong samples.
+
+## Pass 2 result (code/008, 010): BASE and CUE+INF (oracle implication) on the same 30 wrong samples -> THE READ GATE OF STEP 2
+- Forced conclusion = gold (top letter), LATE cut, 30 wrong samples: BASE 1, NON 2, CUE 5, CUE+INF 10. EARLY cut: NON 1/25, CUE 2/25, CUE+INF 14/30.
+  Gold by question, late: CUE {2654: 1, 6110: 1, 6614: 2, 6800: 1}; CUE+INF {4811: 2, 6110: 3, 6614: 3, 6800: 2}.
+- Clustered by question (13), late cut:
+    CUE - NON    : margin -0.14 (SE 0.81, z -0.2); P(gold) +.096 (SE .070, z 1.4); top = gold +.147 (SE .090, z 1.6)
+    INF - NON    : margin +0.63 (SE 1.64);          P(gold) +.158 (SE .093, z 1.7); top = gold +.224 (SE .116, z 1.9)
+    NON - BASE   : margin +7.81 (SE 1.06, z 7.4, 13/13 questions) but top = gold +.006 (SE .052): ANY "Wait, let me re-read the question" before the
+                   commitment shakes the commitment (P(wrong pick) .94 -> .80) without changing the pick.
+  early cut (11 questions): CUE - NON top = gold +.09 (SE .09); INF - NON +.43 (SE .14, z 3.1); INF - CUE +.34 (SE .13, z 2.6).
+- By the pre-registered rule (CUE - NON not clearly > 0, z < 2) THE STEM-CHECK LINE IS CLOSED AS A GENERAL MECHANISM. Precisely:
+  (1) quoting the decisive cue helps on 4 of 13 cue questions (all health/psychology vignettes; 3 are mixed questions, i.e. the model has the
+      knowledge), and makes the wrong pick firmer on the law/history questions where the model's reading of the cue is itself wrong;
+  (2) what moves the conclusion on the others is the IMPLICATION (knowledge), not the quote;
+  (3) wrong samples already re-state the stem and the cue words as much as right samples, also right before they commit (free checks above);
+  (4) the stem-reading heads are not selective for the cue: at the BASE conclusion the full-attention layers put 2.2% of their attention on the stem,
+      and the cue's share of that is 6-17% (L22.H1 .06, H8 .11, H10 .07, H0 .15, H11 .12, H14 .17; L14.H4 .06; L18.H13 .09), about its share of the
+      stem tokens. A weight edit that raises stem attention cannot know which detail decides; my insertion works where it does because the
+      annotator chose the detail.
+  Coverage bound: 13 of 34 questions with a finished-wrong sample have a stem cue; 4 of 13 respond to the cue quote: at most ~12% of finished-wrong
+  answers, i.e. ~3% of questions, and only with oracle choice of the phrase.
+
+## Pass 4 (read, parent, no edit): work/req_p4.json (code/013), 139 texts, 144k tokens; top-50 + token log-probs at the last token.
+   KNOWLEDGE VS USE: for each of the 13 cue questions a two-statement forced choice (the right implication of the cue vs the premise behind the
+   wrong pick), both orders: (a) bare, in the direct-answer format (26 texts); (b) inside the model's own trace at the early cut of every sample
+   (92 texts: 60 wrong, 18 cut, 14 right). Does the model hold the implication when asked directly on the questions it gets wrong?
+   SAFETY: the 7 right samples of the cue questions, late cut x {BASE, NON, CUE}: does a cue quote disturb right conclusions?

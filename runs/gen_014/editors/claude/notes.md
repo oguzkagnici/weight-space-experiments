@@ -40,3 +40,22 @@ Target: STEM-CHECK CIRCUIT. Material: pass@4 bank at 8,192 (64 q x 4) + 32 bank-
 - Reading: putting the decisive cue right in front of the conclusion does not turn wrong conclusions right (at most +0.04-0.09 P(gold), within
   noise). With the text-level result (wrong samples already use the cue many times), the stem check is NOT the bottleneck: the model sees the cue
   and does not know what it implies. By the gate rule, a weight edit that makes the model attend to / re-state the cue cannot help.
+
+## Pass 2 result (read, original): ATTENTION at option-judging positions = NULL (code/012, 013)
+- 98 prefixes (35 finished samples of the 10 mixed verbal questions; 7 over 4,096 tokens dropped): first evaluation of the gold option (j_gold),
+  of the main wrong finalist (j_fin), commit paragraph (j_late). attn_last at all 11 attention layers (sliding-window layers cannot reach the prompt).
+- Attention from judging positions to the stem is tiny: ~1% of the mass (stem+cue .010-.014 per head on average; options .11-.14; own trace .77-.80).
+  WRONG samples attend slightly MORE to the stem than right ones (j_gold .0113 vs .0096; j_fin .0142 vs .0111; j_late .0068 vs .0043).
+- Within question (right - wrong, SE over 10 questions), no head reaches |z| > 3 of 176 at any point (about 9 would pass |z| > 2.26 by chance);
+  layer means |z| <= 2.2 (L22 at j_gold +.004, z 2.23; at j_late -0.85). Split-half correlation of the 96 full-attention head differences between
+  two disjoint sets of 5 questions: -0.07 (j_gold), +0.06 (j_fin): no replicable head pattern. Only L22.H10 is positive in both halves
+  (half B z 2.75 at j_gold, 1.31 at j_fin).
+- CONCLUSION OF STEPS 1-2: the stem-check is not a mechanism that fails in wrong samples. Wrong samples see the cue (text), attend to the stem as
+  much or more (network), and quoting the cue in front of the conclusion does not change it (causal). The failure is knowing what the cue implies.
+  Per the gate rule I stop spending passes on this line.
+
+## EDIT (minimal, to have a measured candidate; expected null): L22.H10 output x1.5
+- model.layers.22.self_attn.o_proj.weight columns 1280:1408 (head 10's 128 inputs) x1.5 (code/014). Rationale: the only head whose right>wrong stem
+  attention replicates on both halves. Nothing else changed.
+- Pass 3 (read, edited): the identical 120 texts of pass 1 (paired): P(gold) at the probe with none/ctrl/cue insertions, and whether the edit
+  enlarges the cue effect. Then passes 4-5: HOLDOUT48 (ids 0-23, 24-47) at 8,192. Passes 6-8 stay unused (the line is closed; saves queue time).

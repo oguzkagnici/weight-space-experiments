@@ -30,9 +30,10 @@ def regions(text,mt):
 M=np.zeros((len(texts),len(LAY),16,len(REG)),np.float32)
 A=[np.load(D+'/attn_last_L%d.npy'%l,mmap_mode='r') for l in LAY]
 for i,(t,mt) in enumerate(zip(texts,meta)):
+    if mt['kind']=='key': continue
     lab=regions(t,mt); n=off[i+1]-off[i]; assert n==len(lab),(n,len(lab))
     for li,a in enumerate(A):
         x=np.asarray(a[off[i]:off[i+1]],dtype=np.float32)
         for r in range(len(REG)): M[i,li,:,r]=x[lab==r].sum(0)
 np.save('work/%s_attn_regions.npy'%name,M); json.dump(dict(REG=REG,LAY=LAY),open('work/attn_regions_meta.json','w'))
-print('saved',M.shape,'row sums ~1:',float(M.sum(-1).mean()))
+print('saved',M.shape)
