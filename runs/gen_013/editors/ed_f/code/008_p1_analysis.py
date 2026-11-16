@@ -31,7 +31,7 @@ for f in ('F1','F2'):
         print(f,k,'top openers:',', '.join('%s %.2f'%(w.encode('ascii','replace').decode(),v/len(grp(f,k))) for w,v in c.most_common(12)))
 # token log-probs of the result/copied number: clean vs corrupted
 try:
-    tl=np.load(D+'/token_logprobs.npy',allow_pickle=True); off=np.cumsum([0]+M['n_tokens'])
+    tl=np.load(D+'/token_logprobs.npy',allow_pickle=True); off=np.cumsum([0]+[x-1 for x in M['n_tokens']])
     print('token_logprobs shape',tl.shape)
     def numlp(n):
         t=meta[n]; text=json.load(open('work/p1_texts.json'))[n] if False else None

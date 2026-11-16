@@ -39,3 +39,21 @@ Risk known in advance: natural consequential slips are rare (0.25% of statements
 more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will report that honestly.
 
 ## Pass 1 (read, parent, no edit): work/req_p1.json = 306 texts (code/007): F1 80 exact arithmetic statements from 20 questions x {clean, big (leading digit changed), small (last digit changed)}; F2 33 question restatements x {clean, number changed}. All end in a paragraph break. Returns top-50, h0-h24, MLP L18-23 at the last token, token log-probs.
+
+## Pass 1 result (code/008-012): the parent KNOWS the right step but barely REGISTERS a wrong one once it is on the page
+- Knowledge at the step: log P(result tokens) clean median 0.00 (81% of exact results have P > .5); corrupted results log P -24 (big) / -19 (small).
+  Numbers copied from the question: 990 copies in the clean prefixes, median P 1.000, mean .966 (the low ones are choices of what to write next,
+  not mis-copies). So neither digit production nor copying is a weak point (agrees with the 0.25% slip rate).
+- Behaviour after the corrupted step (next paragraph opener, top-50): P(re-check opener: Wait/Actually/Hmm/Hold/But/However...)
+  F1 clean .198 -> big .302 (+.105, SE .017) -> small .238 (+.040, SE .010); F2 clean .016 -> .149 (+.133, SE .046).
+  i.e. after a result it would itself give probability e^-20, the model walks on in ~70% (F1) / 85% (F2) of cases.
+- Residual at that position: the lens logit difference (re-check minus continue openers) rises by +1.55 logits (SE .14) within pairs, built up
+  gradually L14 -> L24 (+.20 h14, +.59 h18, +1.01 h20, +1.44 h22, +1.65 h24), not by a few MLP neurons (L21 +.23, L22 -.03, L23 +.05 by DLA).
+  But across contexts it is weak: held-out-by-question AUC of the mean-difference direction .63 (F1 big), .58 (small), .74-.79 (F2);
+  shrinkage LDA at best .71 / .69 / .78 (h24); best single neuron of L18-L23 .65. Paired win share .90-.95: the direction is real, the
+  context-to-context spread along it is larger than the error effect.
+- Decision by the pre-registered rule: borderline (a). There is an error signal -> re-check pathway (in scope to strengthen), but no detector
+  sharp enough for a threshold gate, and the target error is rare in natural traces. I still build the one edit this evidence supports, as the
+  test of the pathway, and measure it: a gated L23 unit reading the LDA error direction at the MLP input and writing re-check openers.
+
+## Pass 2 (read, parent, no edit): work/req_p2.json = the 226 pass-1 clean/big texts + 70 paragraph-break controls + 55 random-token controls + 14 prompt-token controls; records the INPUT of L23/L22 feed_forward, mlp23, h22-24, top-50 at the last token (needed to place a gate at the L23 MLP).
