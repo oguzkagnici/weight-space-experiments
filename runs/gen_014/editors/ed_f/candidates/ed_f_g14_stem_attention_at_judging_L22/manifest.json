@@ -1,0 +1,14 @@
+{
+ "label": "ed_f_g14_stem_attention_at_judging_L22",
+ "editor": "ed_f",
+ "gen": 14,
+ "time": 1794869279.6207113,
+ "tensors": {
+  "model.layers.22.self_attn.q_proj.weight": {
+   "changed_bf16": 733127,
+   "numel": 4194304,
+   "rel_change": 0.008692058734595776,
+   "sha_bf16": "df308bcca4d72178"
+  }
+ }
+}

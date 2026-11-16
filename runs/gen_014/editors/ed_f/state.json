@@ -1,8 +1,6 @@
 {
- "passes_used": 7,
- "pending": [
-  "gen_014_ed_f_p08_7380bb"
- ],
+ "passes_used": 8,
+ "pending": [],
  "passes": [
   {
    "k": 1,
@@ -45,6 +43,12 @@
    "id": "gen_014_ed_f_p07_5211a5",
    "type": "generate",
    "seconds": 1852.5
+  },
+  {
+   "k": 8,
+   "id": "gen_014_ed_f_p08_7380bb",
+   "type": "read",
+   "seconds": 1069.5
   }
  ]
 }

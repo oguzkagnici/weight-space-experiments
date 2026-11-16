@@ -1360,3 +1360,16 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Passes: 5/8 (3 read, 2 generate); 3 left unused because the gate closed the line.
 - **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued ~21:00 UTC.
 - **Prediction (pre-registered):** net ≈ 0 (|z| < 1), with the 1.5× head producing seed-like flips (~25 changed answers, as the resampling control); identical traces ≤ 10 of 256.
+
+#### Gen 14: `ed_f` (Fable 5.2) hand-back (2026-11-16, ~22:45 UTC)
+
+- **Result: the stem check is a symptom, not a mechanism (negative).** Report under `## REPORT` in `runs/gen_014/editors/ed_f/notes.md` (writing `report.md` was refused).
+- Material: 288 parent traces; only 10 mixed verbal questions in the bank. 34 questions have a finished-wrong sample; in 13 (30 wrong samples) a stem phrase separates gold from the wrong pick; 21 are recall questions.
+- **Text level (1a):** inside option-judging regions, wrong samples re-state the stem as much as right ones (stem-only content words 64.4 vs 61.2 per 1,000 words, within-question diff −3.3, SE 3.6; quoted phrases +0.1, SE 0.5); the cue's key words are as frequent; wrong samples re-state the stem *more* just before committing (40.5 vs 11.5 3-grams per 1,000 words in the last 256 tokens).
+- **Attention (1b):** judging positions put .013 on the stem (.82 on their own trace, .11 on the option lines); 5 of 11 attention layers cannot see the stem (window 256). Right vs wrong +.0013 (SE .0018) with controls; 1/49 heads |z| > 2 (2.5 expected). No dedicated or cue-selective stem reader.
+- **Causal insertion (2), 30 wrong samples, late cut:** forced conclusion = gold: none 1, non-cue control 2, cue quote 5, cue + one sentence of its implication (oracle) 10. Cue − control margin −0.14 (SE 0.81) in one wording, +1.26 (SE 1.39) in a replication (gold 0 → 6/30). The effect splits by question: it helps on 4 health/psychology vignettes and hardens the wrong pick on law questions read the wrong way. Early cut: the oracle implication gives gold in 14/30 vs 2/25 for the cue alone. **The missing piece is the inference (knowledge), not attention to the cue.**
+- **Candidate `ed_f_g14_stem_attention_at_judging_L22`** (the direct weight-level test of the hypothesis): rank-one terms in `model.layers.22.self_attn.q_proj.weight` for heads 1, 11, 3, 0, 8, 15 (733,127 weights), steering judging positions toward stem keys. Read gate: stem attention of the edited heads .048 → .108 (+.061, SE .008) on held-out positions; forced conclusions unchanged (gold 1 → 1); off-target mean |dlogp| .0088. Holdout48 at 8,192: −2.08 (SE 5.56, +3/−4); both-finish (39) +0.00 (SE 5.20, +2/−2); cuts 7 → 7; 1/48 identical, first difference at a median 4.1%, before the first judging paragraph in 28/29 traces.
+- **Suggested next:** stop looking for a missing "consult the question" step; if anything, test knowledge injection and whether a single-fact edit generalises to held-out paraphrases before generating.
+- Passes: 8/8 (6 read, 2 generate).
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8 and `ga select --priority 8` (champion + both candidates), queued 22:49 UTC.
+- **Prediction (pre-registered):** net ≈ 0 (|z| < 1). Check: identical traces ≤ 10 of 256 (the leaking gate resamples early), and cuts within ±3 of the champion's 42.

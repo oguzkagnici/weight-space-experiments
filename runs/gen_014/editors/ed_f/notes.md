@@ -163,3 +163,112 @@ The text-level check is already negative, but it has little power (10 questions)
 ## Pass 8 (read, PARENT, no edit; "model": "original"): work/req_p8.json (code/021), 60 texts: REPLICATION of the causal test at the late cut with
    another wording ('Hold on. The question specifically says: "<phrase>".') and other non-cue control phrases (taken from the middle of the stem,
    not sentence starts). Checks that the per-question split of pass 1 is not an artefact of wording or control choice.
+
+## Passes 6-7 result = HOLDOUT48 at 8,192, edit v1 (code/020, 023)
+- overall 62.5 -> 60.4 (-2.08, SE 5.56, +3/-4); both-finish (39) 71.8 -> 71.8 (+0.00, SE 5.20, +2/-2), 8 of 39 answers changed;
+  cuts 7 -> 7 (2 cut -> finished, 1 of them right; 2 finished-right -> cut); tokens 3,472 -> 3,398.
+  wrong -> right on both-finish: 2179, 2721 (psychology); right -> wrong: 11253 (philosophy), 7567 (economics).
+- 1 of 48 traces identical; first difference at a median 4.1% of the trace, BEFORE the first option-judging paragraph in 28 of 29 traces that
+  have one: the linear gate's leak re-samples the trace before the targeted point is reached (as every edit since generation 6).
+- Targeted behaviour in the generated traces (both-finished, judging region, per 1,000 words): explicit references to the question
+  ("the question says", "re-read", "the scenario"...) .78 -> 1.20 (+.42, SE .19); stem-only content words 47.0 -> 52.8 (+5.8, SE 4.0);
+  stem 3-grams 21.0 -> 24.4 (+3.4, SE 3.1). A small rise of stem references, no change in what is concluded.
+
+## Pass 8 result (code/022): REPLICATION of the causal test with another wording and other control phrases (parent, late cut, same 30 wrong samples)
+- Per-question CUE-minus-control margin effects of the two wordings correlate r = .79 (13 questions), same sign in 11/13.
+  Helped in both: 2654 (+4.3 / +11.5), 6110 (+3.9 / +3.8), 6614 (+2.9 / +5.2), 6800 (+2.3 / +4.9). Wrong pick made firmer in both: 1196, 1275,
+  1409, 1643, 1705, 6562. Mixed sign: 1445, 4811; 6829 +0.5 / +6.5.
+- Forced conclusion = gold: NON2 0/30, CUE2 6/30 (2654: 1, 6110: 1, 6614: 3, 6800: 1); by question +.218 (SE .106, z 2.1). Margin +1.26 (SE 1.39).
+  Both wordings pooled: control 2/60, cue 11/60, all 11 on the same four health/psychology vignettes.
+- FINAL READING OF STEP 2: quoting the decisive cue right before the conclusion flips about one wrong sample in five on cue questions, but only on
+  the 4 of 13 questions where the model can use the cue; on the rest it leaves the pick or firms it up. The pooled margin effect is not
+  different from zero (-0.14, SE 0.81; +1.26, SE 1.39). The effect needs the annotator's choice of the phrase: the model would not pick it
+  itself (log P -15.9 for the cue against -7.6 for another stem phrase after a forced re-read opener), wrong samples already re-state the cue
+  as often as right ones, and no head reads the cue selectively.
+
+## SUBMITTED: ed_f_g14_stem_attention_at_judging_L22 (= edit v1; code/024). All 8 passes used (6 read, 2 generate).
+
+## REPORT
+# Report: editor ed_f, generation 14
+
+**Result: the stem check is a symptom, not a mechanism. Negative on steps 1(a), 1(b) and (as a general mechanism) step 2.**
+**Candidate submitted:** `ed_f_g14_stem_attention_at_judging_L22` (1 tensor, 733,127 weights). All 8 passes used: 6 read, 2 generate.
+**Holdout48 at 8,192 tokens:** overall 62.5 -> 60.4, -2.08 points (SE 5.56, +3/-4). Both-finish (39 questions): 71.8 -> 71.8, +0.00 (SE 5.20, +2/-2).
+**Expected on selection:** about 0. GSM8K was not measured.
+
+## What the model gets wrong (and what it does not)
+
+Material: 288 parent traces at 8,192 tokens (pass@4 bank + trace bank). The bank holds only 10 mixed verbal questions (18 right / 17 wrong samples), not the 40 the task asked for; a new mixed question costs about 16 generated answers.
+
+**Step 1(a), text level: wrong samples re-state the stem as much as right samples.**
+
+| measure inside the option-judging region, per 1,000 words | right | wrong | within-question diff (SE) |
+|---|---|---|---|
+| stem-only content words | 61.2 | 64.4 | -3.3 (3.6) |
+| stem 3-grams | 35.1 | 36.4 | -1.3 (4.9) |
+| quoted stem phrases | 4.2 | 4.1 | +0.1 (0.5) |
+| "the question says", "re-read", ... | 2.3 | 2.2 | +0.14 (0.27) |
+| stem 3-grams in the 256 tokens before the first commitment | 11.5 | 40.5 | -29.0 (10.6) |
+
+- The decisive cue's key words are as frequent in wrong as in right samples (6110 "informed/open-label": wrong 27.5, 17.7, 20.2 vs right 23.4 per 1,000 words; same for 6800, 2654, 6562).
+- Wrong samples re-state the stem more right before they commit.
+
+**How many wrong answers have a stem cue at all.** 34 questions have a finished-wrong sample. For 13 of them (30 of 77 wrong samples) a stem phrase separates gold from the wrong pick; the other 21 are recall questions.
+
+**Step 1(b), attention from option-judging positions (pass 3, 64 texts, 9 questions).**
+- Judging positions look at their own trace (.82 of all attention) and the option lines (.11). The stem gets .013, and 2.4% in the six full-attention layers. Five of the 11 attention layers have a 256-token window and cannot see the stem at all.
+- Right vs wrong: stem attention .0274 vs .0240. With question, prefix-length and format controls the difference is +.0013 (SE .0018). Of 49 heads with stem attention above .02, one has |z| > 2 (2.5 expected by chance).
+- No head is a dedicated stem reader. The heads with most stem attention (L18.H12-15, about .077) put the same share on it at random positions and are sink-like.
+- No head reads the cue selectively: the cue's share of stem attention is 6-17%, about its share of the stem tokens.
+- An apparent "right samples look at the option lines more" effect is a format artefact (bare "(H)" label vs "(H) text:"); with a format control it is +.002 (SE .018).
+
+**Step 2, causal insertion test (passes 1, 2, 4, 8).** 30 wrong samples of the 13 cue questions, cut before the paragraph that first commits to the wrong letter, then `Wait, let me re-read the question. It says: "<phrase>".` and a forced "So the answer is (".
+
+| arm (late cut, 30 wrong samples) | forced conclusion = gold | margin log P(gold) - log P(wrong pick) |
+|---|---|---|
+| no insertion | 1 | -11.2 |
+| non-cue stem quote (control) | 2 | -4.5 |
+| decisive cue quote | 5 | -5.0 |
+| cue quote + one sentence with its implication (oracle) | 10 | -3.2 |
+
+- Cue minus control, clustered by question: margin -0.14 (SE 0.81); gold +.147 (SE .090).
+- Replication with another wording and other control phrases: margin +1.26 (SE 1.39); gold 0/30 -> 6/30 (+.218, SE .106). Per-question effects of the two wordings correlate r = .79.
+- **The effect splits by question.** The cue quote helps on 4 health/psychology vignettes (2654, 6110, 6614, 6800: +2.3 to +11.5 logits; all 11 gold conclusions of both wordings are there). It makes the wrong pick firmer on law questions where the model reads the cue the wrong way (1275 "without permission of the mayor": -5.4 / -3.7; 1705, 1643, 1196).
+- **The missing piece is the inference.** At the early cut the oracle implication gives gold in 14/30 against 2/25 for the cue alone (+.34, SE .13). Asked directly, the model prefers the right implication over the premise of its wrong pick in only 5 of 13 questions.
+- Any re-read insertion shakes the commitment (margin +7.8, SE 1.1) without changing the pick. A cue quote leaves right conclusions alone (6/7 in every arm).
+- The model would not pick the cue itself: after a forced re-read opener the first cue token has log P -15.9, another stem phrase -7.6.
+- Caveat: the probe is weak in places (letter mass after "So the answer is (" averages .56-.73), and 13 questions is a small sample.
+
+## What I changed and why
+
+Nothing in the diagnosis supports an edit, so the candidate is the direct weight-level test of the hypothesis: make the model look at the stem where it judges an option.
+
+- Layer 22 has no positional rotation; recorded queries and keys reproduce its attention (corr .93-1.00 for 15 of 16 heads; query head h uses kv head h // 4).
+- `model.layers.22.self_attn.q_proj.weight`, heads 1, 11, 3, 0, 8, 15: `W_q[h] += gam_h * (t_g / w_q) (x) d`, a rank-one term per head (row change 1.2-1.7%).
+  - `d`: mean-difference direction of the attention input, option-judging positions minus random trace positions (held-out AUC .92).
+  - `t_g`: "stem key" direction of the kv head (stem keys +5.0, option keys +0.9, trace keys -4.4 on held-out questions).
+  - `gam_h`: +2.2 log-odds toward stem keys at judging positions.
+
+## Evidence for the edit
+
+- **Read gate (pass 5, questions not used to fit `d` or `t`):** stem attention of the edited heads at 57 held-out judging positions .048 -> .108 (+.061, SE .008). Other L22 heads unchanged; background positions .123 -> .139.
+- **Output:** next-token distribution at judging positions barely moves (total variation .019; top-1 changed in 1 of 89). Forced conclusions on the 30 wrong samples: margin +0.07 (SE 0.03), gold 1 -> 1.
+- **Off-target:** mean |dlogp| .0088 over 181k tokens; the linear gate leaks.
+- **Holdout48 at 8,192:**
+
+  | | parent | edited | diff (SE) | wrong->right / right->wrong |
+  |---|---|---|---|---|
+  | overall (48) | 62.5 | 60.4 | -2.08 (5.56) | 3 / 4 |
+  | both-finish (39) | 71.8 | 71.8 | +0.00 (5.20) | 2 / 2 |
+
+  Cuts 7 -> 7. Only 1 of 48 traces is identical; the first difference is at a median 4.1% of the trace, before the first judging paragraph in 28 of 29 traces, so the swaps are resampling. Explicit references to the question in the judging region rise from .78 to 1.20 per 1,000 words (SE .19); conclusions do not change.
+
+## What I would try next
+
+1. **Stop looking for a missing "consult the question" step.** Wrong samples read and quote the stem; they draw the wrong inference from it. This is the same finding as generations 10-13 from another side: the conclusion follows the model's beliefs.
+2. **The one positive lever is small and needs an oracle.** A cue quote helps on about 4 of 34 wrong questions, only when the annotator picks the phrase. That is at most about 3% of questions.
+3. **If anything, test knowledge injection directly.** The oracle implication sentence moves 10-14 of 30 wrong conclusions. The open question is whether any single-fact weight edit generalises beyond its own question; I would measure that on held-out paraphrases before spending generate passes.
+4. **Process notes.**
+   - Forced "So the answer is (" probes lose much of their mass to non-letter tokens after an insertion; use "The answer is (" or check the letter mass.
+   - Control for format when comparing attention at judging positions (bare label vs label + option text).
+   - A linear position gate on the query input leaks enough (mean |dlogp| .009) to resample every trace before the targeted point.
