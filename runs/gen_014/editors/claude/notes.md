@@ -59,3 +59,8 @@ Target: STEM-CHECK CIRCUIT. Material: pass@4 bank at 8,192 (64 q x 4) + 32 bank-
   attention replicates on both halves. Nothing else changed.
 - Pass 3 (read, edited): the identical 120 texts of pass 1 (paired): P(gold) at the probe with none/ctrl/cue insertions, and whether the edit
   enlarges the cue effect. Then passes 4-5: HOLDOUT48 (ids 0-23, 24-47) at 8,192. Passes 6-8 stay unused (the line is closed; saves queue time).
+
+## Pass 3 result (read, edited = L22.H10 x1.5, paired with pass 1; code/016): NULL as expected
+- dP(gold) at the probe, edited - original, all |dP| <= .0033 (SE .0015-.0035) for none/ctrl/cue at both cuts, also on the 10 cue questions not used
+  to pick the head; top-1 = gold unchanged (5->4, 1->1, 3->3, 0->0, 1->1); the cue effect is not enlarged. Letter mass unchanged (+.01).
+- The edit is the submitted candidate only because a measured candidate is required; passes 4-5 (holdout48) are already queued.
