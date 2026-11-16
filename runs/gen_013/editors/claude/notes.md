@@ -41,3 +41,10 @@
 - n881 folded into near-duplicate n331 (cos .9996; ratio .989); n881 gate = K*(w - T*p)/g_ffn with w = corrupt-minus-clean mean of normalised h22 on TRAIN questions (work/train_qs.json), p = bias proxy, T = 85th pct of train corrupt scores; up = p/g_ffn; w2 col = mean E[Wait, " Wait", Actually, " Actually"] - mean E, Q8-safe (norm 1.10).
 - Gate at sentence ends (pass-1 vectors): TEST questions fire corrupt 19% vs clean 4% (train 16% / 1%); AUC .67.
 ## Pass 3 plan (read, EDITED): held-out (test-question) pass-1 pairs + natural own/sub pairs (pass 2 texts, incl. 9251): P(re-check) and token-logprob off-target changes vs pass 1/2 (parent).
+
+## Pass 3 results (read, EDITED E1; code/013) — gate check FAILS the "clean steps left alone" condition, and doubts true steps
+- Held-out pass-1 pairs: P(re-check next) CORRUPT 0.124 -> 0.386 (up in 67%), but CLEAN 0.064 -> 0.233 (up in 49%): leaky, near-global.
+- Natural: own correct pick 0.50 -> 0.51; own WRONG pick 0.75 -> 0.77 (unchanged); wrong letter substituted into right samples 0.75 -> 0.95; GOLD substituted into wrong samples 0.88 -> 1.00; 9251 own false step 0.20 -> 0.24 vs corrected step 0.58 -> 1.00.
+- => exactly as pass 2 predicts: strengthening the network's own error signal makes it re-check the TRUE step that deviates from its belief, not its own wrong belief.
+- Off-target: per-token |dlogprob| mean 0.039, changes from the first tokens of every text (0/212 unchanged), median max |d| 5.6: the gate fires off-target (prompt/sink positions likely).
+## Pass 4 plan (read, ORIGINAL): w1 inputs of L23 MLP at ALL positions on held-out pairs + practice traces -> refit gate offline against real background positions (sink projection, threshold for silence), simulate n881 activation exactly.
