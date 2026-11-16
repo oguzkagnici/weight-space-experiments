@@ -57,3 +57,19 @@ more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will 
   test of the pathway, and measure it: a gated L23 unit reading the LDA error direction at the MLP input and writing re-check openers.
 
 ## Pass 2 (read, parent, no edit): work/req_p2.json = the 226 pass-1 clean/big texts + 70 paragraph-break controls + 55 random-token controls + 14 prompt-token controls; records the INPUT of L23/L22 feed_forward, mlp23, h22-24, top-50 at the last token (needed to place a gate at the L23 MLP).
+
+## Pass 2 result (code/014, 015): a gate at the L23 MLP input
+- Recorded input reproduces mlp23 exactly (corr 1.0000). Cross-validated (6 folds by question) shrinkage-LDA detector, lam 3:
+  AUC F1 .705, F2 .793, corrupted vs generic controls .83; at 5% false positives overall: fires on 29% of corrupted F1 steps, 27% of F2,
+  10% of clean arithmetic steps, 1% of generic paragraph-break / random-token controls. Same numbers at L22 input, h22, h24.
+## EDIT v1 (staged in edited/; code/014 `0.03 3.0 save`; params in work/edit_params.json)
+- model.layers.23.feed_forward.{w1,w2,w3}: neuron 881 freed by folding into its near-duplicate (w2[:,331] += w2[:,881]; cos .9996).
+- w1[881] = kap*(P w - theta*m_hat/mp): w = unit shrinkage-LDA direction (lam 3) of corrupted-minus-clean at the L23 MLP input, fitted on HALF of the
+  pass-1 questions (work/train_questions.json: 57 pairs F1-big + F2) with clean + half of the controls as within-class scatter; P projects off the
+  inputs of the first 8 prompt tokens; theta 1.41 = 97th percentile of out-of-fold negative scores; m_hat/mp = mean-input bias proxy; kap = 4/sd.
+- w3[881] = m_hat/mp (about 1). w2[:,881] = s*(g_final*r)/g_post, r = mean unembedding of {Wait, Actually, Hmm, Hold, But, However} minus
+  {So, Thus, Then, Now, Therefore, Hence, Next}; s set for +3 logits (re-check minus continue) at the median firing activation; column norm .37,
+  nothing clipped by the Q8 block rule.
+- Predicted on the held-out half (recorded inputs): shift after corrupted F1 +1.52 logits vs clean +0.43; F2 +2.58 vs 0.00; controls +0.01.
+## Pass 3 (read, edited = v1): the 306 pass-1 texts, top-50 at the last token + token log-probs -> GATE on held-out questions:
+   P(re-check opener) after corrupted vs clean steps (big, small, F2), and off-target |dlogp| over all 184k tokens vs pass 1.

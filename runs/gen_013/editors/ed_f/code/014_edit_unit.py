@@ -18,11 +18,18 @@ is_tr=np.array([q in trq for q in qid])
 cl=np.where((src=='p1')&(kind=='clean'))[0]; co=np.where((src=='p1')&(kind=='big'))[0]; assert len(cl)==len(co) and all(M[a]['id']==M[b]['id'] for a,b in zip(cl,co))
 ctl=np.where(src!='p1')[0]; rng.shuffle(ctl); ctl_tr=ctl[:len(ctl)//2]; ctl_te=ctl[len(ctl)//2:]
 tr=is_tr[cl]
-Dm=X[co][tr]-X[cl][tr]; d=Dm.mean(0)
-Z=np.vstack([X[cl][tr]-X[cl][tr].mean(0),X[ctl_tr][src[ctl_tr]!='ctlC']-X[ctl_tr][src[ctl_tr]!='ctlC'].mean(0),Dm-d]); n=len(Z); lam=0.3; s=np.trace(Z@Z.T)/n/X.shape[1]
-w=(d-Z.T@np.linalg.solve(Z@Z.T/n+lam*s*np.eye(n),Z@d)/n)/(lam*s); w/=np.linalg.norm(w)
-sc=X@w
-neg_tr=np.r_[cl[tr],ctl_tr]; theta=np.quantile(sc[neg_tr],1-FR)
+def fit(pair_mask,ctl_idx,lam=3.0):
+    Dm=X[co][pair_mask]-X[cl][pair_mask]; d=Dm.mean(0); C=X[ctl_idx][src[ctl_idx]!='ctlC']
+    Z=np.vstack([X[cl][pair_mask]-X[cl][pair_mask].mean(0),C-C.mean(0),Dm-d]); n=len(Z); s=np.trace(Z@Z.T)/n/X.shape[1]
+    w=(d-Z.T@np.linalg.solve(Z@Z.T/n+lam*s*np.eye(n),Z@d)/n)/(lam*s); return w/np.linalg.norm(w)
+w=fit(tr,ctl_tr); sc=X@w
+# threshold from out-of-fold scores inside the training half (5 folds over training questions; controls split alike)
+trqs=np.array(sorted(trq)); rng.shuffle(trqs); oof=[]
+for k,fo in enumerate(np.array_split(trqs,5)):
+    inn=tr&~np.isin(qid[cl],fo); out_=tr&np.isin(qid[cl],fo); cin=ctl_tr[np.arange(len(ctl_tr))%5!=k]; cout=ctl_tr[np.arange(len(ctl_tr))%5==k]
+    wk=fit(inn,cin); oof+=list(X[cl][out_]@wk)+list(X[cout]@wk)
+theta=np.quantile(oof,1-FR)
+neg_tr=np.r_[cl[tr],ctl_tr]
 auc=lambda a,b:roc_auc_score(np.r_[np.zeros(len(a)),np.ones(len(b))],np.r_[sc[a],sc[b]])
 print('train pairs %d, test pairs %d | AUC train %.3f | TEST F1 %.3f, TEST F2 %.3f | theta %.3f'%(tr.sum(),(~tr).sum(),auc(cl[tr],co[tr]),auc(cl[(~tr)&(fam[cl]=='F1')],co[(~tr)&(fam[cl]=='F1')]),auc(cl[(~tr)&(fam[cl]=='F2')],co[(~tr)&(fam[cl]=='F2')]),theta))
 fire=lambda idx:(sc[idx]>theta).mean()
@@ -30,8 +37,13 @@ print('fire rates: train clean %.2f corrupt %.2f | TEST clean %.2f corrupt %.2f 
 # bias proxy: mean input direction
 mu=X.mean(0); mh=mu/np.linalg.norm(mu); pm=X@mh; print('bias proxy x.m: mean %.3f sd %.3f min %.3f (ctlC min %.3f)'%(pm.mean(),pm.std(),pm.min(),pm[src=='ctlC'].min()))
 mp=np.median(pm)
-kap=6.0/ max(1e-6,np.quantile(sc[co[tr]]-theta,.75))            # silu argument ~6 at the upper quartile of corrupted train scores
-gate=kap*(w-theta*mh/mp)                                        # w1 row: kap*(score - theta*(x.m)/mp)
+pc=np.array([i for i in range(N) if src[i]=='ctlC' and 0<M[i]['k']<=8]); Qm,_=np.linalg.qr(X[pc].T); wp=w-Qm@(Qm.T@w)   # score direction projected off the first prompt tokens (gen-7 pitfall)
+scp=X@wp; print('projected direction: cos with w %.3f | TEST AUC F1 %.3f F2 %.3f'%(wp@w/np.linalg.norm(wp),roc_auc_score(np.r_[np.zeros(((~tr)&(fam[cl]=='F1')).sum()),np.ones(((~tr)&(fam[cl]=='F1')).sum())],np.r_[scp[cl[(~tr)&(fam[cl]=='F1')]],scp[co[(~tr)&(fam[cl]=='F1')]]]),roc_auc_score(np.r_[np.zeros(((~tr)&(fam[cl]=='F2')).sum()),np.ones(((~tr)&(fam[cl]=='F2')).sum())],np.r_[scp[cl[(~tr)&(fam[cl]=='F2')]],scp[co[(~tr)&(fam[cl]=='F2')]]])))
+oofp=[] 
+theta=np.quantile(scp[neg_tr],1-FR/3) if False else theta
+kap=4.0/np.std(scp[neg_tr])
+gate=kap*(wp-theta*mh/mp)                                       # w1 row: kap*(score - theta*(x.m)/mp)
+garg=X@gate; print('gate arg on prompt tokens max %.3f | fire (gate arg > 0): TEST clean F1 %.2f corrupt F1 %.2f | TEST clean F2 %.2f corrupt F2 %.2f | TEST ctlA %.2f ctlB %.2f'%((garg[src=='ctlC'].max(),)+tuple((garg[i]>0).mean() for i in (cl[(~tr)&(fam[cl]=='F1')],co[(~tr)&(fam[cl]=='F1')],cl[(~tr)&(fam[cl]=='F2')],co[(~tr)&(fam[cl]=='F2')],ctl_te[src[ctl_te]=='ctlA'],ctl_te[src[ctl_te]=='ctlB']))))
 up=mh/mp                                                        # w3 row: ~1
 act=lambda idx:(lambda g:g/(1+np.exp(-g)))(X[idx]@gate)*(X[idx]@up)
 aall=act(np.arange(N)); print('unit activation: train corrupt median %.2f p90 %.2f | test corrupt median %.2f | clean test median %.3f p90 %.2f | controls median %.3f p95 %.2f max %.2f | ctlC max %.3f'%(np.median(aall[co[tr]]),np.quantile(aall[co[tr]],.9),np.median(aall[co[~tr]]),np.median(aall[cl[~tr]]),np.quantile(aall[cl[~tr]],.9),np.median(aall[ctl]),np.quantile(aall[ctl],.95),aall[ctl].max(),aall[src=='ctlC'].max()))
