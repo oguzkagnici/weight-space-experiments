@@ -1373,3 +1373,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Passes: 8/8 (6 read, 2 generate).
 - **Selection.** Pre-run in 8 chunks of 32 at priority 8 and `ga select --priority 8` (champion + both candidates), queued 22:49 UTC.
 - **Prediction (pre-registered):** net ≈ 0 (|z| < 1). Check: identical traces ≤ 10 of 256 (the leaking gate resamples early), and cuts within ±3 of the champion's 42.
+
+#### Container restart (2026-11-16, ~23:00 UTC)
+
+- The container restarted during the gen 14 pre-run; server and watchdog were down. Restarted both (`start_server.sh`, watchdog); the interrupted job (`gen_014_prerun_claude_…_00`) was re-queued and re-runs. Both editors had already handed back, so no agent needed re-arming.
