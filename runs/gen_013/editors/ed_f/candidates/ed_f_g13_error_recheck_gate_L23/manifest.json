@@ -1,0 +1,26 @@
+{
+ "label": "ed_f_g13_error_recheck_gate_L23",
+ "editor": "ed_f",
+ "gen": 13,
+ "time": 1794817974.4222097,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.1373213678598404,
+   "sha_bf16": "50e6455ae98afd6f"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 4092,
+   "numel": 15728640,
+   "rel_change": 0.010905597358942032,
+   "sha_bf16": "84558a578d33c8fd"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.013315500691533089,
+   "sha_bf16": "601cecd04bc77da0"
+  }
+ }
+}

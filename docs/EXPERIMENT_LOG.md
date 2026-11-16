@@ -1314,3 +1314,18 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Passes: 7/8 (4 read, 3 generate); 3 generate attempts failed on the full disk (D73), uncharged.
 - **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued ~04:20 UTC.
 - **Prediction (pre-registered):** net ≈ 0 (|z| < 1). Check: re-check opener rate on selection traces should be unchanged (the strict gate rarely fires).
+
+#### Gen 13: `ed_f` (Fable 5.2) hand-back (2026-11-16, ~08:30 UTC)
+
+- **Result: step-level errors are not where the model fails.** Report: `runs/gen_013/editors/ed_f/report.md`.
+- **Slips are rare and unrelated to failure.** 2,021 auto-checked "a op b = c" statements in 288 parent traces: ~5 real consequential slips (0.25%); the deviation rate is the same in right (4.6%) and cut (3.9%) traces. Numbers copied from the question: median probability 1.00. Negation questions are 2.2% of the practice set.
+- **Finished-wrong answers are verbal, quantitative failures are cuts.** Quantitative subjects: 75 right / 5 finished-wrong / 27 cut; all others 87 / 72 / 22. Hand-read first wrong steps (8 samples): 4 coin-flips between finalists, 2 under-weighted stem cues, 2 misapplied formulas, 0 slips. Always-cut quantitative questions: the computed value matches no option exactly and the model re-interprets until the cap.
+- **The network knows the step but barely reacts to a wrong one.** Corrupted results have logprob −19 to −24, yet P(re-check opener) rises only +.04 to +.13; the signal builds gradually L14 → L24, held-out AUC .63–.79.
+- **Candidate `ed_f_g13_error_recheck_gate_L23` (v2):** L23 MLP neuron 881 (freed by folding into near-duplicate 331), gated by a shrinkage-LDA corrupted−clean direction at the 99th-percentile threshold, writing re-check minus continue openers (+3 logits at median firing).
+  - Read gate (held-out questions): re-check +.041/+.045/+.088 after corrupted steps vs +.009 after clean; off-target mean |dlogp| .0020.
+  - v1 (97th percentile) lost 3 finished-right answers to cuts on holdout ids 24–47 (−12.5, SE 6.9); its +16.7 on 6 parent-failure dev questions is resampling (traces diverge at a median 7%, not at an error).
+  - **v2 holdout48 at 8,192: +0.00 (SE 2.98, +1/−1); both-finish +0.00 (SE 3.58, n 40, +1/−1)**; cuts 7 → 7; re-check openers per 1,000 tokens 4.09 → 5.20.
+- **Suggested next:** stop hunting local slips; test whether a re-check ever proposes an alternative formulation; measure stem attention in right vs wrong samples of the same question on many more than 2 cases; never use dev sets picked from parent failures.
+- Passes: 8/8 (4 read, 4 generate); 3 generate attempts failed on the full disk (D73), uncharged.
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8 and `ga select --priority 8` (champion + both candidates), queued ~08:33 UTC.
+- **Prediction (pre-registered):** net ≈ 0 (|z| < 1), with a small risk of a loss through extra cuts. Check: re-check openers per 1,000 tokens rise ~+25% on selection traces (as on holdout), and cuts do not fall.

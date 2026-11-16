@@ -115,3 +115,8 @@ more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will 
   (+.045, SE .018); F2 clean .002 -> .002; F2 big .129 -> .218 (+.088, SE .038). Corrupted-minus-clean gap: big +.032 (SE .016), small +.036
   (SE .016), F2 +.088 (SE .038). Top-1 opener changed in 6/41, 1/41, 1/15 corrupted texts, 0 clean.
 - Off-target: mean |dlogp| .0020 (v1 .0038), 1.1% of tokens > .01 (2.0%), 0.32% > .1 (0.55%).
+
+## FINAL (passes 7-8, edit v2; code/017, 018)
+- HOLDOUT48 at 8,192, v2: overall 62.5 -> 62.5 (+0.00, SE 2.98, +1/-1); both-finish (40) 75.0 -> 75.0 (+0.00, SE 3.58, +1/-1), 7 of 40 answers
+  changed; cuts 7 -> 7; tokens 3,472 -> 3,270; re-check openers per 1,000 tokens 4.09 -> 5.20; 4/48 traces identical, first diff at 8.8%.
+- Submitted: ed_f_g13_error_recheck_gate_L23 (= v2; 3 tensors, 8,188 weights). Report in report.md. All 8 passes used.
