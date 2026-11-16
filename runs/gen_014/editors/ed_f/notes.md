@@ -97,3 +97,19 @@ The text-level check is already negative, but it has little power (10 questions)
    wrong pick), both orders: (a) bare, in the direct-answer format (26 texts); (b) inside the model's own trace at the early cut of every sample
    (92 texts: 60 wrong, 18 cut, 14 right). Does the model hold the implication when asked directly on the questions it gets wrong?
    SAFETY: the 7 right samples of the cue questions, late cut x {BASE, NON, CUE}: does a cue quote disturb right conclusions?
+
+## Pass 3 result (code/010, 014): STEP 1(b), attention from option-judging positions (64 texts, 9 mixed verbal questions with both statuses)
+- Where judging positions look (all layers/heads): own trace .82, options .11, special .04, instruction .02, STEM .013 (+ cue .001). In the six
+  full-attention layers the stem gets 2.4% (L2 .024, L6 .020, L10 .011, L14 .021, L18 .046, L22 .028), LESS than at random trace positions (6%).
+- Right vs wrong samples of the same question: stem attention (full layers) .0274 vs .0240, within-question +.0035 (SE .0026; 5/9 questions);
+  with question fixed effects and log(prefix length) (stem attention falls with length, r -.48): RIGHT +.0010 (SE .0017). Per head: 49 heads with
+  stem attention > .02, |z| > 2 in 1 (2.5 expected by chance). -> NO within-question difference in attention to the stem.
+- There is no dedicated stem reader at judging positions: the heads with most stem attention (L18.H12-15, .075-.079) put the same share on the
+  stem at background positions (.067-.074) and are sink-like (special .21-.25, instruction .17). Judging positions read the option lines
+  (L14.H5 .61, H1 .38, H7 .33; L10.H10 .38; L22.H8 .41, H1 .29) and the trace.
+- Side observation (not the target, 9 questions, weak): right samples put more attention on the OPTION lines and less on their own trace
+  (+.030, SE .020 with controls; 10 of 70 option-reading heads |z| > 2, all positive: L10.H6/H15/H3/H7, L6.H2/H3/H6/H15, L2.H1/H14).
+- WOULD THE MODEL RE-QUOTE THE CUE BY ITSELF? (pass 1 token log-probs, free): after the forced opener 'Wait, let me re-read the question. It says: "'
+  the first token of the cue phrase has log P -15.9, of the non-cue phrase -7.6 (diff -8.3, SE 2.0; cue > non-cue in 1/12 questions; my non-cue
+  phrases are mostly sentence starts): a self-started re-read restarts the stem from a sentence start, it does not go to the decisive detail.
+  "Wait" itself has log P -10.6 at the late cut. A unit that makes the trace re-read the stem would therefore not produce the cue quote.
