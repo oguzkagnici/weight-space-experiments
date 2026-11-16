@@ -148,3 +148,18 @@ The text-level check is already negative, but it has little power (10 questions)
    with the parent's passes 2-3 on the same texts.
 ## Pass 6 (generate, edited = v1, cap 8192): work/req_hold1.json = HOLDOUT48 ids 0-23 (queued before the gate result to keep the place in the
    queue; if the gate asks for another dose, the two remaining passes re-measure the whole holdout with it).
+
+## Pass 5 result = READ GATE for v1 (code/019; edited vs the parent's passes 2-3 on the same texts)
+- TARGETED BEHAVIOUR, HELD-OUT questions (not used to fit d or t): stem attention of the six edited L22 heads at option-judging positions
+  .048 -> .108 (+.061, SE .008; n 57); fit questions .052 -> .116. Other L22 heads unchanged (.029 -> .029). The extra stem attention comes out of
+  the trace (.436 -> .344), not the options (.387 -> .365). Held-out background positions .123 -> .139 (+.016, SE .006); conclusion probes .047 -> .080.
+- What it does to the output: next-token distribution at judging positions moves little (total variation .019 held-out / .026 fit; top-1 changed
+  in 1 of 89; background .0014). Forced conclusions on the 30 late BASE texts: margin +0.07 (SE 0.03), top = gold 1 -> 1.
+- Off-target over 181k teacher-forced tokens: mean |dlogp| .0088, median .0006, 15.9% of tokens > .01, 1.7% > .1 (the linear gate d.x is not
+  zero off-target: sd .5 at background against 1.2-1.4 at judging positions). Enough to re-sample most traces early.
+- Reading: the edit does what it was built to do (2.2x stem attention where options are judged, on held-out questions), and, as the causal test
+  predicted, looking at the stem more does not change what is concluded.
+## Pass 7 (generate, edited = v1, cap 8192): work/req_hold2.json = HOLDOUT48 ids 24-47.
+## Pass 8 (read, PARENT, no edit; "model": "original"): work/req_p8.json (code/021), 60 texts: REPLICATION of the causal test at the late cut with
+   another wording ('Hold on. The question specifically says: "<phrase>".') and other non-cue control phrases (taken from the middle of the stem,
+   not sentence starts). Checks that the per-question split of pass 1 is not an artefact of wording or control choice.
