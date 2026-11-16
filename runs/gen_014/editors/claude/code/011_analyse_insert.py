@@ -38,3 +38,14 @@ for q in sorted({k[0] for k in rec}):
     late = [rec[k]["margin"] - rec[(k[0], k[1], k[2], "ctrl")]["margin"] for k in rec if k[0] == q and k[2] == "late" and k[3] == "cue"]
     early = [rec[k]["margin"] - rec[(k[0], k[1], k[2], "ctrl")]["margin"] for k in rec if k[0] == q and k[2] == "early" and k[3] == "cue"]
     print(q, "late", np.round(late, 2), "early", np.round(early, 2))
+print("\nbounded statistic: P(gold) among letters (renormalised), cue - other, SE by question")
+for cut in ("early", "late"):
+    for a, b in (("cue", "ctrl"), ("cue", "none")):
+        qm = collections.defaultdict(list); flips = 0; n = 0
+        for (q, s, c, v), r in rec.items():
+            if c != cut or v != a or (q, s, c, b) not in rec: continue
+            o = rec[(q, s, c, b)]; qm[q].append(r["pg"] - o["pg"]); n += 1
+            flips += (r["top"] == r["g"]) - (o["top"] == o["g"])
+        if not qm: continue
+        qv = np.array([np.mean(v) for v in qm.values()])
+        print(f"  {cut} {a}-{b}: dP(gold) {qv.mean():+.3f} (SE {qv.std(ddof=1)/np.sqrt(len(qv)):.3f}, {len(qv)} q, {n} samples); net top-1 -> gold {flips:+d}")

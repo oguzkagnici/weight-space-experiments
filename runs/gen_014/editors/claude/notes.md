@@ -29,3 +29,14 @@ Target: STEM-CHECK CIRCUIT. Material: pass@4 bank at 8,192 (64 q x 4) + 32 bank-
 - Reading: wrong samples SEE the cue and reason about it; they draw the wrong inference from it (they do not know, e.g., that informing every patient
   makes the trial open-label, that newly discovered evidence must exist at trial time, that a 30-day TRO extension is appealable as an injunction).
   This is a knowledge/inference failure, not an attention failure. Passes 1-2 test whether the network itself agrees.
+
+## Pass 1 result (read, original): CAUSAL INSERTION GATE = NULL (code/011)
+- 32 finished-wrong samples of the 15 cue questions, early cut (~30% of the trace), 3 variants; 12 of them also at the late cut (commit paragraph).
+- Bounded statistic, P(gold) among the 10 letters at the probe "The answer is (" (SE by question):
+  early cue - ctrl (non-decisive stem quote) +0.041 (SE 0.039); early cue - none -0.001 (SE 0.066); late cue - ctrl +0.085 (SE 0.066).
+  Top-1 letter becomes gold: early none 5/32, ctrl 1/32, cue 3/32 (net vs ctrl +2, vs none -2); late ctrl 0/12, cue 1/12.
+  Log-margin gold - pick, cue - ctrl: early median +0.51 (up in 21/32), late median +0.42 (6/12); the means are dominated by letters outside the
+  top-50 (floor -30), so I use the bounded statistic.
+- Reading: putting the decisive cue right in front of the conclusion does not turn wrong conclusions right (at most +0.04-0.09 P(gold), within
+  noise). With the text-level result (wrong samples already use the cue many times), the stem check is NOT the bottleneck: the model sees the cue
+  and does not know what it implies. By the gate rule, a weight edit that makes the model attend to / re-state the cue cannot help.
