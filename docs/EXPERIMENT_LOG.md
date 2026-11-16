@@ -1300,7 +1300,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 
 - At the user's request, wrote `docs/NEW_EXPERIMENT_weight_assembly_from_donors.md`: a self-contained brief for a new environment. An LLM runner assembles a ≤ 2B model by writing weights from several open donor models (no training, no training data), in the same genetic loop, judged on hidden MMLU-Pro / GPQA selection sets with a sealed final set (MMLU-Pro final + GPQA Diamond). The bar is the best eligible donor. It includes this experiment's lessons (§11).
 
-#### Gen 13: `claude` hand-back (2026-11-16, ~05:20 UTC)
+#### Gen 13: `claude` hand-back (2026-11-16, ~04:15 UTC)
 
 - **Result: self-correction is a negative result.** Report under `## REPORT` in `runs/gen_013/editors/claude/notes.md` (writing `report.md` was refused).
 - **Where wrong conclusions come from.** Arithmetic slips are rare: ~7 of 1,134 checkable statements, most regex artefacts, the real ones already re-checked (6/7). Of 10 mixed questions' wrong samples, ~4 have an identifiable wrong step (a confident false belief or an unchecked decisive cue) and ~5 are knowledge guesses.
@@ -1312,5 +1312,5 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
   - **Holdout48 at 8,192: +0.00 (SE 4.21, +2/−2); both-finish +0.00 (SE 3.67, n 39, +1/−1).** Expects ~0 at selection.
 - **Suggested next:** a stem-check circuit. Right samples test each option against the decisive cue in the question stem; wrong samples skip it. Look for attention that reads the stem while an option is judged, and whether it is weaker in wrong samples.
 - Passes: 7/8 (4 read, 3 generate); 3 generate attempts failed on the full disk (D73), uncharged.
-- **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued ~05:25 UTC.
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued ~04:20 UTC.
 - **Prediction (pre-registered):** net ≈ 0 (|z| < 1). Check: re-check opener rate on selection traces should be unchanged (the strict gate rarely fires).
