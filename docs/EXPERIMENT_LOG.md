@@ -1343,7 +1343,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - `ga new-gen --editors claude,ed_f --budget 8 --max-cands 1 --protocol think --template editor_task_think_g14.md --trace-bank runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl --sel-cap 8192 --sel-from 10 --focus <json>` (D75).
 - `claude` (fork) on the stem-check circuit; `ed_f` (Fable 5.2) on text-level stem re-statement and the causal insertion test. Both may read their own earlier generations' work.
 
-#### Follow-up experiment brief rewritten (2026-11-16, ~20:30 UTC)
+#### Follow-up experiment brief rewritten (2026-11-16, ~20:10 UTC)
 
 - At the user's request, the brief now centres on **writing** an LLM's weights, not on assembling donors. Renamed to `docs/NEW_EXPERIMENT_writing_an_llm.md` (was `NEW_EXPERIMENT_weight_assembly_from_donors.md`).
 - Changes: existing open models are "reference models" to study and, optionally, take parts from; recipes are built from tensor groups whose reference reads are counted, giving each candidate an **authored share** (designed / random vs verbatim / derived) with an audit against hidden copying and stored benchmark answers; two lineages: W (≥ 90% authored) and M (any share, promoted by an intelligence move or an "authoring move" that writes ≥ 2 more points of the model at no significant loss); B-random floor and a letter-prior baseline for near-chance written models; the final report plots accuracy against authored share and answers three questions (how intelligent a written model can be, how much of a strong model can be written, whether writing adds intelligence). Lessons updated with generations 13–14.
