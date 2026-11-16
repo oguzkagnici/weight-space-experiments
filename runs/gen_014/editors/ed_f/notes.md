@@ -113,3 +113,36 @@ The text-level check is already negative, but it has little power (10 questions)
   the first token of the cue phrase has log P -15.9, of the non-cue phrase -7.6 (diff -8.3, SE 2.0; cue > non-cue in 1/12 questions; my non-cue
   phrases are mostly sentence starts): a self-started re-read restarts the stem from a sentence start, it does not go to the decisive detail.
   "Wait" itself has log P -10.6 at the late cut. A unit that makes the trace re-read the stem would therefore not produce the cue quote.
+- CORRECTION of the side observation: the option-attention difference is a FORMAT artefact. Judging texts that end at a bare label "(H)" (the model
+  must copy the option text next) look at the option lines more than texts ending at "(H) <option text>:", and right samples have the bare-label
+  format more often (44% vs 23%). With a format control the RIGHT coefficient is +.002 (SE .018) for option attention and -.007 (SE .016) for
+  trace attention. No internal right-vs-wrong difference at judging positions survives.
+
+## Pass 4 result (code/015)
+- SAFETY: on the 7 right samples of the cue questions (late cut) the forced conclusion is gold in 6/7 under BASE, NON and CUE alike (mean P(gold)
+  .83 / .79 / .82): a cue quote does not disturb right conclusions.
+- KNOWLEDGE VS USE (13 two-statement choices, right implication vs the premise of the wrong pick, both orders averaged):
+  bare direct-answer format: the model prefers the right implication in 5 of 13 (mean log-odds +0.07): 1196 +1.5, 1445 +0.3, 1705 +5.4, 6110 +2.0,
+  6800 +4.1; against it 2654 -4.1, 6614 -4.3, 4811 -1.6, 1643 -0.7, 1275 -0.6, 1409 -0.5, 6562 -0.5, 6829 -0.1. Cue-responsive questions 2/4, others 3/9.
+  -> no sign of knowledge that is held but unused: in direct mode the model is at chance on the very implications that decide these questions.
+  (The in-trace version of the probe failed: only 8% of the probability mass falls on "1"/"2" after "The correct statement is (", so its
+  log-odds, all within +-1, are not interpretable.)
+
+## DECISION after passes 1-4: steps 1(a), 1(b) and 2 are negative; no stem-check component exists to strengthen. The TASK still asks for a measured
+   edit, so I build the direct weight-level counterpart of the hypothesis as its test, small and position-gated, and measure it.
+## EDIT v1 (staged in edited/; code/017 `2.2 save 6`; params work/edit_params.json): "look at the stem while judging an option", layer 22 queries
+- Layer 22 has no positional rotation; code/016 confirms that q_norm(W_q x) . k_norm(W_k x) / sqrt(128) reproduces the recorded attention
+  (median corr with log attention .93-1.00 for 15 of 16 heads; query head h uses kv head h // 4).
+- model.layers.22.self_attn.q_proj.weight, rows of heads 1, 11, 3, 0, 8, 15 (the six with most stem attention at judging positions, .044-.057):
+  W_q[h] += gam_h * (t_g / w_q) (x) d.
+  d = unit direction of the query input (operator_norm output) = mean at option-judging positions minus mean at random trace positions,
+      orthogonal to the background mean; fitted on HALF of the questions (work/fit_questions.json): d.x = 1.41 at fit judging positions, 1.20 at
+      held-out ones, 0.21 at held-out background (held-out AUC .92), 0.45 at conclusion probes, 0.02 on prompt tokens.
+  t_g = unit "stem key" direction of kv head g: mean post-norm key of stem tokens minus the mean of (option tokens, trace tokens)/2
+      (t.k: stem +5.0, options +0.9, trace -4.4 on held-out questions).
+  gam_h set so that the log-odds of attending to a stem key rather than another key rise by 2.2 at judging positions (row change 1.2-1.7%).
+- Predicted from recorded activations on held-out questions (exact for layer 22): log-odds shift to the stem +1.7 to +1.9 at judging positions,
+  +0.25 to +0.30 at background positions, +0.7 to +0.9 at conclusion probes.
+## Pass 5 (read, edited = v1) = READ GATE: work/req_p5.json: the 129 pass-3 judging / background texts (57 judging + 19 background from questions
+   NOT used to fit d and t) and the late-cut BASE texts of pass 2 that fit under the token limit; attn_last L22, top-50, token log-probs; compared
+   with the parent's passes 2-3 on the same texts.
