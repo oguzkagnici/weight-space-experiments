@@ -343,3 +343,13 @@ The user chose to target the model's reasoning and continue the loop.
   - Finished-wrong answers are mostly verbal (72 of 77 in `ed_f`'s count); quantitative failures are mostly cuts. Wrong conclusions come from guesses between finalists, unchecked stem cues and misapplied models of the problem.
   - The internal error signal exists (the model assigns near-zero probability to corrupted steps; a corrupt−clean direction separates pairs) but it tracks consistency with the model's own beliefs, not truth: gold substituted for the model's own wrong pick looks error-like in 25/25 cases. Boosting it adds re-checks that re-confirm the same belief.
 - **Overall (gens 9–13):** ten candidates in a row within noise. Gen 13 moved the target from forced-answer probes to the reasoning steps and the result is the same. The two editors' shared suggestion for a next target is the stem-check: whether the model tests options against the decisive cue in the question, measured by attention from judging positions to the stem in right vs wrong samples of the same question, on many questions before any edit.
+
+### D75 (2026-11-16): Generation 14 — target the stem check
+
+The user chose to launch generation 14 on the target both generation-13 editors suggested.
+
+- **Target** (`prompts/editor_task_think_g14.md` = g13 brief + generation-13 summary and lessons + new "THIS GENERATION'S TARGET"): on verbal questions, right samples test options against the decisive cue in the stem and wrong samples of the same question skip it. Is this a mechanism or a symptom of not knowing (gen 11's lesson)?
+- **Required order:** (1) quantify on ≥ 40 mixed verbal pass@4 questions, within question (text-level stem re-statement; attention from option-judging positions to stem tokens); (2) a causal insertion test before any edit: in wrong samples, insert a quote of the decisive cue vs an equal-length control and measure P(right conclusion) vs P(wrong); if quoting the cue does not move the conclusion, no attention edit can help and the line closes; (3) only then localise and edit, never as a global attention knob.
+- **Gate:** the insertion effect, a read-pass effect of the edit on held-out texts, then generate passes on the holdout bank only (dev sets picked from parent failures misled both gen-13 editors).
+- **Editors:** `claude` (fork, Opus 5.5): the stem-check circuit (attention, heads, patching). `ed_f` (fresh sub-agent, Fable 5.2): text-level stem re-statement at scale and the insertion test.
+- **Unchanged:** 8 passes, 1 candidate each; gen 10's 256 selection questions at 8,192 (`--sel-from 10`); rule z ≥ 2, both-finish z ≥ 1, GSM8K-boxed guard z ≥ −2; chunked pre-run at priority 8.

@@ -1337,3 +1337,8 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - `claude_g13_selfcheck_recheck_L23`: 59.77, −0.78 (SE 1.8, z −0.43), +10/−12; both-finish +0.00 (n 200).
 - Pre-registered checks held: re-check openers per 1,000 tokens 3.53 → 3.73 (`claude`), → 4.64 (`ed_f`, +31%); `ed_f` cuts 42 → 42.
 - Decision: no winner; the gen-8 champion survives (D74). Report: `runs/gen_013/REPORT.md`.
+
+#### Gen 14 launch (2026-11-16, ~17:05 UTC)
+
+- `ga new-gen --editors claude,ed_f --budget 8 --max-cands 1 --protocol think --template editor_task_think_g14.md --trace-bank runs/shared/trace_bank_gen008champ_cap3072_det1.jsonl --sel-cap 8192 --sel-from 10 --focus <json>` (D75).
+- `claude` (fork) on the stem-check circuit; `ed_f` (Fable 5.2) on text-level stem re-statement and the causal insertion test. Both may read their own earlier generations' work.
