@@ -87,3 +87,5 @@ more re-checking costs tokens (gen 5: cutting re-checks is what helped). I will 
 - Pass 4 DEV: work/req_dev.json, 6 passk questions x 4 samples (parent cached): quantitative mixed 9251 (BIII), 7456 (AF-C), 11805 (BJJD),
   7261 (-DDD); verbal mixed 6110 (BBBF); always-right control with many equations 8198 (CCCC).
 - Passes 5-6 HOLDOUT48: work/req_hold1.json (ids 0-23), work/req_hold2.json (ids 24-47).
+
+## Pass 4 = HOLDOUT48 second half (ids 24-47), edited v1 (the first submissions of dev/hold1 failed on a full disk, not charged; re-queued as passes 5 (DEV) and 6 (hold1))
