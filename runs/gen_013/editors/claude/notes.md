@@ -60,3 +60,28 @@
 
 ## BLOCKED (2026-11-16 ~02:10 UTC): passes 5, 6, 7 FAILED (not charged) — llama-quantize Q8_0 failed for lack of disk (free 0.9-1.2 GB during the builds; 4.2 GB after). A gguf build needs ~5.3 GB free (bf16 ~3.5 GB + q8 ~1.85 GB). Budget: 4 used of 8.
 - To resume: re-submit work/req_gen5.json (pass@4 mixed, 24 answers), work/req_hold6.json and work/req_hold7.json (holdout48), edit E2 already saved in edited/. Then code/018_paired.py dev 05 ; hold 06 07 (check numbering of the new passes).
+
+## Passes 5-7 results (generate, EDITED E2, cap 8192; code/018, 019) — resubmitted after the disk fix
+- Pass 5, pass@4 mixed (6110, 6800, 2731, 5325, 2055, 11805 x 4 samples): overall 41.7 -> 58.3% (+16.7, SE 13.0, +7/-3); both-finish n 22 +22.7 (SE 13.1, +7/-2). 0/24 traces identical, first difference at 1-52% of the trace. These 6 questions were chosen for having the most finished-WRONG parent samples, so resampling alone regresses them upward; not evidence of the mechanism.
+- Passes 6-7, HOLDOUT48: overall 62.5 -> 62.5% (+0.00, SE 4.21, +2/-2); both-finish n 39 74.4 -> 74.4% (+0.00, SE 3.67, +1/-1); cut 7 -> 6; 7/48 identical.
+- Mechanism check: re-check openers per 1k generated tokens unchanged (pass@4 1.29 -> 1.36; holdout48 3.46 -> 3.45). The strict unit is effectively inert in natural text: the model's own sampled steps never produce the large self-inconsistency the gate needs. The pass-5 swaps come from the fold/leak perturbing traces (resampling).
+
+## REPORT
+Generation 13, `claude`: SELF-CORRECTION, a negative result.
+- **What goes wrong.**
+  - Arithmetic slips are almost absent (about 7 of 1,134 checkable statements, mostly regex artefacts), and the real ones are already re-checked (6 of 7).
+  - The finished-wrong samples of 10 mixed questions are confident beliefs or unchecked decisive cues (about 4: 9251 lens sign, 6800 Mycoplasma, 6110 "informed" means open-label, 2654 sleep paralysis) or knowledge guesses (about 5).
+- **Error signal: real, but it tracks self-consistency, not truth.**
+  - Corrupted steps are surprising (logprob −13 to −21 vs −0.6) and raise re-check openers ×1.6.
+  - A corrupt-minus-clean direction separates held-out pairs 0.83–0.90 (paired), but only 0.63–0.71 unpaired.
+  - Putting the gold letter in place of the model's own wrong pick looks more error-like (25 of 25).
+  - The corrected 9251 step looks more error-like than the model's own false step, and P(re-check) rises 0.20 → 0.58.
+  - The model doubts its wrong picks more (P(re-check) 0.76 vs 0.50 after right picks), but its re-checks re-derive the same belief.
+  - Against 14.8k background positions there is no gateable "false step" state: a gate at 0.1% background firing catches 0 of 12 held-out corrupted steps.
+- **Edits.**
+  - **E1**, the briefed detector → re-check link at L23 n881: re-check after corrupted steps 0.12 → 0.39, but after clean steps 0.06 → 0.23, after the gold substitution → 1.00, and after the model's own wrong picks unchanged (0.75 → 0.77). It also leaked from the first token. Rejected.
+  - **E2**, submitted: the strict refit, firing on about 0.1% of tokens.
+- **Measured.**
+  - pass@4 mixed questions: +16.7 (SE 13.0, +7/−3); both-finish +22.7 (n 22, +7/−2). This is resampling and regression to the mean (the questions were chosen for wrong samples; 0 of 24 traces identical; re-check rate unchanged, 1.29 → 1.36 per 1,000 tokens).
+  - Holdout48 at 8,192: +0.00 (SE 4.21, +2/−2); both-finish +0.00 (SE 3.67, n 39, +1/−1).
+- **Next.** Self-correction cannot fix this model's MMLU-Pro errors. Try verification against the question stem instead: is attention to the decisive cue in the stem weaker in wrong samples at the moment the decisive option is judged? Process note: pick dev questions by mixed status, not by wrong count, and check the targeted behaviour rate in generated traces before trusting dev gains.

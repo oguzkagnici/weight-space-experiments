@@ -1,0 +1,26 @@
+{
+ "label": "claude_g13_selfcheck_recheck_L23",
+ "editor": "claude",
+ "gen": 13,
+ "time": 1794802767.304919,
+ "tensors": {
+  "model.layers.23.feed_forward.w1.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.16125981509685516,
+   "sha_bf16": "e82353b33f0adde1"
+  },
+  "model.layers.23.feed_forward.w2.weight": {
+   "changed_bf16": 4095,
+   "numel": 15728640,
+   "rel_change": 0.018759967759251595,
+   "sha_bf16": "2435da6544e1f3f8"
+  },
+  "model.layers.23.feed_forward.w3.weight": {
+   "changed_bf16": 2048,
+   "numel": 15728640,
+   "rel_change": 0.012158985249698162,
+   "sha_bf16": "fb92a75fa61c430d"
+  }
+ }
+}

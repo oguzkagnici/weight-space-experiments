@@ -1299,3 +1299,18 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 #### Separate deliverable: brief for a follow-up experiment (2026-11-15)
 
 - At the user's request, wrote `docs/NEW_EXPERIMENT_weight_assembly_from_donors.md`: a self-contained brief for a new environment. An LLM runner assembles a ≤ 2B model by writing weights from several open donor models (no training, no training data), in the same genetic loop, judged on hidden MMLU-Pro / GPQA selection sets with a sealed final set (MMLU-Pro final + GPQA Diamond). The bar is the best eligible donor. It includes this experiment's lessons (§11).
+
+#### Gen 13: `claude` hand-back (2026-11-16, ~05:20 UTC)
+
+- **Result: self-correction is a negative result.** Report under `## REPORT` in `runs/gen_013/editors/claude/notes.md` (writing `report.md` was refused).
+- **Where wrong conclusions come from.** Arithmetic slips are rare: ~7 of 1,134 checkable statements, most regex artefacts, the real ones already re-checked (6/7). Of 10 mixed questions' wrong samples, ~4 have an identifiable wrong step (a confident false belief or an unchecked decisive cue) and ~5 are knowledge guesses.
+- **The error signal exists** (140 clean/corrupted pairs from right traces): the corrupted token has logprob −13 to −21 vs −0.6; re-check openers are 1.6× more likely after a swap; a corrupt−clean direction separates held-out pairs 0.83–0.90 pair-wise, 0.63–0.71 AUC step-wise.
+- **It tracks self-consistency, not truth.** Substituting gold for the model's own wrong pick looks more error-like in 25/25 cases; on 9251 the corrected step looks more error-like than the model's false step (P(re-check) 0.20 → 0.58). Re-checks after wrong picks (0.76 vs 0.50 after right picks) re-derive the same belief.
+- **E1** (L23 n881 gated detector → re-check, as briefed): re-checks after corrupted steps 0.12 → 0.39, but also after clean steps 0.06 → 0.23 and after gold substitution → 1.00, and not after its own wrong picks (0.75 → 0.77); leaks from the first token. Rejected.
+- **Candidate `claude_g13_selfcheck_recheck_L23` (E2):** the same unit with a strict gate (~0.1% of tokens).
+  - 6 mixed pass@4 questions × 4: +16.7 (SE 13.0), both-finish +22.7 (n 22). The editor attributes this to resampling: the 6 were picked as mostly-wrong for the parent, all 24 traces changed, the re-check rate did not (1.29 → 1.36 per 1,000 tokens).
+  - **Holdout48 at 8,192: +0.00 (SE 4.21, +2/−2); both-finish +0.00 (SE 3.67, n 39, +1/−1).** Expects ~0 at selection.
+- **Suggested next:** a stem-check circuit. Right samples test each option against the decisive cue in the question stem; wrong samples skip it. Look for attention that reads the stem while an option is judged, and whether it is weaker in wrong samples.
+- Passes: 7/8 (4 read, 3 generate); 3 generate attempts failed on the full disk (D73), uncharged.
+- **Selection.** Pre-run in 8 chunks of 32 at priority 8, queued ~05:25 UTC.
+- **Prediction (pre-registered):** net ≈ 0 (|z| < 1). Check: re-check opener rate on selection traces should be unchanged (the strict gate rarely fires).
