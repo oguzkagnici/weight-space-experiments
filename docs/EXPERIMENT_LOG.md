@@ -1383,3 +1383,4 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Second restart during the gen 14 pre-run, after chunks 00–02 of the `claude` candidate had finished. Restarted server and watchdog; the interrupted chunk 03 was re-queued and re-runs (running again 01:17 UTC). No finished results were lost.
 - Third restart ~01:30 UTC, after chunk 03 had finished. Same recovery; chunk 04 running 01:34 UTC.
 - Fourth restart ~02:45 UTC, after chunks 04–05 had finished; chunk 06 re-queued. Same recovery.
+- Fifth restart just before 06:50 UTC (found at the scheduled check-in), after ed_f chunk 00 had finished; chunk 01 re-queued. Same recovery. Background monitors are replaced by scheduled check-ins (send_later), which survive restarts.
