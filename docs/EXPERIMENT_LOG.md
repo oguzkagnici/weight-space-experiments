@@ -1381,3 +1381,4 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 #### Container restart (2026-11-17, ~01:10 UTC)
 
 - Second restart during the gen 14 pre-run, after chunks 00–02 of the `claude` candidate had finished. Restarted server and watchdog; the interrupted chunk 03 was re-queued and re-runs (running again 01:17 UTC). No finished results were lost.
+- Third restart ~01:30 UTC, after chunk 03 had finished. Same recovery; chunk 04 running 01:34 UTC.
