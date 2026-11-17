@@ -1384,3 +1384,4 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Third restart ~01:30 UTC, after chunk 03 had finished. Same recovery; chunk 04 running 01:34 UTC.
 - Fourth restart ~02:45 UTC, after chunks 04–05 had finished; chunk 06 re-queued. Same recovery.
 - Fifth restart just before 06:50 UTC (found at the scheduled check-in), after ed_f chunk 00 had finished; chunk 01 re-queued. Same recovery. Background monitors are replaced by scheduled check-ins (send_later), which survive restarts.
+- Sixth restart, found at the 07:53 UTC check-in. The server's last output was 06:57, ~5 min after the session went idle with no background task running: the container appears to be reclaimed when the session is idle. Between 02:49 and 04:47, with background monitors running, it ran uninterrupted. Fix: keep a background monitor running at all times (re-armed every 2 h), with hourly scheduled check-ins as a fallback.
