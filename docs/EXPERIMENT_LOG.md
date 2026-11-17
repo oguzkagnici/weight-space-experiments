@@ -1377,3 +1377,7 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 #### Container restart (2026-11-16, ~23:00 UTC)
 
 - The container restarted during the gen 14 pre-run; server and watchdog were down. Restarted both (`start_server.sh`, watchdog); the interrupted job (`gen_014_prerun_claude_…_00`) was re-queued and re-runs. Both editors had already handed back, so no agent needed re-arming.
+
+#### Container restart (2026-11-17, ~01:10 UTC)
+
+- Second restart during the gen 14 pre-run, after chunks 00–02 of the `claude` candidate had finished. Restarted server and watchdog; the interrupted chunk 03 was re-queued and re-runs (running again 01:17 UTC). No finished results were lost.
