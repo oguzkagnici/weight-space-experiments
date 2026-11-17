@@ -353,3 +353,21 @@ The user chose to launch generation 14 on the target both generation-13 editors 
 - **Gate:** the insertion effect, a read-pass effect of the edit on held-out texts, then generate passes on the holdout bank only (dev sets picked from parent failures misled both gen-13 editors).
 - **Editors:** `claude` (fork, Opus 5.5): the stem-check circuit (attention, heads, patching). `ed_f` (fresh sub-agent, Fable 5.2): text-level stem re-statement at scale and the insertion test.
 - **Unchanged:** 8 passes, 1 candidate each; gen 10's 256 selection questions at 8,192 (`--sel-from 10`); rule z ≥ 2, both-finish z ≥ 1, GSM8K-boxed guard z ≥ −2; chunked pre-run at priority 8.
+
+### D76 (2026-11-17): Generation 14 — no winner; the gen-8 champion survives
+
+`ga decide --z 2 --bf-z 1 --guard-z -2`, 256 selection questions (gen 10's set), 8,192 tokens. The champion reproduced: 155/256 = 60.55%.
+
+| Candidate | Editor | Weights | Acc | Diff (SE) | z | +/− | Both-finish diff (SE), n | Identical raw |
+|---|---|---|---|---|---|---|---|---|
+| `ed_f_g14_stem_attention_at_judging_L22` | `ed_f` (Fable 5.2) | 733,127 | 62.11 | +1.56 (2.1) | +0.74 | +16/−12 | +0.99 (1.71), 203 | 4 |
+| `claude_g14_stemcheck_L22H10_amp` | `claude` | 262,144 | 59.77 | −0.78 (1.9) | −0.41 | +11/−13 | +0.00 (1.59), 200 | 2 |
+
+- Neither passes (z ≥ 2 needed); the GSM8K guard and held-out check were not needed. `ed_f` is the highest point estimate since gen 8 but well inside noise (resampling alone flips ~25 answers).
+- **Pre-registered checks held.**
+  - Both net ≈ 0 (|z| < 1): +0.74 and −0.41.
+  - `claude`: seed-like flips, 24 right/wrong changes (predicted ~25); 2 identical traces (≤ 10).
+  - `ed_f`: 4 identical traces (≤ 10); cuts 42 → 39 (within ±3, at the edge).
+  - Re-check openers per 1,000 tokens: champion 3.53, `claude` 3.67, `ed_f` 3.49 (unchanged). Cut → right / right → cut: `claude` 6 / 8, `ed_f` 9 / 7.
+- **What gen 14 established (both editors independently):** the stem check is a symptom, not a mechanism. Wrong samples read and use the decisive cue; attention from judging positions to the stem does not differ between right and wrong samples of the same question; quoting the cue into a wrong sample rarely moves the conclusion (2–5 of 30), while supplying the missing implication does (10–14 of 30). The missing piece is the inference or domain knowledge, not attention to the question.
+- **Overall (gens 9–14):** twelve candidates in a row within noise. Gens 11, 13 and 14 each traced failures down to the same place: the model lacks the knowledge or the inference step, and circuit edits that change how it reads, checks or re-checks cannot supply it. Both editors suggest knowledge injection (writing specific facts or implications into MLP weights) with single-fact generalisation tests first, and both doubt it scales to a 256-question gain.

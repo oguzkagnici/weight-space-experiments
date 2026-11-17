@@ -549,3 +549,9 @@ Two editors (Opus 5.5 fork, Fable 5.2) independently examined the parent's think
 - **First wrong steps (hand-read, 18 samples across both editors):** about half are guesses between plausible finalists without the knowledge to decide; the rest are confident false beliefs, an unchecked decisive cue in the stem, or a misapplied formula/model. None is an arithmetic, copying or negation slip.
 - **The model knows a corrupted step is wrong but barely acts on it.** Corrupted arithmetic results get logprob −19 to −24 vs ~0 for the true one, yet P(next paragraph opens with a re-check word) rises only +.04 to +.13. The signal builds gradually from about L14 to L24.
 - **The error signal is self-consistency, not truth.** A corrupt−clean direction separates held-out pairs (pair-wise 0.83–0.90; step-wise AUC 0.63–0.79). But substituting the gold answer for the model's own wrong pick looks more error-like in 25/25 cases, and re-checks after wrong picks re-derive the same belief. Strengthening the signal (two independent L23 gated units) raised re-check frequency by up to 55% in generation without changing accuracy (selection: −0.39 and −0.78, both within noise); the broader variant cost finished answers by pushing them past the cap.
+
+## Generation 14: the stem check is a symptom (D76)
+
+- Wrong samples on verbal questions read and use the decisive cue in the stem; attention from option-judging positions to the stem is the same in right and wrong samples of the same question.
+- Causal insertion: quoting the cue into a wrong sample moves the conclusion in 2–5 of 30 cases; inserting the missing implication moves it in 10–14 of 30. What separates right from wrong is the inference or the knowledge behind it, not reading the question.
+- Edits to the reading path (a 1.5× L22 head; rank-one query terms on six L22 heads) change answers like a reseed (~25 flips) and leave accuracy unchanged (−0.78, +1.56; both within noise).
