@@ -1398,3 +1398,27 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - `scripts/make_loop_gguf.py` writes a looped GGUF from an existing one: layers a..b are repeated right after b (copies of the same tensors), the per-layer metadata lists (`head_count_kv`, `sliding_window_pattern`) are extended, and the second pass's residual writes can be damped by β (LFM3's sandwich post-norm weights × β, which scales each layer's write exactly).
 - Test: base Q8_0, layers 8–15 looped once (32 layers, β = 1, 2.36 GB). The unmodified llama.cpp build loaded and ran it; three non-thinking prompts gave coherent, correct answers (one small factual slip in an explanation). No accuracy measured yet. The test file was deleted (disk).
 - Open: the gates in GLM-5.4 are trained; here they can only be hand-set constants (no training). Compute grows with the looped share (8 of 24 layers ≈ +33% time per token).
+
+#### Loop sweep, stage 1: direct-answer screen (2026-11-23, 16:00–17:33 UTC)
+
+Champion 35.0% on 200 practice questions (direct answer). Paired differences (SE), and Δ mean log P(gold):
+
+| Config | Acc | Diff (SE) | Δ logp (SE) |
+|---|---|---|---|
+| L04-11 β1.0 | 35.5 | +0.5 (2.5) | +0.259 (0.110) |
+| L04-11 β0.5 | 36.0 | +1.0 (2.2) | +0.048 (0.073) |
+| L10-13 β0.5 | 36.5 | +1.5 (2.3) | −0.053 (0.053) |
+| L12-19 β0.5 | 34.5 | −0.5 (1.9) | −0.065 (0.053) |
+| L08-15 β0.5 | 34.0 | −1.0 (1.9) | +0.032 (0.053) |
+| L06-17 β0.5 | 34.0 | −1.0 (1.9) | −0.017 (0.053) |
+| L04-19 β0.5 | 33.0 | −2.0 (2.0) | −0.132 (0.058) |
+| L12-19 β1.0 | 33.0 | −2.0 (2.6) | −0.011 (0.083) |
+| L10-13 β1.0 | 32.0 | −3.0 (2.7) | −0.224 (0.105) |
+| L08-15 ×2 β0.5 | 32.0 | −3.0 (2.3) | +0.084 (0.086) |
+| L08-15 β1.0 | 31.0 | −4.0 (2.3) | +0.227 (0.099) |
+| L04-19 β1.0 | 30.0 | −5.0 (3.0) | −0.187 (0.119) |
+| L06-17 β1.0 | 29.5 | −5.5 (2.4) | +0.113 (0.088) |
+
+- Undamped loops over the middle (β 1.0, spans of 8–16 layers) cost 3–5.5 points; damped loops (β 0.5) are within noise; the lower-middle span 4–11 is the only one that does not lose at β 1.0, and raises log P(gold) (z 2.4). Letter-format mass is unchanged everywhere (0.998–1.000): no config breaks the answer format.
+- Stage 2 picks (thinking, 8,192, holdout48): L04-11 β1.0, L04-11 β0.5, L10-13 β0.5, and L08-15 β1.0 (the GLM-5.4-like middle third, kept because the screen is direct-answer only and GLM-5.4's gains were largest on long reasoning). Benchmarks for base and champion queued behind them at priority 9 (AIME25, IFBench, GPQA-Diamond 8,192).
+- Bug: the first stage-2 submission failed at once (the looped-GGUF builder called itself with the loop still on: RecursionError; the β tests had used the base model, whose parent is the stock file). Fixed (`build_gguf(..., loop=False)` for the parent), server restarted, the four jobs re-queued 17:34 UTC; the first is generating.
