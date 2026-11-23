@@ -1391,3 +1391,10 @@ The champion run finished at 15:31 (about 4 h 50 m; the waiter hit its 2 h limit
 - Pre-run finished after six container restarts (no finished work lost); selection files complete 13:26 UTC.
 - `ed_f` 62.11% (+1.56, z +0.74, +16/−12; both-finish +0.99, n 203); `claude` 59.77% (−0.78, z −0.41, +11/−13; both-finish +0.00, n 200). Champion 60.55%.
 - No candidate passes; the gen-8 champion survives (D76). Pre-registered checks held (see D76).
+
+#### Layer looping feasibility check (2026-11-23)
+
+- Prompted by Z.ai's GLM-5.4 post (a "Loop Transformer": 28 middle layers of a 78-layer base run twice with weight sharing; per-token learned damp gates x₂ = x₁ + β(h₂ − x₁); adapted by continued training, ~10% extra compute; on a 30B iso-parameter ablation, AIME25 +11.3, GPQA-Diamond +8.7, AA-LCR +7.3, MMLU-Pro +3.4, IFBench +3.3, with 2–15% shorter outputs).
+- `scripts/make_loop_gguf.py` writes a looped GGUF from an existing one: layers a..b are repeated right after b (copies of the same tensors), the per-layer metadata lists (`head_count_kv`, `sliding_window_pattern`) are extended, and the second pass's residual writes can be damped by β (LFM3's sandwich post-norm weights × β, which scales each layer's write exactly).
+- Test: base Q8_0, layers 8–15 looped once (32 layers, β = 1, 2.36 GB). The unmodified llama.cpp build loaded and ran it; three non-thinking prompts gave coherent, correct answers (one small factual slip in an explanation). No accuracy measured yet. The test file was deleted (disk).
+- Open: the gates in GLM-5.4 are trained; here they can only be hand-set constants (no training). Compute grows with the looped share (8 of 24 layers ≈ +33% time per token).

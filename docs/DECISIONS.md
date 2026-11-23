@@ -371,3 +371,15 @@ The user chose to launch generation 14 on the target both generation-13 editors 
   - Re-check openers per 1,000 tokens: champion 3.53, `claude` 3.67, `ed_f` 3.49 (unchanged). Cut → right / right → cut: `claude` 6 / 8, `ed_f` 9 / 7.
 - **What gen 14 established (both editors independently):** the stem check is a symptom, not a mechanism. Wrong samples read and use the decisive cue; attention from judging positions to the stem does not differ between right and wrong samples of the same question; quoting the cue into a wrong sample rarely moves the conclusion (2–5 of 30), while supplying the missing implication does (10–14 of 30). The missing piece is the inference or domain knowledge, not attention to the question.
 - **Overall (gens 9–14):** twelve candidates in a row within noise. Gens 11, 13 and 14 each traced failures down to the same place: the model lacks the knowledge or the inference step, and circuit edits that change how it reads, checks or re-checks cannot supply it. Both editors suggest knowledge injection (writing specific facts or implications into MLP weights) with single-fact generalisation tests first, and both doubt it scales to a 256-question gain.
+
+### D77 (2026-11-23): Benchmarks from the GLM-5.4 post added to the suite list
+
+The user asked to add the benchmarks from Z.ai's GLM-5.4 post (its loop ablation, 30B model: AIME25, GPQA-Diamond, AA-LCR, MMLU-Pro, IFBench).
+
+| Benchmark | Status here | Notes |
+|---|---|---|
+| MMLU-Pro | already the target (D4) | selection set |
+| GPQA-Diamond | already built (D15a), run so far at 3,072 only | re-run at 8,192 with the suite |
+| AIME 2025 | **added**: `data/aime25.jsonl`, 30 problems from `math-ai/aime25` (integer answers, exact match) | very noisy (SE ≈ 8 pts at 30 items); a 1.7B model at 8,192 tokens is likely near the floor; report only |
+| IFBench | **pending user approval** of the official checker (AllenAI's IFBench code, external), 300 prompts | out-of-distribution verifiable constraints; complements IFEval |
+| AA-LCR | **not feasible** (as in D62) | ~100k-token inputs; prefilling one item takes hours on this 4-core CPU |
