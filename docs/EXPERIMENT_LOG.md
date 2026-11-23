@@ -1435,3 +1435,17 @@ Champion 35.0% on 200 practice questions (direct answer). Paired differences (SE
 - **L10-13 β0.5** on holdout48: **56.2% vs 62.5%**, diff −6.2 (SE 4.6, z −1.35), +1/−4. Cut 10 vs 7; mean tokens 4,002 vs 3,472. On the 36 both-finished: 26 vs 28 correct, thinking 12% longer (2,677 vs 2,382 tokens); "Wait" 4.6 per answer vs 3.6. A milder version of the β1.0 pattern: no gain, longer and more hesitant thinking.
 - L04-11 β0.5 had been moved to `queue/failed`: the two out-of-memory crashes at 19:16–19:17 were charged to it ("crashed twice"). Re-queued with the crash count cleared; it is generating now.
 - Correction: moving L08-15 β1.0 to priority 6 still placed it ahead of the benchmarks (priority 9), so it started at 20:23 against the stage-2 rule above. It was stopped about a minute in and parked in `queue/held/`. It runs only if L04-11 β0.5 comes out level or better.
+
+#### Loop sweep, stage 2 closed (2026-11-23, 21:53 UTC)
+
+Holdout48, thinking mode at 8,192 tokens, paired with the champion's banked answers (champion 62.5%, cut 7, mean 3,472 tokens, "Wait" 3.6 per answer):
+
+| Config | Acc | Diff (SE, z) | +/− | Cut | Mean tokens | Both-finished: loop vs champion (n) | "Wait" per answer |
+|---|---|---|---|---|---|---|---|
+| L10-13 β0.5 | 56.2 | −6.2 (4.6, −1.35) | +1/−4 | 10 | 4,002 | 26 vs 28 (36) | 4.6 |
+| L04-11 β0.5 | 45.8 | −16.7 (6.9, −2.42) | +2/−10 | 15 | 4,608 | 22 vs 23 (33) | 7.7 |
+| L04-11 β1.0 | 35.4 | −27.1 (7.1, −3.80) | +1/−14 | 19 | 5,124 | 17 vs 20 (29) | 10.8 |
+
+- Every config loses. The loss grows with the amount of looping (more layers, larger β), and so do thinking length and hesitation. On questions both finish, the looped model is about level per question but takes 12–34% longer, so most of the loss comes from answers cut at the cap.
+- Stage 1 (direct answer) ranked L04-11 at the top; in thinking mode it is the worst. The direct-answer screen does not predict the thinking-mode effect of looping.
+- D79: no config goes to the 256-question selection; L08-15 β1.0 stays parked (`queue/held/`) and will not run. The loop track closes. The benchmarks (AIME25, IFBench, GPQA-Diamond for base and champion) started at 21:53.

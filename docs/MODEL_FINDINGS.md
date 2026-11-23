@@ -555,3 +555,9 @@ Two editors (Opus 5.5 fork, Fable 5.2) independently examined the parent's think
 - Wrong samples on verbal questions read and use the decisive cue in the stem; attention from option-judging positions to the stem is the same in right and wrong samples of the same question.
 - Causal insertion: quoting the cue into a wrong sample moves the conclusion in 2–5 of 30 cases; inserting the missing implication moves it in 10–14 of 30. What separates right from wrong is the inference or the knowledge behind it, not reading the question.
 - Edits to the reading path (a 1.5× L22 head; rank-one query terms on six L22 heads) change answers like a reseed (~25 flips) and leave accuracy unchanged (−0.78, +1.56; both within noise).
+
+## Layer looping without training (D78–D79)
+
+- Re-running a span of the champion's own layers (shared weights, residual writes of the extra pass scaled by a constant β) never helps in thinking mode. On 48 held-out questions at 8,192 tokens: layers 10–13 at β 0.5: −6 points; 4–11 at β 0.5: −17; 4–11 at β 1.0: −27.
+- The model stays coherent but hesitates: "Wait" rises from 3.6 to as many as 10.8 per answer, thinking is 12–48% longer, and more answers hit the token cap. On questions that both finish, accuracy is close to level.
+- A direct-answer screen (one letter after the prompt) showed every damped loop within noise, and L04-11 β1.0 even raised log P(gold). That signal did not carry over to thinking mode.
