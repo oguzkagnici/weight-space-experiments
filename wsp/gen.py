@@ -52,7 +52,30 @@ def grade(content, gold_letter):
 
 # ---------------------------------------------------------------- weights -> gguf
 def build_gguf(weight_dirs, key):
-    """Q8_0 GGUF for a weight state (list of edit dirs, later overriding earlier); base -> official Q8_0."""
+    """Q8_0 GGUF for a weight state (list of edit dirs, later overriding earlier); base -> official Q8_0.
+    D78: with a loop.json among the dirs, the loop-free Q8_0 is built (or reused) first and the looped file is a raw
+    copy of it with repeated blocks (wsp.loop); only that parent and the new file are kept on disk."""
+    from .loop import read_loop, write_looped_gguf
+    spec = read_loop(weight_dirs)
+    if spec:
+        out = os.path.join(GGUF_CACHE, f"{key}.q8_0.gguf")
+        if os.path.exists(out):
+            os.utime(out); return out
+        from .engine import weights_key
+        has_tensors = any(fn.endswith(".safetensors") for d in weight_dirs if d and os.path.isdir(d) for fn in os.listdir(d))
+        parent = build_gguf(weight_dirs, weights_key(weight_dirs, include_loop=False)) if has_tensors else BASE_Q8
+        os.utime(parent) if parent != BASE_Q8 else None
+        for f in os.listdir(GGUF_CACHE):                      # disk: keep only the parent
+            fp = os.path.join(GGUF_CACHE, f)
+            if fp != parent and f.endswith(".gguf"):
+                os.remove(fp)
+        try:
+            write_looped_gguf(parent, out + ".tmp", spec)
+            os.replace(out + ".tmp", out)
+        finally:
+            if os.path.exists(out + ".tmp"):
+                os.remove(out + ".tmp")
+        return out
     if not weight_dirs:
         return BASE_Q8
     os.makedirs(GGUF_CACHE, exist_ok=True)

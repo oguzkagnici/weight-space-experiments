@@ -381,5 +381,23 @@ The user asked to add the benchmarks from Z.ai's GLM-5.4 post (its loop ablation
 | MMLU-Pro | already the target (D4) | selection set |
 | GPQA-Diamond | already built (D15a), run so far at 3,072 only | re-run at 8,192 with the suite |
 | AIME 2025 | **added**: `data/aime25.jsonl`, 30 problems from `math-ai/aime25` (integer answers, exact match) | very noisy (SE ≈ 8 pts at 30 items); a 1.7B model at 8,192 tokens is likely near the floor; report only |
-| IFBench | **pending user approval** of the official checker (AllenAI's IFBench code, external), 300 prompts | out-of-distribution verifiable constraints; complements IFEval |
+| IFBench | **added** (user approved the checker, D78): AllenAI's IFBench, commit 4889186, all 300 prompts | out-of-distribution verifiable constraints; complements IFEval |
 | AA-LCR | **not feasible** (as in D62) | ~100k-token inputs; prefilling one item takes hours on this 4-core CPU |
+
+### D78 (2026-11-23): Training-free layer looping on the champion; benchmark suite extended
+
+The user approved all three proposals after D77: a looping track inside this experiment, AllenAI's IFBench checker, and base/champion runs on the new benchmarks. **No training**: GLM-5.4 learns its gates and adapts the model by continued training; here weights are only copied and scaled, so the only knob is a hand-set constant damping β per extra pass ("let's see what happens when we loop only").
+
+- **Mechanism** (`wsp/loop.py`): `loop.json` in an edit dir, `{"span": [a, b], "repeats": R, "beta": β}`. Layers 0..b run, then a..b again R times, then the rest. Extra-pass copies share all weights; their residual writes are scaled by β through LFM3's sandwich post-norm weights (exact). Weight edits apply to every pass.
+  - PyTorch engine: the layer stack is rebuilt in `set_weights`; all forwards run with `use_cache=False`.
+  - llama.cpp: `gen.build_gguf` writes the looped Q8_0 as a raw copy of the loop-free parent with repeated blocks and extended per-layer metadata. Stock llama.cpp runs it unchanged. Disk: only the parent and the new file are kept.
+  - `weights_key` includes the loop spec only when present (loop-free keys unchanged).
+- **Checks passed:**
+  - β = 0 reproduces the base model exactly in both engines: PyTorch letter probabilities identical (max |Δp| = 0), llama.cpp `det1` greedy texts and first-token log-probs identical on 6 of 6 prompts.
+  - β = 1 (layers 8–15 once): PyTorch and llama.cpp agree on the looped model as closely as on the base (same top token on 6 of 6 prompts, log-prob differences of the same size as base vs base). With thinking switched off, the looped model sometimes opens an empty `<think></think>` first (P(<think>) rises).
+- **Sweep, three stages, on the gen-8 champion** (`scripts/loop_sweep.py`):
+  1. Direct-answer screen (PyTorch) on 200 practice questions not in any bank: 13 configs, paired against the champion. Spans 4–11, 4–19, 6–17, 8–15, 10–13, 12–19 at β 1.0 and 0.5, plus 8–15 twice at β 0.5. Catches configs that break the model and ranks the rest.
+  2. Thinking mode at 8,192 tokens on the 48-question holdout bank (the champion's answers there are banked with the same seeds) for the best 2–4 configs.
+  3. Any config that looks better or close goes to the 256 selection questions under the D65 rule (z ≥ 2, both-finish z ≥ 1, GSM8K guard).
+- **Benchmarks** (queued behind the loop stages, priority 9): base and champion on AIME 2025 (30) and IFBench (300) via `wsp.bench`, GPQA-Diamond at 8,192 via the held-out path. A loop winner, if any, gets the same runs.
+- **Housekeeping:** 58 byte-identical duplicate weight files under `runs/gen_*/editors` were replaced by hard links (3.05 GB freed; every folder still complete). NLTK `stopwords` and `averaged_perceptron_tagger_eng` fetched by hand (NLTK's downloader is blocked here), as with `punkt_tab` in D62. IFBench checker check: on the repository's sample responses it scores 82/300 strict; per-instruction results match the repository's published reference on 283 of 294 prompts (the reference predates later checker fixes).

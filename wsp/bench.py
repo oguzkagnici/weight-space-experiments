@@ -18,6 +18,7 @@ MC_INSTR = 'Think step by step, then finish with "The answer is (X)" where X is 
 NUM_INSTR = 'Think step by step, then finish with "The answer is N" where N is the final number.'
 BOX_INSTR = "Think step by step, then put your final answer within \\boxed{}."
 IFEVAL_SRC = "/home/user/bench_src/gr"          # google-research checkout with instruction_following_eval/
+IFBENCH_SRC = "/home/user/bench_src/ifbench"    # allenai/IFBench checkout (commit 4889186), D78
 
 # bench -> (description, sample size or None for all)
 BENCHES = {
@@ -27,6 +28,9 @@ BENCHES = {
     "math500": ("MATH-500, 200 sampled; last \\boxed{} vs gold with math-verify", 200),
     # H62a: the same 250 GSM8K questions with the \\boxed{} instruction instead of "The answer is N"
     "gsm8k_boxed": ("GSM8K, same 250 as gsm8k, \\boxed{} instruction; math-verify vs gold (H62a)", 250),
+    # D78: from the GLM-5.4 loop ablation (GPQA-Diamond runs through `ga heldout --set gpqa --cap 8192`)
+    "aime25": ("AIME 2025, all 30 problems (math-ai/aime25); last \\boxed{} vs integer gold with math-verify", None),
+    "ifbench": ("IFBench test, all 300 prompts; official AllenAI checker, strict and loose", None),
 }
 
 
@@ -74,6 +78,14 @@ def prep(bench):
         for i, r in _sample(d, n, bench):
             items.append({"id": f"math500:{r['unique_id']}", "messages": [{"role": "user", "content": f"{r['problem']}\n\n{BOX_INSTR}"}],
                           "meta": {"gold": r["answer"], "subject": r["subject"], "level": r["level"]}})
+    elif bench == "aime25":
+        for r in map(json.loads, open(os.path.join(ROOT, "data", "aime25.jsonl"))):
+            items.append({"id": r["id"], "messages": [{"role": "user", "content": f"{r['problem']}\n\n{BOX_INSTR}"}],
+                          "meta": {"gold": r["answer"]}})
+    elif bench == "ifbench":
+        for r in map(json.loads, open(os.path.join(IFBENCH_SRC, "data", "IFBench_test.jsonl"))):
+            items.append({"id": f"ifbench:{r['key']}", "messages": [{"role": "user", "content": r["prompt"]}],
+                          "meta": {"key": r["key"], "instruction_id_list": r["instruction_id_list"], "kwargs": r["kwargs"]}})
     else:
         sys.exit(f"unknown bench {bench}")
     os.makedirs(os.path.join(BDIR, bench), exist_ok=True)
@@ -168,10 +180,36 @@ def score_ifeval(rows, items):
     return out
 
 
+def score_ifbench(rows, items):
+    """D78: AllenAI's checker (its own evaluation_lib); seeded per prompt like IFEval."""
+    os.environ.setdefault("NLTK_DATA", "/home/user/nltk_data")   # punkt_tab, stopwords, tagger fetched by hand
+    sys.path.insert(0, IFBENCH_SRC)
+    import evaluation_lib as ev
+    from langdetect import DetectorFactory
+    out = {}
+    for it in items:
+        r = rows[it["id"]]; m = it["meta"]
+        kw = lambda: [{k: v for k, v in d.items() if v is not None} for d in m["kwargs"]]
+        inp = ev.InputExample(key=m["key"], instruction_id_list=m["instruction_id_list"],
+                              prompt=it["messages"][0]["content"], kwargs=kw())
+        resp = "" if r["cut"] else r["content"].strip()
+        random.seed(f"ifbench:{m['key']}"); DetectorFactory.seed = 0
+        s = ev.test_instruction_following_strict(inp, {inp.prompt: resp})
+        inp.kwargs = kw()
+        random.seed(f"ifbench:{m['key']}"); DetectorFactory.seed = 0
+        l = ev.test_instruction_following_loose(inp, {inp.prompt: resp})
+        out[it["id"]] = {"correct": int(s.follow_all_instructions), "loose": int(l.follow_all_instructions),
+                         "inst_strict": s.follow_instruction_list, "inst_loose": l.follow_instruction_list}
+    return out
+
+
 def score(bench, rows, items):
     if bench == "ifeval":
         return score_ifeval(rows, items)
-    f = {"gsm8k": score_gsm8k, "medqa": score_mc, "math500": score_math, "gsm8k_boxed": score_math}[bench]
+    if bench == "ifbench":
+        return score_ifbench(rows, items)
+    f = {"gsm8k": score_gsm8k, "medqa": score_mc, "math500": score_math, "gsm8k_boxed": score_math,
+         "aime25": score_math}[bench]
     res = {}
     for it in items:
         r = rows[it["id"]]
@@ -203,7 +241,7 @@ def grade(bench, whos=("base", "champion"), cap=8192, write=True):
         summ = {"n": n, "acc": round(100 * acc, 2), "se": round(100 * math.sqrt(acc * (1 - acc) / n), 2),
                 "cut": round(100 * sum(rows[i]["cut"] for i in rows) / n, 1),
                 "mean_tokens": round(sum(rows[i]["tokens"] for i in rows) / n)}
-        if bench == "ifeval":
+        if bench in ("ifeval", "ifbench"):
             summ["prompt_loose"] = round(100 * sum(s["loose"] for s in sc.values()) / n, 2)
             inst = [x for s in sc.values() for x in s["inst_strict"]]; il = [x for s in sc.values() for x in s["inst_loose"]]
             summ["inst_strict"] = round(100 * sum(inst) / len(inst), 2); summ["inst_loose"] = round(100 * sum(il) / len(il), 2)
@@ -214,7 +252,7 @@ def grade(bench, whos=("base", "champion"), cap=8192, write=True):
     if "base" in res and "champion" in res:
         pr = _paired(res["base"][1], res["champion"][1])
         print("champion vs base (paired):", json.dumps(pr))
-        if bench == "ifeval":
+        if bench in ("ifeval", "ifbench"):
             print("  loose:", json.dumps(_paired(res["base"][1], res["champion"][1], "loose")))
         if write:
             json.dump({"bench": bench, "cap": cap, "summary": {w: v[0] for w, v in res.items()}, "paired": pr,

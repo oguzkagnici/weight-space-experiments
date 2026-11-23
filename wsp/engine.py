@@ -11,11 +11,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 from .config import MODEL_DIR, WEIGHTS_FILE, LETTERS, CACHE, N_LAYERS, MAX_ATTN_TEXTS
 from . import data
+from . import loop as looping
 
 torch.set_num_threads(int(os.environ.get("WSP_THREADS", "4")))
 
 
-def weights_key(dirs):
+def weights_key(dirs, include_loop=True):
     """Identity of a weight state = the ordered list of edit dirs with each file's size and mtime."""
     h = hashlib.sha256()
     for d in dirs:
@@ -23,6 +24,9 @@ def weights_key(dirs):
             if fn.endswith(".safetensors"):
                 st = os.stat(os.path.join(d, fn))
                 h.update(f"{os.path.realpath(d)}/{fn}:{st.st_size}:{st.st_mtime_ns};".encode())
+    spec = looping.read_loop(dirs) if include_loop else None
+    if spec:   # D78: a loop changes the network; keys of loop-free states are unchanged
+        h.update(("loop:" + json.dumps(spec, sort_keys=True)).encode())
     return h.hexdigest()[:20]
 
 
@@ -67,6 +71,7 @@ class Engine:
         self.stash = {}            # name -> original tensor, for tensors currently replaced
         self.current = None
         self.layers = self.model.model.layers
+        self.orig_layers = self.model.model.layers; self.orig_types = list(self.model.config.layer_types)
 
     def unload(self):
         """Free the model's memory (used while llama-server generates)."""
@@ -93,6 +98,8 @@ class Engine:
                 if name not in self.stash:
                     self.stash[name] = p.data.clone()
                 p.data.copy_(t.to(torch.bfloat16).to(COMPUTE_DTYPE))
+        # D78: (re)build the layer stack after the tensor edits, so extra-pass post-norm copies see edited values
+        self.layers = looping.apply_torch(self.model, looping.read_loop(dirs), self.orig_layers, self.orig_types)
         self.current = key
         return key
 
@@ -141,7 +148,7 @@ class Engine:
             hooks = self._hooks(acts, store) if acts else []
             try:
                 with torch.inference_mode():
-                    logits = self.model(ids, logits_to_keep=1).logits[0, -1].float()
+                    logits = self.model(ids, logits_to_keep=1, use_cache=False).logits[0, -1].float()
             finally:
                 for h in hooks: h.remove()
             k = len(q["options"])
@@ -214,7 +221,7 @@ class Engine:
                     lambda m, i, o: fin.__setitem__("h", o.detach()[0])))
             try:
                 with torch.inference_mode():
-                    out = self.model(ids, logits_to_keep=1)
+                    out = self.model(ids, logits_to_keep=1, use_cache=False)
             finally:
                 for h in hooks: h.remove()
                 if want_attn:
