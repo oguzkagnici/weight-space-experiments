@@ -66,10 +66,10 @@ def write_looped_gguf(src, dst, spec):
             by_layer.setdefault(int(m.group(1)), []).append((m.group(2), t))
 
     def add(name, t, s=None):
-        data = np.array(t.data)
+        data = t.data                     # memmap view: no copy, so a looped build needs no extra RAM per block
         if s is not None:
             assert t.tensor_type == gguf.GGMLQuantizationType.F32, (name, t.tensor_type)
-            data = data * np.float32(s)
+            data = np.asarray(data) * np.float32(s)
         plain = t.tensor_type in (gguf.GGMLQuantizationType.F32, gguf.GGMLQuantizationType.F16)
         w.add_tensor(name, data, raw_shape=data.shape if plain else None, raw_dtype=t.tensor_type)
 
