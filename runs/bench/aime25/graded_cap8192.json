@@ -1,0 +1,394 @@
+{
+ "bench": "aime25",
+ "cap": 8192,
+ "summary": {
+  "base": {
+   "n": 30,
+   "acc": 26.67,
+   "se": 8.07,
+   "cut": 73.3,
+   "mean_tokens": 7138
+  },
+  "champion": {
+   "n": 30,
+   "acc": 36.67,
+   "se": 8.8,
+   "cut": 63.3,
+   "mean_tokens": 6656
+  }
+ },
+ "paired": {
+  "n": 30,
+  "diff": 10.0,
+  "se": 5.57,
+  "z": 1.8,
+  "plus": 3,
+  "minus": 0
+ },
+ "scores": {
+  "base": {
+   "aime25-0": {
+    "pred": "70",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1253
+   },
+   "aime25-1": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-2": {
+    "pred": "16",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5724
+   },
+   "aime25-3": {
+    "pred": "117",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7880
+   },
+   "aime25-4": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-5": {
+    "pred": "504",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3197
+   },
+   "aime25-6": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-7": {
+    "pred": "77",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 6058
+   },
+   "aime25-8": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-9": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-10": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-11": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-12": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-13": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-14": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-15": {
+    "pred": "468",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2427
+   },
+   "aime25-16": {
+    "pred": "49",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2942
+   },
+   "aime25-17": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-18": {
+    "pred": "106",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4428
+   },
+   "aime25-19": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-20": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-21": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-22": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-23": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-24": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-25": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-26": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-27": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-28": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-29": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   }
+  },
+  "champion": {
+   "aime25-0": {
+    "pred": "70",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 1219
+   },
+   "aime25-1": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-2": {
+    "pred": "16",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4594
+   },
+   "aime25-3": {
+    "pred": "117",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3395
+   },
+   "aime25-4": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-5": {
+    "pred": "504",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2344
+   },
+   "aime25-6": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-7": {
+    "pred": "77",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 3482
+   },
+   "aime25-8": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-9": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-10": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-11": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-12": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-13": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-14": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-15": {
+    "pred": "468",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4945
+   },
+   "aime25-16": {
+    "pred": "49",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 2588
+   },
+   "aime25-17": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-18": {
+    "pred": "106",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4706
+   },
+   "aime25-19": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-20": {
+    "pred": "293",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 4398
+   },
+   "aime25-21": {
+    "pred": "237",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 5117
+   },
+   "aime25-22": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-23": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-24": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-25": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-26": {
+    "pred": "19",
+    "correct": 1,
+    "cut": 0,
+    "tokens": 7229
+   },
+   "aime25-27": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-28": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   },
+   "aime25-29": {
+    "pred": null,
+    "correct": 0,
+    "cut": 1,
+    "tokens": 8192
+   }
+  }
+ }
+}
