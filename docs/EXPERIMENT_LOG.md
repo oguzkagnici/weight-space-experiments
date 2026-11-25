@@ -1449,3 +1449,21 @@ Holdout48, thinking mode at 8,192 tokens, paired with the champion's banked answ
 - Every config loses. The loss grows with the amount of looping (more layers, larger β), and so do thinking length and hesitation. On questions both finish, the looped model is about level per question but takes 12–34% longer, so most of the loss comes from answers cut at the cap.
 - Stage 1 (direct answer) ranked L04-11 at the top; in thinking mode it is the worst. The direct-answer screen does not predict the thinking-mode effect of looping.
 - D79: no config goes to the 256-question selection; L08-15 β1.0 stays parked (`queue/held/`) and will not run. The loop track closes. The benchmarks (AIME25, IFBench, GPQA-Diamond for base and champion) started at 21:53.
+
+#### GLM-5.4 benchmarks: base vs champion (2026-11-25, 11:12 UTC)
+
+The three benchmarks from the GLM-5.4 post that run here (D77), thinking mode at 8,192 tokens, one sample per question, same seeds for both models. The champion is gen008_carry_stack_shortans_L23_finalist_L22. Both models are scored on the same questions, so the comparison is paired.
+
+| Benchmark (n) | Base | Champion | Diff (SE, z) | +/− | Cut: base / champion | Mean tokens: base / champion |
+|---|---|---|---|---|---|---|
+| AIME25 (30) | 26.7 | 36.7 | +10.0 (5.6, 1.80) | +3/−0 | 22 / 19 | 7,138 / 6,656 |
+| GPQA-Diamond (198) | 36.9 | 41.4 | +4.5 (2.8, 1.62) | +20/−11 | 105 / 90 | 6,420 / 5,800 |
+| IFBench, prompt strict (300) | 45.0 | 43.0 | −2.0 (2.5, −0.79) | +26/−32 | 127 / 125 | 5,933 / 5,906 |
+| IFBench, prompt loose (300) | 50.0 | 48.3 | −1.7 (z −0.69) | | | |
+
+- None of the three differences reaches z 2 on its own. The two reasoning benchmarks both point the same way as the MMLU-Pro selection; the instruction-following one does not move.
+- GPQA-Diamond: the gain comes from answers that finish within the 8,192-token limit. Base alone is cut on 26 questions, the champion alone on 11. On the 82 questions both finish, base gets 66 right and the champion 63. Per subject (base / champion correct): Physics 53 / 57 of 86, Chemistry 16 / 17 of 93, Biology 4 / 8 of 19. The same pattern holds on AIME25: three more answers finish, and the champion never loses a question that base got right.
+- IFBench: the two models are cut equally often (42%), and the champion is neither better nor worse at following the extra format constraints. The selection used only MMLU-Pro, so it had nothing to push this up.
+- The short-cap GPQA runs from earlier (3,072 tokens: base 12.6%, champion 19.2%, with 76–85% cut) are superseded by these.
+- Timing: a full 198-question GPQA run takes about 6 h here (3.4 tokens/s per slot, 16 slots). The champion's run took 87 min only because the answer cache kept 134 answers through the 00:40 container restart.
+- GPQA answer files stay out of git (`.gitignore`, so the questions are not published); only these summary numbers are logged.

@@ -561,3 +561,9 @@ Two editors (Opus 5.5 fork, Fable 5.2) independently examined the parent's think
 - Re-running a span of the champion's own layers (shared weights, residual writes of the extra pass scaled by a constant β) never helps in thinking mode. On 48 held-out questions at 8,192 tokens: layers 10–13 at β 0.5: −6 points; 4–11 at β 0.5: −17; 4–11 at β 1.0: −27.
 - The model stays coherent but hesitates: "Wait" rises from 3.6 to as many as 10.8 per answer, thinking is 12–48% longer, and more answers hit the token cap. On questions that both finish, accuracy is close to level.
 - A direct-answer screen (one letter after the prompt) showed every damped loop within noise, and L04-11 β1.0 even raised log P(gold). That signal did not carry over to thinking mode.
+
+## The champion on outside benchmarks (D77)
+
+- Thinking mode at 8,192 tokens, paired with base: AIME25 +10.0 (26.7 → 36.7, +3/−0), GPQA-Diamond +4.5 (36.9 → 41.4, +20/−11), IFBench prompt-strict −2.0 (45.0 → 43.0, +26/−32). No single result reaches z 2.
+- Evolved only on MMLU-Pro, the champion's gain carries over to two unseen reasoning benchmarks, and on both it comes the same way: more answers finish inside the token limit (GPQA: base alone cut on 26 questions, the champion alone on 11). Among answers both models finish, GPQA accuracy is about level (66 vs 63 of 82).
+- Instruction following (IFBench) is unchanged: the edits made the model reason more efficiently, not follow formats better.
